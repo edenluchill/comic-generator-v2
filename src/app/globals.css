@@ -249,8 +249,11 @@
 }
 
 /* ========== 动画类定义 ========== */
+/* 初始状态：元素开始时是隐藏的，避免闪烁 */
 .animate-fadeIn {
-  animation: fadeIn 0.6s ease-out;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeIn 0.6s ease-out forwards;
 }
 
 .animate-shimmer {
@@ -277,18 +280,26 @@
 }
 
 .animate-fade-in-up {
+  opacity: 0;
+  transform: translateY(30px);
   animation: fade-in-up 0.6s ease-out forwards;
 }
 
 .animate-slide-in-left {
+  opacity: 0;
+  transform: translateX(-30px);
   animation: slide-in-left 0.6s ease-out forwards;
 }
 
 .animate-slide-in-right {
+  opacity: 0;
+  transform: translateX(30px);
   animation: slide-in-right 0.6s ease-out forwards;
 }
 
 .animate-slide-in-down {
+  opacity: 0;
+  transform: translateY(-20px);
   animation: slide-in-down 0.6s ease-out forwards;
 }
 

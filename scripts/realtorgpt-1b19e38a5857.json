@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "realtorgpt",
+  "private_key_id": "1b19e38a58572d1c0d110c1318624388fac3575a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCNomQN2UdJnQxS\nUiDsM8KXEudLtdYzUacrjKgKOMCfTcxq4SJVWTq8ME0WaCTnvfiTjb6ZZUzb2+xG\nOhNOK2sqRSACvaeKnkhi//wkhzdyiYfFRaBpjyfdsupDIxIb2Cuw8eTqvJR4YBfG\n1jjuRavuzR8UA2nUA+P5jDKKzpd/AEo9WPYu4TuS/lqtrTj8XHtWPmHqG6T3+P/Q\n05iKa3gVUjl4J7ezsqG/33z3R1Nu1z5jw3a94S/qjgDJqVLUOV/WXJ5qlOEdynDd\ny4jFKowqSI8DQtSXr/Xswzbm0MQVi1KOg5gNXr2vAczL2nVRmMzzsm2IWNM6gM1e\n3JthwdBjAgMBAAECggEAPU8rQndojWwHFmdoyvZI6H6NUs+erk5NL+POJcaVUyAp\nOabE5u8eJrI93FIuj4ZDYRP9ioc4Mv/LEkc3biILXJvZlHYmXTHRIdGvgtxpWxI/\njFxsaOVIG4bEM1WuFBGKMCk1r4r8NfNat36p3DKaj1+JcW9c0yLv/2j5w+5T0+xW\nTRzZNAw5dgJ6AzsAVpCzNKehjEZShtEHKSypZ526BKqcrV9atZZFsOVPm4PH0NMH\nbuIZwLEAbesKR4dGatPBFY0taHcV/siW+ngglGrem6sMgcbRppE7zicnC9gSAYv7\nccdaRFezIn5DM0YKrUhaOiCHPOG4jEWXJxJZavleWQKBgQDDj/2DW5Md79FllW5N\nBuB0mHCR6xXst6LBEgQH3XYarJ1nP8wIAmjVNK3MpWnIVw2BZgZ7uHOILqYrmsmb\nJHviR3+2o1qlLXSMNEykoJVnGV/pIkEYSA1o9ZMsJNanlrQblU84nrGj6aZotKIz\nF8X+G1SPnGdDKi8WOvOlGewrJwKBgQC5Z9qAr+Z/lMGEqwwKJdyHxX5rBznsy+MU\n9CTTut9HD+xVVDuYsOjQ9sS2D4JIAzcBui4ijEQk3qAeJT/XSZHVXgFFrzzGVL+j\nSHzHdb1kLLJSgiTs0fybLL6+pl8ppZSeQSnL248sSUrYBn8IqxUluSoDFmkd8nd+\nqZql3YsmZQKBgHWMeoTXqZGIEmSuMpPIO2i6LIf5N7+HDiRhUNztaE1WTnK+bUSv\nNhZZyNJG51PNx8ds7R6223MTHzz8mIxRnMmB0qmUfSrmLLUNxrf58nP7U6RNu7T9\nslnRqvoQ1pn7wx0FXY4aDYsKKcWsNgbiFlfMU8LS71r240DIhKVL9KJnAoGAJRmM\n9Zc9LmZb2upHPHibCmgQheYqRyH9TKIWBHAuYY/kIKb8Te+Ihtf6QNwVm8dY6HWS\n6cLbl+0caSvW/INyNRncc08/gAhRWKEWpur+fN8cx7nXHbRfMcXgXVH5VOIXPRuY\n+3vxyFDaMyQJo3hogOXubDO90QpFswjJM0uDnqkCgYArxw6OeuUfr91BUlGuUt7v\ngUFpF/FrMcOLybO8puvvmSNHy5gE/i2Tm40MubBhKqf8fv11icpVM75ObA6mMFzN\nkfhRhdZXpO1ry38KprKpt5wiqiGxGMUGx+/BrLIxWwSaxoSLZXVy8ZSBHFBPrGxF\n0VrOn+47Cv4VgxoHAoJxow==\n-----END PRIVATE KEY-----\n",
+  "client_email": "cloud-translation-api-user@realtorgpt.iam.gserviceaccount.com",
+  "client_id": "113846401667248884691",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cloud-translation-api-user%40realtorgpt.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

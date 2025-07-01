@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Launch via NPM",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["run-script", "dev"]
+      "runtimeArgs": ["run-script", "translate"]
     }
   ]
 }

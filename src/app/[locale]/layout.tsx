@@ -16,10 +16,35 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Comic AI Generator - AI驱动的漫画创作工具",
-  description: "使用AI技术将照片转换为漫画角色，创作独特的漫画故事",
-};
+// 动态生成metadata
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  // 根据不同语言设置不同的标题
+  const titles = {
+    en: "Daily Memory Tales",
+    zh: "日忆物语",
+    ja: "デイリーメモリーテイルズ",
+    ko: "일일 기억 이야기",
+  };
+
+  const descriptions = {
+    en: "Capture beautiful moments in comic diary",
+    zh: "记录每日美好的漫画日记",
+    ja: "漫画日記で美しい瞬間を記録",
+    ko: "만화 일기로 아름다운 순간을 기록",
+  };
+
+  return {
+    title: titles[locale as keyof typeof titles] || titles.en,
+    description:
+      descriptions[locale as keyof typeof descriptions] || descriptions.en,
+  };
+}
 
 // 添加消息缓存
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -46,30 +71,10 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              // 性能监控脚本
-              window.pageLoadStart = performance.now();
-              
-              // 监控页面切换
-              const observer = new PerformanceObserver((list) => {
-                for (const entry of list.getEntries()) {
-                  if (entry.entryType === 'navigation') {
-                    console.log('🚀 Navigation Performance:', {
-                      'DNS lookup': entry.domainLookupEnd - entry.domainLookupStart,
-                      'Connection': entry.connectEnd - entry.connectStart,
-                      'Response': entry.responseEnd - entry.responseStart,
-                      'DOM parsing': entry.domContentLoadedEventEnd - entry.responseEnd,
-                      'Total time': entry.loadEventEnd - entry.navigationStart
-                    });
-                  }
-                }
-              });
-              observer.observe({ entryTypes: ['navigation'] });
-            `,
-          }}
-        />
+        {/* 添加多种格式的图标 */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
@@ -79,22 +84,6 @@ export default async function RootLayout({
           <main className="pb-16 md:pb-0">{children}</main>
           <MobileNavigationBar />
         </NextIntlClientProvider>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              // 页面加载完成时间
-              window.addEventListener('load', () => {
-                const loadTime = performance.now() - window.pageLoadStart;
-                console.log('📊 Page Load Time:', loadTime.toFixed(2) + 'ms');
-                
-                // 检查是否超过500ms
-                if (loadTime > 500) {
-                  console.warn('⚠️ Page load time exceeds 500ms!');
-                }
-              });
-            `,
-          }}
-        />
       </body>
     </html>
   );

@@ -34,7 +34,7 @@ export default function ProfilePage() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // 如果用户未登录，重定向到登录页面
-  if (!loading && !user) {
+  if (!loading && !user && !isLoggingOut) {
     router.push("/login");
     return null;
   }

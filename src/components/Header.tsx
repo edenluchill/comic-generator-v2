@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/hooks/useTranslations";
-import { Home, Pencil, PenTool } from "lucide-react";
+import { Home, Pencil, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LanguagePicker from "./Header/LanguagePicker";
 import AccountMenu from "./Header/AccountMenu";
@@ -30,7 +30,7 @@ export default function Header() {
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="relative">
               <div className="w-10 h-10 border-2 border-amber-400/50 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:border-amber-500 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-amber-400/20">
-                <PenTool className="w-5 h-5 text-amber-600 group-hover:text-amber-700 transition-colors" />
+                <Palette className="w-5 h-5 text-amber-600 group-hover:text-amber-700 transition-colors" />
               </div>
             </div>
             <div className="">

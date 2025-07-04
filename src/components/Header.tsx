@@ -8,9 +8,11 @@ import { Home, Pencil, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LanguagePicker from "./Header/LanguagePicker";
 import AccountMenu from "./Header/AccountMenu";
+import { useLocale } from "next-intl";
 
 export default function Header() {
   const pathname = usePathname();
+  const locale = useLocale();
   const t = useTranslations("Navigation");
   const headerT = useTranslations("Header");
 
@@ -27,7 +29,10 @@ export default function Header() {
       <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo区域 */}
-          <Link href="/" className="flex items-center space-x-3 group">
+          <Link
+            href={`/${locale}`}
+            className="flex items-center space-x-3 group"
+          >
             <div className="relative">
               <div className="w-10 h-10 border-2 border-amber-400/50 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:border-amber-500 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-amber-400/20">
                 <Palette className="w-5 h-5 text-amber-600 group-hover:text-amber-700 transition-colors" />
@@ -47,7 +52,7 @@ export default function Header() {
           <div className="flex items-center space-x-3">
             {/* 桌面端导航链接 */}
             <nav className="hidden md:flex items-center space-x-2">
-              <Link href="/">
+              <Link href={`/${locale}`}>
                 <Button
                   variant="ghost"
                   className={cn(
@@ -80,7 +85,7 @@ export default function Header() {
                 </Button>
               </Link>
 
-              <Link href="/workshop">
+              <Link href={`/${locale}/workshop`}>
                 <Button
                   variant="ghost"
                   className={cn(

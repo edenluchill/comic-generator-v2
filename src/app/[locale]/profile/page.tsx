@@ -23,9 +23,11 @@ import {
   Stars,
   LogOut,
 } from "lucide-react";
+import { useLocale } from "next-intl";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const locale = useLocale();
   const tProfile = useTranslations("Profile");
   const tAccount = useTranslations("Account");
   const { user, profile, loading, signOut } = useAuth();
@@ -36,7 +38,7 @@ export default function ProfilePage() {
 
   // 如果用户未登录，重定向到登录页面
   if (!loading && !user && !isLoggingOut) {
-    router.push("/login");
+    router.push(`/${locale}/login`);
     return null;
   }
 
@@ -55,7 +57,7 @@ export default function ProfilePage() {
           <p className="text-amber-700">
             {tProfile("profileNotFound") || "Profile not found"}
           </p>
-          <Button onClick={() => router.push("/")} className="mt-4">
+          <Button onClick={() => router.push(`/${locale}/`)} className="mt-4">
             {tProfile("backToHome") || "Back to Home"}
           </Button>
         </div>
@@ -73,7 +75,7 @@ export default function ProfilePage() {
     try {
       setIsLoggingOut(true);
       await signOut();
-      router.push("/");
+      router.push(`/${locale}/`);
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -281,7 +283,7 @@ export default function ProfilePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <Button
                 variant="ghost"
-                onClick={() => router.push("/workshop")}
+                onClick={() => router.push(`/${locale}/workshop`)}
                 className="h-auto p-4 flex flex-col items-center gap-2 bg-amber-50/60 hover:bg-amber-100/80 border border-amber-200/30 rounded-xl transition-all duration-300 hover:scale-105"
               >
                 <ImageIcon className="w-6 h-6 text-amber-600" />

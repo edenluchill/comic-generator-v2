@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import {
   User,
   Mail,
@@ -23,11 +23,9 @@ import {
   Stars,
   LogOut,
 } from "lucide-react";
-import { useLocale } from "next-intl";
 
 export default function ProfilePage() {
-  const router = useRouter();
-  const locale = useLocale();
+  const { router, locale } = useLocalizedNavigation();
   const tProfile = useTranslations("Profile");
   const tAccount = useTranslations("Account");
   const { user, profile, loading, signOut } = useAuth();

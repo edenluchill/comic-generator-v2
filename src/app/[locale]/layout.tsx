@@ -1,20 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+// import { Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import Header from "@/components/Header";
 import MobileNavigationBar from "@/components/MobileNavigationBar";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
+import { cache } from "react";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// const geistSans = Geist({
+//   variable: "--font-geist-sans",
+//   subsets: ["latin"],
+// });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// const geistMono = Geist_Mono({
+//   variable: "--font-geist-mono",
+//   subsets: ["latin"],
+// });
 
 // 动态生成metadata
 export async function generateMetadata({
@@ -46,9 +47,10 @@ export async function generateMetadata({
   };
 }
 
-// 添加消息缓存
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const messagesCache = new Map<string, any>();
+// 使用 React cache 优化
+const getMessagesWithCache = cache(async (locale: string) => {
+  return await getMessages({ locale });
+});
 
 export default async function RootLayout({
   children,
@@ -58,27 +60,15 @@ export default async function RootLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-
-  // 尝试从缓存获取消息
-  let messages;
-  if (messagesCache.has(locale)) {
-    messages = messagesCache.get(locale);
-  } else {
-    messages = await getMessages({ locale });
-    messagesCache.set(locale, messages);
-  }
+  const messages = await getMessagesWithCache(locale);
 
   return (
     <html lang={locale}>
       <head>
         {/* 添加多种格式的图标 */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body>
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Header />
           <main className="pb-16 md:pb-0">{children}</main>

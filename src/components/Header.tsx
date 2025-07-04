@@ -8,11 +8,11 @@ import { Home, Pencil, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 import LanguagePicker from "./Header/LanguagePicker";
 import AccountMenu from "./Header/AccountMenu";
-import { useLocale } from "next-intl";
+import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 
 export default function Header() {
   const pathname = usePathname();
-  const locale = useLocale();
+  const { getLocalizedHref } = useLocalizedNavigation();
   const t = useTranslations("Navigation");
   const headerT = useTranslations("Header");
 
@@ -30,7 +30,7 @@ export default function Header() {
         <div className="flex items-center justify-between">
           {/* Logo区域 */}
           <Link
-            href={`/${locale}`}
+            href={getLocalizedHref("/")}
             className="flex items-center space-x-3 group"
           >
             <div className="relative">
@@ -52,7 +52,7 @@ export default function Header() {
           <div className="flex items-center space-x-3">
             {/* 桌面端导航链接 */}
             <nav className="hidden md:flex items-center space-x-2">
-              <Link href={`/${locale}`}>
+              <Link href={getLocalizedHref("/")}>
                 <Button
                   variant="ghost"
                   className={cn(
@@ -85,7 +85,7 @@ export default function Header() {
                 </Button>
               </Link>
 
-              <Link href={`/${locale}/workshop`}>
+              <Link href={getLocalizedHref("/workshop")}>
                 <Button
                   variant="ghost"
                   className={cn(

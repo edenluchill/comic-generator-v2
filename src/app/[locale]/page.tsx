@@ -20,9 +20,11 @@ import {
   Zap,
 } from "lucide-react";
 import { useTranslations } from "@/hooks/useTranslations";
+import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 
 export default function HomePage() {
   const t = useTranslations("HomePage");
+  const { getLocalizedHref } = useLocalizedNavigation();
 
   return (
     <div className="min-h-screen bg-amber-50/30 relative overflow-hidden">
@@ -89,7 +91,7 @@ export default function HomePage() {
               className="animate-fadeIn"
               style={{ animationDelay: "1400ms" }}
             >
-              <Link href="/workshop">
+              <Link href={getLocalizedHref("/workshop")}>
                 <Button
                   size="lg"
                   className="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-8 py-3 text-lg rounded-full shadow-lg hover:shadow-xl transform transition-all duration-300 hover:scale-105 group relative overflow-hidden animate-bounce-gentle"

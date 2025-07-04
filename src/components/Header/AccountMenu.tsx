@@ -1,15 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import { User, LogIn, Settings, Heart, LogOut, Crown } from "lucide-react";
 
 export default function AccountMenu() {
-  const router = useRouter();
+  const { navigate } = useLocalizedNavigation();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { user, profile, loading, signOut } = useAuth();
@@ -33,7 +33,7 @@ export default function AccountMenu() {
   }, [showMenu]);
 
   const handleLogin = () => {
-    router.push("/login");
+    navigate("/login");
   };
 
   const handleLogout = async () => {
@@ -173,7 +173,7 @@ export default function AccountMenu() {
             </button>
             <button
               onClick={() => {
-                router.push("/profile");
+                navigate("/profile");
                 setShowMenu(false);
               }}
               className="w-full px-4 py-2 text-left text-amber-700 hover:bg-amber-50/60 transition-colors duration-200 flex items-center space-x-3"

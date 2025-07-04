@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
+import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 
 interface UserProfile {
   id: string;
@@ -26,6 +27,7 @@ export function useAuth() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { getLocalizedHref } = useLocalizedNavigation();
 
   useEffect(() => {
     let mounted = true;
@@ -170,7 +172,7 @@ export function useAuth() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [getLocalizedHref]);
 
   const signInWithGoogle = async () => {
     try {
@@ -180,7 +182,9 @@ export function useAuth() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}${getLocalizedHref(
+            "/auth/callback"
+          )}`,
         },
       });
 
@@ -200,7 +204,9 @@ export function useAuth() {
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          emailRedirectTo: `${window.location.origin}${getLocalizedHref(
+            "/auth/callback"
+          )}`,
         },
       });
 

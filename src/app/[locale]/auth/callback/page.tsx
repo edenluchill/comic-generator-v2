@@ -1,12 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { useTranslations } from "@/hooks/useTranslations";
+import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 
 export default function AuthCallbackPage() {
-  const router = useRouter();
+  const { navigate } = useLocalizedNavigation();
   const tLogin = useTranslations("Login");
 
   useEffect(() => {
@@ -23,7 +23,7 @@ export default function AuthCallbackPage() {
 
         if (error) {
           console.error("Auth error:", error, errorDescription);
-          router.push("/auth/error?error=" + encodeURIComponent(error));
+          navigate("/auth/error?error=" + encodeURIComponent(error));
           return;
         }
 
@@ -36,7 +36,7 @@ export default function AuthCallbackPage() {
 
           if (sessionError) {
             console.error("Session error:", sessionError);
-            router.push(
+            navigate(
               "/auth/error?error=" + encodeURIComponent(sessionError.message)
             );
             return;
@@ -44,7 +44,7 @@ export default function AuthCallbackPage() {
 
           if (data.session) {
             // 成功登录，重定向到首页
-            router.push("/");
+            navigate("/");
           }
         } else {
           // 尝试从 URL 参数获取 code（用于服务器端流程）
@@ -58,23 +58,23 @@ export default function AuthCallbackPage() {
 
             if (codeError) {
               console.error("Code exchange error:", codeError);
-              router.push(
+              navigate(
                 "/auth/error?error=" + encodeURIComponent(codeError.message)
               );
               return;
             }
 
             if (data.session) {
-              router.push("/");
+              navigate("/");
             }
           } else {
             // 没有找到认证信息
-            router.push("/auth/error?error=no_auth_info");
+            navigate("/auth/error?error=no_auth_info");
           }
         }
       } catch (error) {
         console.error("Auth callback error:", error);
-        router.push(
+        navigate(
           "/auth/error?error=" +
             encodeURIComponent(
               error instanceof Error ? error.message : "unknown_error"
@@ -84,7 +84,7 @@ export default function AuthCallbackPage() {
     };
 
     handleAuthCallback();
-  }, [router]);
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">

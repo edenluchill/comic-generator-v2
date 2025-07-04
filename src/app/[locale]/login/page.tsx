@@ -1,16 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import { Mail, ArrowLeft, Loader2, Stars, Heart, Sparkles } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 
 export default function LoginPage() {
-  const router = useRouter();
+  const { navigate } = useLocalizedNavigation();
   const tLogin = useTranslations("Login");
   const { signInWithGoogle, signInWithEmail, verifyEmailCode } = useAuth();
 
@@ -54,7 +54,7 @@ export default function LoginPage() {
       setLoading(true);
       setError("");
       await verifyEmailCode(email, code);
-      router.push("/");
+      navigate("/");
     } catch (error) {
       console.error("Code verification failed:", error);
       setError("Verification code is incorrect, please try again");
@@ -69,7 +69,7 @@ export default function LoginPage() {
     } else if (step === "verify") {
       setStep("email");
     } else {
-      router.push("/");
+      navigate("/");
     }
   };
 

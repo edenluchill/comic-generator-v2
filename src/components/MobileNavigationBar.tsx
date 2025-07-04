@@ -8,12 +8,12 @@ import { useTranslations } from "@/hooks/useTranslations";
 import { useAuth } from "@/hooks/useAuth";
 import { Home, Pencil, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useLocale } from "next-intl"; // 添加这个import
+import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 
 export default function MobileNavigationBar() {
   const router = useRouter();
   const pathname = usePathname();
-  const locale = useLocale(); // 获取当前locale
+  const { getLocalizedHref } = useLocalizedNavigation();
   const t = useTranslations("Navigation");
   const tAccount = useTranslations("Account");
   const { user, profile, loading } = useAuth();
@@ -28,9 +28,9 @@ export default function MobileNavigationBar() {
   const handleAccountClick = () => {
     const isLoggedIn = !loading && user && profile;
     if (isLoggedIn) {
-      router.push(`/${locale}/profile`); // 添加locale前缀
+      router.push(getLocalizedHref("/profile"));
     } else {
-      router.push(`/${locale}/login`); // 添加locale前缀
+      router.push(getLocalizedHref("/login"));
     }
   };
 
@@ -43,7 +43,7 @@ export default function MobileNavigationBar() {
       <div className="bg-white/80 backdrop-blur-lg border-t border-gray-200/50 shadow-lg">
         <div className="flex items-center justify-around px-2 py-1 safe-area-inset-bottom">
           {/* 首页 */}
-          <Link href={`/${locale}`} className="flex-1">
+          <Link href={getLocalizedHref("/")} className="flex-1">
             <Button
               variant="ghost"
               className={cn(
@@ -66,7 +66,7 @@ export default function MobileNavigationBar() {
           </Link>
 
           {/* 工作台 */}
-          <Link href={`/${locale}/workshop`} className="flex-1">
+          <Link href={getLocalizedHref("/workshop")} className="flex-1">
             <Button
               variant="ghost"
               className={cn(

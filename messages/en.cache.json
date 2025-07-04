@@ -27,7 +27,32 @@
     "settings": "Settings",
     "logout": "Logout",
     "login": "Login",
-    "register": "Register"
+    "register": "Register",
+    "my": "My",
+    "user": "User",
+    "username": "Username",
+    "generatedThisMonth": "Generated this month",
+    "unlimited": "Unlimited",
+    "remaining": "Remaining"
+  },
+  "Login": {
+    "welcome": "Welcome",
+    "welcomeSignup": "Welcome to Sign Up",
+    "subtitle": "Choose your login method",
+    "signupSubtitle": "Enter verification code to complete registration",
+    "googleLogin": "Sign in with Google",
+    "emailLogin": "Sign in with Email",
+    "or": "or",
+    "emailAddress": "Email Address",
+    "emailHint": "New email will create an account automatically, existing email will receive a login verification code",
+    "sendCode": "Send Code",
+    "verificationCode": "Verification Code",
+    "codeDesc": "Code sent to",
+    "verifyCode": "Verify & Login",
+    "resendCode": "Resend Code",
+    "codePlaceholder": "6-digit code",
+    "loggingIn": "Logging in...",
+    "verifyingIdentity": "Verifying your identity, please wait..."
   },
   "HomePage": {
     "title": "Not Just a Free Comic Generator",
@@ -82,6 +107,26 @@
     "mouth": "Mouth",
     "styleRecommendations": "Style Recommendations",
     "recommendedStyle": "Recommended Style",
-    "lineWeight": "Line Weight"
+    "lineWeight": "Line Weight",
+    "saveCharacter": "Save Character",
+    "regenerate": "Regenerate",
+    "clickToStartAnalysis": "Click button to start analysis and generate sketch"
+  },
+  "Profile": {
+    "profileTitle": "My Profile",
+    "back": "Back",
+    "profileNotFound": "Profile not found",
+    "backToHome": "Back to Home",
+    "email": "Email",
+    "joinDate": "Join Date",
+    "usageStats": "Usage Statistics",
+    "imagesGenerated": "Images Generated",
+    "storiesCreated": "Stories Created",
+    "quickActions": "Quick Actions",
+    "createNew": "Create New",
+    "noName": "No Name",
+    "enterName": "Enter your name",
+    "save": "Save",
+    "cancel": "Cancel"
   }
 }

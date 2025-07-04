@@ -21,6 +21,10 @@ export const metadata: Metadata = {
   description: "使用AI技术将照片转换为漫画角色，创作独特的漫画故事",
 };
 
+// 添加消息缓存
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const messagesCache = new Map<string, any>();
+
 export default async function RootLayout({
   children,
   params,
@@ -28,15 +32,45 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
 }) {
-  // 等待 params 解析
   const { locale } = await params;
 
-  // 获取当前语言的翻译消息
-  const messages = await getMessages({ locale });
+  // 尝试从缓存获取消息
+  let messages;
+  if (messagesCache.has(locale)) {
+    messages = messagesCache.get(locale);
+  } else {
+    messages = await getMessages({ locale });
+    messagesCache.set(locale, messages);
+  }
 
-  console.log("locale", locale);
   return (
     <html lang={locale}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // 性能监控脚本
+              window.pageLoadStart = performance.now();
+              
+              // 监控页面切换
+              const observer = new PerformanceObserver((list) => {
+                for (const entry of list.getEntries()) {
+                  if (entry.entryType === 'navigation') {
+                    console.log('🚀 Navigation Performance:', {
+                      'DNS lookup': entry.domainLookupEnd - entry.domainLookupStart,
+                      'Connection': entry.connectEnd - entry.connectStart,
+                      'Response': entry.responseEnd - entry.responseStart,
+                      'DOM parsing': entry.domContentLoadedEventEnd - entry.responseEnd,
+                      'Total time': entry.loadEventEnd - entry.navigationStart
+                    });
+                  }
+                }
+              });
+              observer.observe({ entryTypes: ['navigation'] });
+            `,
+          }}
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
@@ -45,6 +79,22 @@ export default async function RootLayout({
           <main className="pb-16 md:pb-0">{children}</main>
           <MobileNavigationBar />
         </NextIntlClientProvider>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // 页面加载完成时间
+              window.addEventListener('load', () => {
+                const loadTime = performance.now() - window.pageLoadStart;
+                console.log('📊 Page Load Time:', loadTime.toFixed(2) + 'ms');
+                
+                // 检查是否超过500ms
+                if (loadTime > 500) {
+                  console.warn('⚠️ Page load time exceeds 500ms!');
+                }
+              });
+            `,
+          }}
+        />
       </body>
     </html>
   );

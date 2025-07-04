@@ -1,23 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/hooks/useTranslations";
-import { Home, Pencil, User, LogIn } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Home, Pencil, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, useRef, useEffect } from "react";
 
 export default function MobileNavigationBar() {
+  const router = useRouter();
   const pathname = usePathname();
   const t = useTranslations("Navigation");
   const tAccount = useTranslations("Account");
-
-  const [showAccountMenu, setShowAccountMenu] = useState(false);
-  const accountMenuRef = useRef<HTMLDivElement>(null);
-
-  // 模拟登录状态
-  const [isLoggedIn] = useState(false);
+  const { user, profile, loading } = useAuth();
 
   const isActive = (path: string) => {
     const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}/, "") || "/";
@@ -26,65 +23,42 @@ export default function MobileNavigationBar() {
     return false;
   };
 
-  const handleLogin = () => {
-    console.log("启动登录流程...");
-    setShowAccountMenu(false);
+  const handleAccountClick = () => {
+    const isLoggedIn = !loading && user && profile;
+    if (isLoggedIn) {
+      router.push("/profile");
+    } else {
+      router.push("/login");
+    }
   };
 
-  // 点击外部关闭菜单
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        accountMenuRef.current &&
-        !accountMenuRef.current.contains(event.target as Node)
-      ) {
-        setShowAccountMenu(false);
-      }
-    };
-
-    if (showAccountMenu) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showAccountMenu]);
+  const isLoggedIn = !loading && user && profile;
+  const isAccountActive = isActive("/profile") || isActive("/login");
 
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-      {/* 账户菜单 */}
-      {showAccountMenu && !isLoggedIn && (
-        <div ref={accountMenuRef} className="absolute bottom-full right-4 mb-2">
-          <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-amber-200/30 py-4 px-6 min-w-48">
-            <Button
-              onClick={handleLogin}
-              className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white border-0"
-            >
-              <LogIn className="w-4 h-4 mr-2" />
-              {tAccount("login") || "登录"}
-            </Button>
-          </div>
-        </div>
-      )}
-
-      {/* 底部导航栏 */}
-      <div className="bg-gradient-to-r from-amber-50/95 via-orange-50/95 to-yellow-50/95 backdrop-blur-md border-t border-amber-200/30">
-        <div className="flex items-center justify-around px-4 py-2 safe-area-inset-bottom">
+      {/* 优雅的底部导航栏 */}
+      <div className="bg-white/80 backdrop-blur-lg border-t border-gray-200/50 shadow-lg">
+        <div className="flex items-center justify-around px-2 py-1 safe-area-inset-bottom">
           {/* 首页 */}
           <Link href="/" className="flex-1">
             <Button
               variant="ghost"
               className={cn(
-                "w-full h-14 flex-col gap-1 rounded-2xl transition-all duration-300",
+                "w-full h-16 flex-col gap-1.5 rounded-xl transition-all duration-200 ease-out",
                 isActive("/")
-                  ? "bg-amber-500/15 text-amber-800 scale-105"
-                  : "text-amber-700/70 hover:bg-amber-500/10 hover:text-amber-800"
+                  ? "bg-amber-500/10 text-amber-700 shadow-sm"
+                  : "text-gray-600 hover:bg-gray-100/70 hover:text-gray-800"
               )}
             >
-              <Home
-                className={cn("w-6 h-6", isActive("/") && "text-amber-700")}
-              />
+              <div
+                className={cn(
+                  "relative transition-all duration-200",
+                  isActive("/") && "scale-110"
+                )}
+              >
+                <Home className="w-6 h-6" />
+              </div>
               <span className="text-xs font-medium">{t("home")}</span>
             </Button>
           </Link>
@@ -94,18 +68,20 @@ export default function MobileNavigationBar() {
             <Button
               variant="ghost"
               className={cn(
-                "w-full h-14 flex-col gap-1 rounded-2xl transition-all duration-300",
+                "w-full h-16 flex-col gap-1.5 rounded-xl transition-all duration-200 ease-out",
                 isActive("/workshop")
-                  ? "bg-orange-500/15 text-orange-800 scale-105"
-                  : "text-orange-700/70 hover:bg-orange-500/10 hover:text-orange-800"
+                  ? "bg-orange-500/10 text-orange-700 shadow-sm"
+                  : "text-gray-600 hover:bg-gray-100/70 hover:text-gray-800"
               )}
             >
-              <Pencil
+              <div
                 className={cn(
-                  "w-6 h-6",
-                  isActive("/workshop") && "text-orange-700"
+                  "relative transition-all duration-200",
+                  isActive("/workshop") && "scale-110"
                 )}
-              />
+              >
+                <Pencil className="w-6 h-6" />
+              </div>
               <span className="text-xs font-medium">{t("workshop")}</span>
             </Button>
           </Link>
@@ -114,23 +90,32 @@ export default function MobileNavigationBar() {
           <div className="flex-1">
             <Button
               variant="ghost"
-              onClick={() => setShowAccountMenu(!showAccountMenu)}
+              onClick={handleAccountClick}
               className={cn(
-                "w-full h-14 flex-col gap-1 rounded-2xl transition-all duration-300",
-                showAccountMenu
-                  ? "bg-amber-500/15 text-amber-800 scale-105"
-                  : "text-amber-700/70 hover:bg-amber-500/10 hover:text-amber-800"
+                "w-full h-16 flex-col gap-1.5 rounded-xl transition-all duration-200 ease-out",
+                isAccountActive
+                  ? "bg-violet-500/10 text-violet-700 shadow-sm"
+                  : "text-gray-600 hover:bg-gray-100/70 hover:text-gray-800"
               )}
             >
-              {isLoggedIn ? (
-                <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-white" />
-                </div>
-              ) : (
-                <User className="w-6 h-6" />
-              )}
+              <div
+                className={cn(
+                  "relative transition-all duration-200",
+                  isAccountActive && "scale-110"
+                )}
+              >
+                {isLoggedIn ? (
+                  <div className="w-7 h-7 bg-gradient-to-br from-violet-500 to-purple-600 rounded-full flex items-center justify-center shadow-sm">
+                    <User className="w-4 h-4 text-white" />
+                  </div>
+                ) : (
+                  <div className="w-7 h-7 border-2 border-gray-400 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4" />
+                  </div>
+                )}
+              </div>
               <span className="text-xs font-medium">
-                {isLoggedIn ? "我的" : tAccount("login")}
+                {isLoggedIn ? tAccount("my") : tAccount("login")}
               </span>
             </Button>
           </div>

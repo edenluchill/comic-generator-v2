@@ -27,7 +27,13 @@
     "settings": "設定",
     "logout": "ログアウト",
     "login": "ログイン",
-    "register": "登録する"
+    "register": "登録する",
+    "my": "私の",
+    "user": "ユーザー",
+    "username": "ユーザー名",
+    "generatedThisMonth": "今月生成",
+    "unlimited": "無制限",
+    "remaining": "残り"
   },
   "HomePage": {
     "title": "単なる無料コミックジェネレーターではない",
@@ -82,6 +88,45 @@
     "mouth": "口",
     "styleRecommendations": "スタイルの推奨事項",
     "recommendedStyle": "推奨スタイル",
-    "lineWeight": "線の太さ"
+    "lineWeight": "線の太さ",
+    "saveCharacter": "キャラクターを保存",
+    "regenerate": "再生",
+    "clickToStartAnalysis": "ボタンをクリックして分析を開始し、スケッチを生成します"
+  },
+  "Login": {
+    "welcome": "いらっしゃいませ",
+    "subtitle": "ログイン方法を選択してください",
+    "googleLogin": "Googleでログイン",
+    "emailLogin": "メールでサインイン",
+    "or": "または",
+    "emailAddress": "電子メールアドレス",
+    "sendCode": "コードを送信",
+    "verificationCode": "検証コード",
+    "codeDesc": "コード送信先",
+    "verifyCode": "確認とログイン",
+    "resendCode": "コードを再送信",
+    "welcomeSignup": "サインアップへようこそ",
+    "signupSubtitle": "登録を完了するには認証コードを入力してください",
+    "emailHint": "新しいメールアドレスは自動的にアカウントを作成し、既存のメールアドレスにはログイン確認コードが送信されます。",
+    "codePlaceholder": "6桁のコード",
+    "loggingIn": "ログイン中...",
+    "verifyingIdentity": "本人確認中です。お待ちください..."
+  },
+  "Profile": {
+    "profileTitle": "マイプロフィール",
+    "back": "戻る",
+    "profileNotFound": "プロフィールが見つかりません",
+    "backToHome": "ホームに戻る",
+    "email": "メール",
+    "joinDate": "参加日",
+    "usageStats": "使用状況統計",
+    "imagesGenerated": "生成された画像",
+    "storiesCreated": "作成されたストーリー",
+    "quickActions": "クイックアクション",
+    "createNew": "新規作成",
+    "noName": "名前なし",
+    "enterName": "名前を入力してください",
+    "save": "保存",
+    "cancel": "キャンセル"
   }
 }

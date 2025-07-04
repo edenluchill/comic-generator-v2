@@ -27,7 +27,13 @@
     "settings": "设置",
     "logout": "登出",
     "login": "登录",
-    "register": "登记"
+    "register": "登记",
+    "my": "我的",
+    "user": "用户",
+    "username": "用户名",
+    "generatedThisMonth": "本月生成",
+    "unlimited": "无限",
+    "remaining": "其余的"
   },
   "HomePage": {
     "title": "不仅仅是免费的漫画生成器",
@@ -84,7 +90,43 @@
     "recommendedStyle": "推荐风格",
     "lineWeight": "线宽",
     "saveCharacter": "保存角色",
-    "regenerate": "重新生成",
-    "clickToStartAnalysis": "点击按钮开始分析并生成简笔画"
+    "regenerate": "再生",
+    "clickToStartAnalysis": "单击按钮开始分析并生成草图"
+  },
+  "Login": {
+    "welcome": "欢迎",
+    "subtitle": "选择您的登录方式",
+    "googleLogin": "使用 Google 登录",
+    "emailLogin": "使用电子邮件登录",
+    "or": "或者",
+    "emailAddress": "电子邮件",
+    "sendCode": "发送代码",
+    "verificationCode": "验证码",
+    "codeDesc": "代码已发送至",
+    "verifyCode": "验证并登录",
+    "resendCode": "重新发送代码",
+    "welcomeSignup": "欢迎注册",
+    "signupSubtitle": "输入验证码完成注册",
+    "emailHint": "新邮箱将自动创建账户，现有邮箱将收到登录验证码",
+    "codePlaceholder": "6位代码",
+    "loggingIn": "正在登录...",
+    "verifyingIdentity": "正在验证您的身份，请稍候..."
+  },
+  "Profile": {
+    "profileTitle": "我的个人资料",
+    "back": "后退",
+    "profileNotFound": "未找到个人资料",
+    "backToHome": "返回首页",
+    "email": "电子邮件",
+    "joinDate": "加入日期",
+    "usageStats": "使用情况统计",
+    "imagesGenerated": "生成的图像",
+    "storiesCreated": "创作的故事",
+    "quickActions": "快速操作",
+    "createNew": "创建新的",
+    "noName": "无名",
+    "enterName": "输入您的姓名",
+    "save": "节省",
+    "cancel": "取消"
   }
 }

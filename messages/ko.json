@@ -27,7 +27,13 @@
     "settings": "설정",
     "logout": "로그아웃",
     "login": "로그인",
-    "register": "등록하다"
+    "register": "등록하다",
+    "my": "나의",
+    "user": "사용자",
+    "username": "사용자 이름",
+    "generatedThisMonth": "이번 달에 생성됨",
+    "unlimited": "제한 없는",
+    "remaining": "남은"
   },
   "HomePage": {
     "title": "무료 만화 생성기 그 이상",
@@ -82,6 +88,45 @@
     "mouth": "입",
     "styleRecommendations": "스타일 추천",
     "recommendedStyle": "추천 스타일",
-    "lineWeight": "선 두께"
+    "lineWeight": "선 두께",
+    "saveCharacter": "캐릭터 저장",
+    "regenerate": "재생하다",
+    "clickToStartAnalysis": "버튼을 클릭하여 분석을 시작하고 스케치를 생성하세요."
+  },
+  "Login": {
+    "welcome": "환영",
+    "subtitle": "로그인 방법을 선택하세요",
+    "googleLogin": "Google로 로그인",
+    "emailLogin": "이메일로 로그인",
+    "or": "또는",
+    "emailAddress": "이메일 주소",
+    "sendCode": "코드 보내기",
+    "verificationCode": "인증 코드",
+    "codeDesc": "코드가 전송되었습니다",
+    "verifyCode": "확인 및 로그인",
+    "resendCode": "코드 재전송",
+    "welcomeSignup": "가입에 오신 것을 환영합니다",
+    "signupSubtitle": "등록을 완료하려면 인증 코드를 입력하세요.",
+    "emailHint": "새 이메일을 입력하면 자동으로 계정이 생성되고, 기존 이메일에는 로그인 확인 코드가 전송됩니다.",
+    "codePlaceholder": "6자리 코드",
+    "loggingIn": "로그인 중...",
+    "verifyingIdentity": "신원 확인 중입니다. 잠시만 기다려 주세요."
+  },
+  "Profile": {
+    "profileTitle": "내 프로필",
+    "back": "뒤쪽에",
+    "profileNotFound": "프로필을 찾을 수 없습니다",
+    "backToHome": "홈으로 돌아가기",
+    "email": "이메일",
+    "joinDate": "가입 날짜",
+    "usageStats": "사용 통계",
+    "imagesGenerated": "생성된 이미지",
+    "storiesCreated": "생성된 스토리",
+    "quickActions": "빠른 작업",
+    "createNew": "새로 만들기",
+    "noName": "이름 없음",
+    "enterName": "이름을 입력하세요",
+    "save": "구하다",
+    "cancel": "취소"
   }
 }

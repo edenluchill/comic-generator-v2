@@ -1,6 +1,7 @@
 "use client";
 
 import { Sparkles, Loader2 } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "@/hooks/useTranslations";
 
 interface SketchResultSectionProps {
@@ -45,10 +46,13 @@ export default function SketchResultSection({
       {sketchResult ? (
         <div className="space-y-3 lg:space-y-4">
           <div className="border-2 border-amber-200 rounded-xl overflow-hidden shadow-md">
-            <img
+            <Image
               src={sketchResult}
               alt="Generated Sketch"
+              width={400}
+              height={192}
               className="w-full h-40 lg:h-48 object-cover"
+              unoptimized
             />
           </div>
 

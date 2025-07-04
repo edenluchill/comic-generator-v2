@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -13,7 +14,7 @@ import {
   Crown,
   Settings,
   Heart,
-  Image,
+  Image as ImageIcon,
   BookOpen,
   Edit2,
   Save,
@@ -131,10 +132,13 @@ export default function ProfilePage() {
                 <div className="text-center">
                   <div className="relative w-32 h-32 mx-auto mb-4">
                     {profile.avatar_url ? (
-                      <img
+                      <Image
                         src={profile.avatar_url}
-                        alt={profile.name || "User"}
+                        alt={profile.name || "User avatar"}
+                        width={128}
+                        height={128}
                         className="w-full h-full rounded-full object-cover border-4 border-amber-200/50"
+                        priority
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-r from-amber-400 to-orange-400 rounded-full flex items-center justify-center border-4 border-amber-200/50">
@@ -237,7 +241,7 @@ export default function ProfilePage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center">
-                          <Image className="w-5 h-5 text-amber-600" />
+                          <ImageIcon className="w-5 h-5 text-amber-600" />
                         </div>
                         <div>
                           <p className="text-sm text-amber-600">
@@ -280,7 +284,7 @@ export default function ProfilePage() {
                 onClick={() => router.push("/workshop")}
                 className="h-auto p-4 flex flex-col items-center gap-2 bg-amber-50/60 hover:bg-amber-100/80 border border-amber-200/30 rounded-xl transition-all duration-300 hover:scale-105"
               >
-                <Image className="w-6 h-6 text-amber-600" />
+                <ImageIcon className="w-6 h-6 text-amber-600" />
                 <span className="text-sm font-medium text-amber-900">
                   {tProfile("createNew") || "Create New"}
                 </span>

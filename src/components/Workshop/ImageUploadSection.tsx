@@ -1,6 +1,7 @@
 "use client";
 
 import { Upload, ImageIcon } from "lucide-react";
+import Image from "next/image";
 import { useTranslations } from "@/hooks/useTranslations";
 
 interface ImageUploadSectionProps {
@@ -94,10 +95,13 @@ export default function ImageUploadSection({
         ) : (
           <div className="relative group">
             <div className="relative border-2 border-amber-200 rounded-2xl overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg">
-              <img
+              <Image
                 src={uploadedImage}
-                alt="Uploaded"
+                alt="Uploaded image for comic generation"
                 className="w-full h-40 lg:h-48 object-cover"
+                width={400}
+                height={192}
+                style={{ objectFit: "cover" }}
               />
 
               <div className="absolute bottom-2 left-2 right-2 bg-white/90 backdrop-blur-sm rounded-lg p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">

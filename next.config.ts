@@ -7,14 +7,13 @@ const withNextIntl = createNextIntlPlugin("./src/i18n.ts");
 const nextConfig: NextConfig = {
   // 性能优化配置
   experimental: {
-    optimizeCss: true,
     optimizeServerReact: true,
-    serverComponentsExternalPackages: [],
-    // 启用 Turbo 模式
-    turbo: {
-      loaders: {
-        ".svg": ["@svgr/webpack"],
-      },
+  },
+
+  // Turbopack 配置 (替代 experimental.turbo)
+  turbopack: {
+    rules: {
+      "*.svg": ["@svgr/webpack"],
     },
   },
 
@@ -29,7 +28,6 @@ const nextConfig: NextConfig = {
   // 构建优化
   poweredByHeader: false,
   reactStrictMode: true,
-  swcMinify: true,
 
   // 图片优化
   images: {

@@ -15,7 +15,7 @@ import {
   Sparkles,
   Stars,
   Palette,
-  Image,
+  Image as ImageIcon,
   ArrowRight,
   Zap,
 } from "lucide-react";
@@ -232,7 +232,7 @@ export default function HomePage() {
               >
                 <div className="flex flex-col items-center text-center space-y-3">
                   <div className="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center group-hover:bg-amber-200 transition-colors animate-pulse">
-                    <Image className="w-6 h-6 text-amber-700 group-hover:scale-110 transition-transform" />
+                    <ImageIcon className="w-6 h-6 text-amber-700 group-hover:scale-110 transition-transform" />
                   </div>
                   <div>
                     <div className="flex items-center justify-center space-x-2 mb-2">

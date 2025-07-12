@@ -1,0 +1,246 @@
+"use client";
+
+import { useState } from "react";
+import { Eye, X, Edit3, Save, Check } from "lucide-react";
+import { FluxGenerationResult } from "@/types/flux";
+
+interface AvatarDisplaySectionProps {
+  currentStep: number;
+  isProcessing: boolean;
+  progress: number;
+  status: string;
+  avatarResult: FluxGenerationResult | null;
+  threeViewResult: FluxGenerationResult | null;
+  onSaveCharacter?: (name: string) => void;
+  isSaved?: boolean;
+}
+
+export default function AvatarDisplaySection({
+  currentStep,
+  isProcessing,
+  progress,
+  status,
+  avatarResult,
+  threeViewResult,
+  onSaveCharacter,
+  isSaved = false,
+}: AvatarDisplaySectionProps) {
+  const [showThreeViewModal, setShowThreeViewModal] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [characterName, setCharacterName] = useState("");
+
+  const renderLoadingSpinner = (step: number, color: string) => {
+    const colorMap = {
+      blue: {
+        border: "border-blue-200",
+        spinBorder: "border-t-blue-500",
+        gradient: "from-blue-500 to-cyan-500",
+        conicColor: "#3b82f6",
+      },
+      purple: {
+        border: "border-purple-200",
+        spinBorder: "border-t-purple-500",
+        gradient: "from-purple-500 to-pink-500",
+        conicColor: "#a855f7",
+      },
+    };
+
+    const colors = colorMap[color as keyof typeof colorMap];
+
+    return (
+      <div className="h-full flex flex-col items-center justify-center">
+        <div className="w-16 h-16 mb-4 relative">
+          <div
+            className={`absolute inset-0 rounded-full border-4 ${colors.border}`}
+          ></div>
+          <div
+            className={`absolute inset-0 rounded-full border-4 border-transparent ${colors.spinBorder} animate-spin`}
+            style={{
+              background: `conic-gradient(from 0deg, transparent ${
+                100 - progress
+              }%, ${colors.conicColor} ${100 - progress}%)`,
+              WebkitMask:
+                "radial-gradient(circle at center, transparent 70%, black 70%)",
+              mask: "radial-gradient(circle at center, transparent 70%, black 70%)",
+            }}
+          ></div>
+        </div>
+        <p className="text-sm text-gray-600 text-center">{status}</p>
+        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <div
+            className={`bg-gradient-to-r ${colors.gradient} h-2 rounded-full transition-all duration-300`}
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+        <p className="text-xs text-gray-500 mt-1">{progress}%</p>
+      </div>
+    );
+  };
+
+  const handleSaveCharacter = () => {
+    if (characterName.trim() && onSaveCharacter) {
+      onSaveCharacter(characterName.trim());
+      setIsEditingName(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleSaveCharacter();
+    } else if (e.key === "Escape") {
+      setIsEditingName(false);
+      setCharacterName("");
+    }
+  };
+
+  const renderContent = () => {
+    if (currentStep === 1 && isProcessing) {
+      return renderLoadingSpinner(1, "blue");
+    }
+
+    if (currentStep === 2 && isProcessing) {
+      return renderLoadingSpinner(2, "purple");
+    }
+
+    if (avatarResult) {
+      return (
+        <div className="h-full flex flex-col items-center justify-center space-y-4">
+          <img
+            src={avatarResult.imageUrl}
+            alt="卡通头像"
+            className="object-cover rounded-lg shadow-lg"
+            width={300}
+            height={300}
+          />
+
+          {/* 角色生成完成状态 */}
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-green-600">✓ 头像生成完成</p>
+            {threeViewResult && (
+              <span className="text-xs text-purple-600">
+                • 点击右上角查看3视图
+              </span>
+            )}
+          </div>
+
+          {/* 名字编辑和保存区域 */}
+          {avatarResult && threeViewResult && !isSaved && (
+            <div className="w-full max-w-sm space-y-3">
+              <div className="text-center">
+                <p className="text-sm text-gray-600 mb-2">给角色起个名字</p>
+                <div className="flex items-center gap-2">
+                  {isEditingName ? (
+                    <div className="flex-1 flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={characterName}
+                        onChange={(e) => setCharacterName(e.target.value)}
+                        onKeyDown={handleKeyPress}
+                        placeholder="输入角色名字"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                        autoFocus
+                      />
+                      <button
+                        onClick={handleSaveCharacter}
+                        disabled={!characterName.trim()}
+                        className="p-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white rounded-lg transition-colors"
+                        title="保存角色"
+                      >
+                        <Save className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsEditingName(false);
+                          setCharacterName("");
+                        }}
+                        className="p-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg transition-colors"
+                        title="取消"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setIsEditingName(true)}
+                      className="w-full py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-300 flex items-center justify-center gap-2 text-sm font-medium"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                      添加角色名字并保存
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 已保存状态 */}
+          {isSaved && (
+            <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+              <Check className="w-4 h-4" />
+              <span className="text-sm font-medium">角色已保存到列表</span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center text-gray-500">
+          <p className="text-sm">卡通头像将在这里显示</p>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-amber-200/50 flex flex-col relative">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-pulse"></div>
+          <h3 className="text-lg font-bold text-gray-800">卡通头像</h3>
+        </div>
+
+        {/* 3视图浮动按钮 */}
+        {threeViewResult && (
+          <button
+            onClick={() => setShowThreeViewModal(true)}
+            className="absolute top-4 right-4 bg-purple-500 hover:bg-purple-600 text-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110 z-10"
+            title="查看3视图"
+          >
+            <Eye className="w-4 h-4" />
+          </button>
+        )}
+
+        <div className="flex-1 relative">{renderContent()}</div>
+      </div>
+
+      {/* 3视图模态框 */}
+      {showThreeViewModal && threeViewResult && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-800">角色3视图</h3>
+              <button
+                onClick={() => setShowThreeViewModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="text-center">
+              <img
+                src={threeViewResult.imageUrl}
+                alt="角色3视图"
+                className="max-w-full h-auto rounded-lg shadow-lg"
+              />
+              <p className="text-sm text-gray-600 mt-2">
+                这个3视图可用于生成不同动作的漫画角色
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}

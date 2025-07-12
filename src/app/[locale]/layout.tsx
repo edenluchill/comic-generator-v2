@@ -6,6 +6,7 @@ import MobileNavigationBar from "@/components/MobileNavigationBar";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { cache } from "react";
+import StoreProvider from "@/store/StoreProvider";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -69,11 +70,13 @@ export default async function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
       <body>
-        <NextIntlClientProvider messages={messages} locale={locale}>
-          <Header />
-          <main className="pb-16 md:pb-0">{children}</main>
-          <MobileNavigationBar />
-        </NextIntlClientProvider>
+        <StoreProvider>
+          <NextIntlClientProvider messages={messages} locale={locale}>
+            <Header />
+            <main className="pb-16 md:pb-0">{children}</main>
+            <MobileNavigationBar />
+          </NextIntlClientProvider>
+        </StoreProvider>
       </body>
     </html>
   );

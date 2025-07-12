@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload, ImageIcon } from "lucide-react";
+import { Upload, ImageIcon, X } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "@/hooks/useTranslations";
 
@@ -94,13 +94,13 @@ export default function ImageUploadSection({
           </div>
         ) : (
           <div className="relative group">
-            <div className="relative border-2 border-amber-200 rounded-2xl overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg">
+            <div className="relative flex justify-center items-center border-2 border-amber-200 rounded-2xl overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg">
               <Image
                 src={uploadedImage}
                 alt="Uploaded image for comic generation"
-                className="w-full h-40 lg:h-48 object-cover"
-                width={400}
-                height={192}
+                className="object-cover"
+                width={300}
+                height={300}
                 style={{ objectFit: "cover" }}
               />
 
@@ -119,19 +119,7 @@ export default function ImageUploadSection({
               onClick={onClearImage}
               className="absolute -top-2 -right-2 w-7 h-7 lg:w-8 lg:h-8 bg-red-500 text-white rounded-full flex items-center justify-center transition-all duration-300 hover:bg-red-600 hover:scale-110"
             >
-              <svg
-                className="w-3 h-3 lg:w-4 lg:h-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <X className="w-3 h-3 lg:w-4 lg:h-4" />
             </button>
 
             <button

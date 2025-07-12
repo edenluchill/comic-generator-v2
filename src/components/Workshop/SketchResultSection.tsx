@@ -6,7 +6,7 @@ import { useTranslations } from "@/hooks/useTranslations";
 
 interface SketchResultSectionProps {
   sketchResult: string | null;
-  processingStep: "analyzing" | "generating" | null;
+  processingStep: "analyzing" | "generating" | "flux-generating" | null;
   mounted: boolean;
 }
 

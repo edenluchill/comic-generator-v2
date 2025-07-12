@@ -116,7 +116,7 @@ export default function ComicGeneration() {
             }`}
           >
             <ComicDisplay
-              comicUrl={comicUrl}
+              comicUrl={comicUrl || undefined}
               isGenerating={isGenerating}
               onGenerate={handleGenerateComic}
               canGenerate={canGenerate}

@@ -77,13 +77,12 @@ export default function AccountMenu() {
       >
         <div className="relative">
           {profile.avatar_url ? (
-            <Image
+            <img
               src={profile.avatar_url}
               alt={profile.name || "User"}
               width={20}
               height={20}
               className="rounded-full"
-              unoptimized
             />
           ) : (
             <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">

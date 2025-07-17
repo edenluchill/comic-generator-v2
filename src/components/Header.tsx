@@ -6,11 +6,15 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/hooks/useTranslations";
 import { Home, Pencil, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
-import LanguagePicker from "./Header/LanguagePicker";
-import AccountMenu from "./Header/AccountMenu";
+// import LanguagePicker from "./Header/LanguagePicker";
+// import AccountMenu from "./Header/AccountMenu";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
+import { lazy, memo } from "react";
 
-export default function Header() {
+const AccountMenu = lazy(() => import("./Header/AccountMenu"));
+const LanguagePicker = lazy(() => import("./Header/LanguagePicker"));
+
+const Header = memo(function Header() {
   const pathname = usePathname();
   const { getLocalizedHref } = useLocalizedNavigation();
   const t = useTranslations("Navigation");
@@ -131,4 +135,6 @@ export default function Header() {
       </div>
     </header>
   );
-}
+});
+
+export default Header;

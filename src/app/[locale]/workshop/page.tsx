@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import CharacterCreationWorkshop from "@/components/Workshop/CharacterCreationWorkshop";
 import ComicGeneration from "@/components/Workshop/ComicGeneration";
+import AuthGuard from "@/components/AuthGuard";
 
 function WorkshopContent() {
   const searchParams = useSearchParams();
@@ -26,7 +27,9 @@ export default function WorkshopPage() {
         </div>
       }
     >
-      <WorkshopContent />
+      <AuthGuard>
+        <WorkshopContent />
+      </AuthGuard>
     </Suspense>
   );
 }

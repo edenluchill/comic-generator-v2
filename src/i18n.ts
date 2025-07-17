@@ -2,17 +2,22 @@
 import { getRequestConfig } from "next-intl/server";
 
 export const locales = ["en", "zh", "ja", "ko"] as const;
+type LocaleType = (typeof locales)[number];
+
+// 预加载常用语言的翻译文件
+const messageCache = new Map();
 
 export default getRequestConfig(async ({ locale = "en" }) => {
-  // 简单的 locale 验证
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const validLocale = locales.includes(locale as any) ? locale : "en";
+  const validLocale = locales.includes(locale as LocaleType) ? locale : "en";
 
-  // 直接动态导入，让 Next.js 和 React 处理缓存
-  const messages = (await import(`../messages/${validLocale}.json`)).default;
+  // 使用缓存避免重复导入
+  if (!messageCache.has(validLocale)) {
+    const messages = (await import(`../messages/${validLocale}.json`)).default;
+    messageCache.set(validLocale, messages);
+  }
 
   return {
     locale: validLocale,
-    messages,
+    messages: messageCache.get(validLocale),
   };
 });

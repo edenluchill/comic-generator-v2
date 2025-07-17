@@ -12,6 +12,10 @@ export default function AuthCallbackPage() {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
+        // 获取保存的返回地址
+        const returnUrl = sessionStorage.getItem("returnUrl") || "/";
+        sessionStorage.removeItem("returnUrl"); // 清除保存的返回地址
+
         // 检查 URL hash 中的参数
         const hashParams = new URLSearchParams(
           window.location.hash.substring(1)
@@ -43,8 +47,8 @@ export default function AuthCallbackPage() {
           }
 
           if (data.session) {
-            // 成功登录，重定向到首页
-            navigate("/");
+            // 成功登录，重定向到保存的返回地址
+            navigate(returnUrl);
           }
         } else {
           // 尝试从 URL 参数获取 code（用于服务器端流程）
@@ -65,7 +69,8 @@ export default function AuthCallbackPage() {
             }
 
             if (data.session) {
-              navigate("/");
+              // 成功登录，重定向到保存的返回地址
+              navigate(returnUrl);
             }
           } else {
             // 没有找到认证信息

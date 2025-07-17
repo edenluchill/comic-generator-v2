@@ -3,15 +3,15 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useAppSelector } from "@/store/hooks";
 import CharactersList from "./CharactersList";
 import DiaryInput from "./DiaryInput";
 import ComicDisplay from "./ComicDisplay";
+import { useCharacters } from "@/hooks/useCharacters";
 
 export default function ComicGeneration() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const characters = useAppSelector((state) => state.characters.characters);
+  const { data: characters = [], isLoading } = useCharacters();
 
   const [mounted, setMounted] = useState(false);
   const [storyText, setStoryText] = useState("");
@@ -91,6 +91,12 @@ export default function ComicGeneration() {
           <CharactersList
             onAddNewCharacter={handleAddNewCharacter}
             mounted={mounted}
+            characters={characters}
+            loading={isLoading}
+            onDeleteCharacter={async (id) => {
+              // 实现删除逻辑，可能需要创建一个删除mutation
+              console.log("删除角色:", id);
+            }}
           />
         </div>
 

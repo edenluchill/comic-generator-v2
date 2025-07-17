@@ -54,7 +54,11 @@ export default function LoginPage() {
       setLoading(true);
       setError("");
       await verifyEmailCode(email, code);
-      navigate("/");
+
+      // 登录成功后跳转到保存的返回地址
+      const returnUrl = sessionStorage.getItem("returnUrl") || "/";
+      sessionStorage.removeItem("returnUrl"); // 清除保存的返回地址
+      navigate(returnUrl);
     } catch (error) {
       console.error("Code verification failed:", error);
       setError("Verification code is incorrect, please try again");
@@ -97,7 +101,6 @@ export default function LoginPage() {
         {/* 背景圆点 */}
         <div className="absolute top-1/4 right-1/3 w-1 h-1 bg-amber-300/30 rounded-full animate-ping delay-300"></div>
         <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-orange-300/20 rounded-full animate-ping delay-700"></div>
-        <div className="absolute top-1/2 left-1/4 w-0.5 h-0.5 bg-yellow-300/40 rounded-full animate-ping delay-1000"></div>
       </div>
 
       {/* 主要内容区域 */}

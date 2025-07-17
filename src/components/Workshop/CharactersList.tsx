@@ -1,23 +1,51 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X, Eye } from "lucide-react";
-import { useAppSelector } from "@/store/hooks";
-import { Character } from "@/store/slices/charactersSlice";
+import { Plus, X, Eye, Trash2 } from "lucide-react";
 
+// 更新接口以接收角色数据
 interface CharactersListProps {
   onAddNewCharacter: () => void;
   mounted: boolean;
+  characters: Character[]; // 添加角色数据prop
+  loading?: boolean; // 添加loading状态prop
+  onDeleteCharacter?: (id: string) => Promise<void>; // 添加删除回调
+}
+
+// 定义Character类型（如果需要的话）
+interface Character {
+  id: string;
+  name: string;
+  avatar_url: string;
+  three_view_url: string;
+  created_at: string;
+  user_id: string;
 }
 
 export default function CharactersList({
   onAddNewCharacter,
   mounted,
+  characters,
+  loading = false,
+  onDeleteCharacter,
 }: CharactersListProps) {
-  const characters = useAppSelector((state) => state.characters.characters);
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null
   );
+
+  const handleDeleteCharacter = async (characterId: string) => {
+    if (confirm("确定要删除这个角色吗？")) {
+      try {
+        if (onDeleteCharacter) {
+          await onDeleteCharacter(characterId);
+        }
+        setSelectedCharacter(null);
+      } catch (error) {
+        console.error("删除角色失败:", error);
+        // 可以在这里显示错误提示
+      }
+    }
+  };
 
   return (
     <>
@@ -28,7 +56,7 @@ export default function CharactersList({
       >
         <div className="mb-4">
           <h3 className="text-lg font-semibold text-amber-800 mb-3">
-            我的角色 ({characters.length})
+            我的角色 ({characters.length}) {loading && "(加载中...)"}
           </h3>
         </div>
 
@@ -52,7 +80,7 @@ export default function CharactersList({
         </div>
       </div>
 
-      {/* 角色详情模态框 */}
+      {/* 角色详情模态框 - 添加删除按钮 */}
       {selectedCharacter && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -60,12 +88,23 @@ export default function CharactersList({
               <h3 className="text-2xl font-bold text-gray-800">
                 {selectedCharacter.name}
               </h3>
-              <button
-                onClick={() => setSelectedCharacter(null)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
+              <div className="flex items-center gap-2">
+                {onDeleteCharacter && (
+                  <button
+                    onClick={() => handleDeleteCharacter(selectedCharacter.id)}
+                    className="p-2 hover:bg-red-100 rounded-full transition-colors text-red-600"
+                    title="删除角色"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                )}
+                <button
+                  onClick={() => setSelectedCharacter(null)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -75,7 +114,7 @@ export default function CharactersList({
                   头像
                 </h4>
                 <img
-                  src={selectedCharacter.avatarUrl}
+                  src={selectedCharacter.avatar_url}
                   alt={`${selectedCharacter.name} 头像`}
                   className="w-full max-w-sm mx-auto rounded-lg shadow-lg"
                 />
@@ -87,7 +126,7 @@ export default function CharactersList({
                   3视图
                 </h4>
                 <img
-                  src={selectedCharacter.threeViewUrl}
+                  src={selectedCharacter.three_view_url}
                   alt={`${selectedCharacter.name} 3视图`}
                   className="w-full max-w-sm mx-auto rounded-lg shadow-lg"
                 />
@@ -102,7 +141,7 @@ export default function CharactersList({
               <div className="space-y-2 text-sm text-gray-600">
                 <p>
                   <strong>创建时间：</strong>{" "}
-                  {new Date(selectedCharacter.createdAt).toLocaleString(
+                  {new Date(selectedCharacter.created_at).toLocaleString(
                     "zh-CN"
                   )}
                 </p>
@@ -133,7 +172,7 @@ function CharacterCard({
     <div className="group relative cursor-pointer" onClick={onClick}>
       <div className="w-20 h-20 rounded-xl overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg hover:scale-105 relative">
         <img
-          src={character.avatarUrl}
+          src={character.avatar_url}
           alt={character.name}
           className="w-full h-full object-cover"
         />

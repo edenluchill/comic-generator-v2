@@ -15,53 +15,41 @@ interface UserProfile {
   usage_stats?: any;
 }
 
-// Global auth cache at module level
-let globalAuthCache: {
-  user: User | null;
-  profile: UserProfile | null;
+// 添加缓存避免重复的会话检查
+const sessionCache: {
+  data: { user: User | null } | null;
   timestamp: number;
-} | null = null;
+  ttl: number;
+} = {
+  data: null,
+  timestamp: 0,
+  ttl: 5000, // 5秒缓存
+};
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { getLocalizedHref } = useLocalizedNavigation();
+  const { getLocalizedHref, navigate } = useLocalizedNavigation();
 
   useEffect(() => {
     let mounted = true;
 
     const getInitialSession = async () => {
+      // 检查缓存
+      const now = Date.now();
+      if (
+        sessionCache.data &&
+        now - sessionCache.timestamp < sessionCache.ttl
+      ) {
+        setUser(sessionCache.data.user);
+        setLoading(false);
+        return;
+      }
+
       try {
-        // 首先检查全局缓存
-        if (globalAuthCache && Date.now() - globalAuthCache.timestamp < 10000) {
-          setUser(globalAuthCache.user);
-          setProfile(globalAuthCache.profile);
-          setLoading(false);
-          return;
-        }
-
-        // 然后检查 sessionStorage
-        const cachedSession = sessionStorage.getItem("auth_session");
-        if (cachedSession) {
-          const parsed = JSON.parse(cachedSession);
-          if (Date.now() - parsed.timestamp < 30000) {
-            // 增加到30秒
-            setUser(parsed.user);
-            setProfile(parsed.profile);
-            setLoading(false);
-
-            // 更新全局缓存
-            globalAuthCache = {
-              user: parsed.user,
-              profile: parsed.profile,
-              timestamp: Date.now(),
-            };
-            return;
-          }
-        }
-
+        // 🔒 只使用 Supabase 官方会话管理
         const {
           data: { session },
           error: sessionError,
@@ -88,24 +76,11 @@ export function useAuth() {
               },
             };
             setProfile(profileData);
-
-            // 缓存认证状态
-            sessionStorage.setItem(
-              "auth_session",
-              JSON.stringify({
-                user: session.user,
-                profile: profileData,
-                timestamp: Date.now(),
-              })
-            );
-
-            // 更新全局缓存
-            globalAuthCache = {
-              user: session.user,
-              profile: profileData,
-              timestamp: Date.now(),
-            };
           }
+          // 更新缓存
+          sessionCache.data = { user: session?.user ?? null };
+          sessionCache.timestamp = now;
+
           setLoading(false);
         }
       } catch (err) {
@@ -143,26 +118,26 @@ export function useAuth() {
         });
 
         // 更新全局缓存
-        globalAuthCache = {
-          user: session.user,
-          profile: {
-            id: session.user.id,
-            email: session.user.email!,
-            name:
-              session.user.user_metadata?.full_name ||
-              session.user.user_metadata?.name,
-            avatar_url: session.user.user_metadata?.avatar_url,
-            subscription_status: "free",
-            usage_stats: {
-              images_generated: 0,
-              stories_created: 0,
-            },
-          },
-          timestamp: Date.now(),
-        };
+        // globalAuthCache = {
+        //   user: session.user,
+        //   profile: {
+        //     id: session.user.id,
+        //     email: session.user.email!,
+        //     name:
+        //       session.user.user_metadata?.full_name ||
+        //       session.user.user_metadata?.name,
+        //     avatar_url: session.user.user_metadata?.avatar_url,
+        //     subscription_status: "free",
+        //     usage_stats: {
+        //       images_generated: 0,
+        //       stories_created: 0,
+        //     },
+        //   },
+        //   timestamp: Date.now(),
+        // };
       } else if (event === "SIGNED_OUT") {
         setProfile(null);
-        globalAuthCache = null; // 清除全局缓存
+        // globalAuthCache = null; // 清除全局缓存
       }
 
       setLoading(false);
@@ -172,7 +147,7 @@ export function useAuth() {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [getLocalizedHref]);
+  }, []);
 
   const signInWithGoogle = async () => {
     try {
@@ -244,6 +219,7 @@ export function useAuth() {
       setLoading(true);
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+      navigate("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {

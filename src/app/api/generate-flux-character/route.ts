@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { APIResponse } from "@/types/api";
 import { FluxGenerationResult } from "@/types/flux";
 import { createFluxCharacterGenerator } from "@/lib/flux-generator";
+import { storeFluxCharacterImages } from "@/lib/image-storage"; // 改为从新文件导入
+import { supabaseAdmin } from "@/lib/supabase/server";
 
 // 启动生成 - 流式响应实现两步生成
 export async function POST(request: NextRequest) {
@@ -16,6 +18,23 @@ export async function POST(request: NextRequest) {
       input_image,
       tags, // 新增：分析特征
     } = body;
+
+    // 获取用户信息（如果已登录）
+    let userId: string | undefined;
+    try {
+      const token = request.headers
+        .get("authorization")
+        ?.replace("Bearer ", "");
+      if (token) {
+        const {
+          data: { user },
+        } = await supabaseAdmin.auth.getUser(token);
+        userId = user?.id;
+      }
+    } catch (error) {
+      // 忽略认证错误，允许匿名用户使用
+      console.log("Anonymous user", error);
+    }
 
     // 创建Flux生成器实例
     const generator = createFluxCharacterGenerator();
@@ -32,7 +51,7 @@ export async function POST(request: NextRequest) {
                 type: "status",
                 message: "开始生成卡通头像...",
                 step: 1,
-                totalSteps: 2,
+                totalSteps: 3, // 更新为3步，包括存储
               })}\n\n`
             )
           );
@@ -85,7 +104,7 @@ export async function POST(request: NextRequest) {
                 type: "status",
                 message: "开始生成3视图全身图...",
                 step: 2,
-                totalSteps: 2,
+                totalSteps: 3,
               })}\n\n`
             )
           );
@@ -118,16 +137,47 @@ export async function POST(request: NextRequest) {
             }
           );
 
+          // 第三步：存储图片到 Supabase
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({
+                type: "status",
+                message: "正在保存图片到数据库...",
+                step: 3,
+                totalSteps: 3,
+              })}\n\n`
+            )
+          );
+
+          // 存储图片到 Supabase Storage
+          const { storedAvatarUrl, storedThreeViewUrl } =
+            await storeFluxCharacterImages(
+              completedAvatar.imageUrl!,
+              completedThreeView.imageUrl!,
+              userId
+            );
+
+          // 更新结果对象中的 URL
+          const finalAvatarResult = {
+            ...completedAvatar,
+            imageUrl: storedAvatarUrl,
+          };
+
+          const finalThreeViewResult = {
+            ...completedThreeView,
+            imageUrl: storedThreeViewUrl,
+          };
+
           // 发送最终结果
           controller.enqueue(
             encoder.encode(
               `data: ${JSON.stringify({
                 type: "complete",
                 data: {
-                  avatar: completedAvatar,
-                  threeView: completedThreeView,
+                  avatar: finalAvatarResult,
+                  threeView: finalThreeViewResult,
                 },
-                message: "所有生成完成！",
+                message: "所有生成完成！图片已保存到数据库。",
               })}\n\n`
             )
           );
@@ -157,7 +207,7 @@ export async function POST(request: NextRequest) {
         Connection: "keep-alive",
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
       },
     });
   } catch (error) {

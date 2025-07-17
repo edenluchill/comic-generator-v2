@@ -5,9 +5,11 @@ import { authenticateRequest } from "@/lib/auth-helpers";
 // 更新角色
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     // 🔒 认证检查
     const { user, error: authError } = await authenticateRequest(request);
     if (authError || !user) {
@@ -30,7 +32,7 @@ export async function PUT(
         avatar_url: avatarUrl,
         three_view_url: threeViewUrl,
       })
-      .eq("id", params.id)
+      .eq("id", id)
       .eq("user_id", user.id) // 确保只能更新自己的角色
       .select()
       .single();
@@ -57,9 +59,11 @@ export async function PUT(
 // 删除角色
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+
     // 🔒 认证检查
     const { user, error: authError } = await authenticateRequest(request);
     if (authError || !user) {
@@ -70,7 +74,7 @@ export async function DELETE(
     const { error } = await supabaseAdmin
       .from("characters")
       .delete()
-      .eq("id", params.id)
+      .eq("id", id)
       .eq("user_id", user.id); // 确保只能删除自己的角色
 
     if (error) {

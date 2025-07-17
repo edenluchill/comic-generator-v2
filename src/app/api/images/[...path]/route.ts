@@ -3,11 +3,13 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
   try {
+    const { path } = await params;
+
     const bucket = "generated-images";
-    const filePath = params.path.join("/");
+    const filePath = path.join("/");
 
     // 从 Supabase Storage 获取文件
     const { data, error } = await supabaseAdmin.storage

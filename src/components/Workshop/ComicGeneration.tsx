@@ -7,16 +7,30 @@ import CharactersList from "./CharactersList";
 import DiaryInput from "./DiaryInput";
 import ComicDisplay from "./ComicDisplay";
 import { useCharacters } from "@/hooks/useCharacters";
+import { useComicGeneration } from "@/hooks/useComicGeneration";
+import { Character } from "@/types/characters";
 
 export default function ComicGeneration() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: characters = [], isLoading } = useCharacters();
+  const {
+    isGenerating,
+    progress,
+    message,
+    currentScene,
+    totalScenes,
+    result,
+    error,
+    generateComic,
+    retryScene,
+  } = useComicGeneration();
 
   const [mounted, setMounted] = useState(false);
   const [storyText, setStoryText] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [comicUrl, setComicUrl] = useState<string | null>(null);
+  const [selectedStyle] = useState<"cute" | "realistic" | "minimal" | "kawaii">(
+    "cute"
+  );
 
   useEffect(() => {
     setMounted(true);
@@ -36,18 +50,28 @@ export default function ComicGeneration() {
   const handleGenerateComic = async () => {
     if (!storyText.trim() || characters.length === 0) return;
 
-    setIsGenerating(true);
     try {
-      // TODO: 实现漫画生成API调用
-      // 这里暂时模拟一个生成过程
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-
-      // 模拟生成结果
-      setComicUrl("/api/placeholder-comic.jpg");
+      const characterData = characters.map((c: Character) => ({
+        id: c.id,
+        name: c.name,
+        avatar_url: c.avatar_url,
+      }));
+      await generateComic({
+        diary_content: storyText,
+        characters: characterData,
+        style: selectedStyle,
+      });
     } catch (error) {
       console.error("生成漫画失败:", error);
-    } finally {
-      setIsGenerating(false);
+    }
+  };
+
+  const handleRetryScene = async (sceneId: string, newDescription: string) => {
+    try {
+      await retryScene(sceneId, newDescription);
+    } catch (error) {
+      console.error("重试场景失败:", error);
+      // 可以在这里添加错误提示
     }
   };
 
@@ -122,10 +146,16 @@ export default function ComicGeneration() {
             }`}
           >
             <ComicDisplay
-              comicUrl={comicUrl || undefined}
               isGenerating={isGenerating}
               onGenerate={handleGenerateComic}
               canGenerate={canGenerate}
+              progress={progress}
+              progressMessage={message}
+              currentScene={currentScene}
+              totalScenes={totalScenes}
+              scenes={result?.scenes}
+              error={error}
+              onRetryScene={handleRetryScene}
             />
           </div>
         </div>

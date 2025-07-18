@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Eye, X, Edit3, Save, Check } from "lucide-react";
 import { FluxGenerationResult } from "@/types/flux";
+import Image from "next/image";
 
 interface AvatarDisplaySectionProps {
   currentStep: number;
@@ -105,12 +106,13 @@ export default function AvatarDisplaySection({
     if (avatarResult) {
       return (
         <div className="h-full flex flex-col items-center justify-center space-y-4">
-          <img
-            src={avatarResult.imageUrl}
+          <Image
+            src={avatarResult.imageUrl || ""}
             alt="卡通头像"
             className="object-cover rounded-lg shadow-lg"
             width={300}
             height={300}
+            unoptimized
           />
 
           {/* 角色生成完成状态 */}
@@ -229,10 +231,13 @@ export default function AvatarDisplaySection({
               </button>
             </div>
             <div className="text-center">
-              <img
-                src={threeViewResult.imageUrl}
+              <Image
+                src={threeViewResult.imageUrl || ""}
                 alt="角色3视图"
                 className="max-w-full h-auto rounded-lg shadow-lg"
+                width={600}
+                height={400}
+                unoptimized
               />
               <p className="text-sm text-gray-600 mt-2">
                 这个3视图可用于生成不同动作的漫画角色

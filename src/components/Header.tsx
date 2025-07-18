@@ -35,7 +35,7 @@ const Header = memo(function Header() {
           {/* Logo区域 */}
           <Link
             href={getLocalizedHref("/")}
-            className="flex items-center space-x-3 group"
+            className="flex items-center gap-3 group"
           >
             <div className="relative">
               <div className="w-10 h-10 border-2 border-amber-400/50 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:border-amber-500 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-amber-400/20">
@@ -53,9 +53,9 @@ const Header = memo(function Header() {
           </Link>
 
           {/* 右侧功能区 */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-3">
             {/* 桌面端导航链接 */}
-            <nav className="hidden md:flex items-center space-x-2">
+            <nav className="hidden md:flex items-center gap-2">
               <Link href={getLocalizedHref("/")}>
                 <Button
                   variant="ghost"

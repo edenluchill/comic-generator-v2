@@ -63,9 +63,9 @@ export default function LanguagePicker() {
         )}
       >
         <Languages className="w-4 h-4" />
-        <span className="text-sm">
+        {/* <span className="text-sm">
           {languages.find((lang) => lang.code === currentLocale)?.flag}
-        </span>
+        </span> */}
       </Button>
 
       {showMenu && (

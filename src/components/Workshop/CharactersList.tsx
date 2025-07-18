@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Plus, X, Eye, Trash2 } from "lucide-react";
+import { createPortal } from "react-dom";
 
 // 更新接口以接收角色数据
 interface CharactersListProps {
@@ -80,83 +81,88 @@ export default function CharactersList({
         </div>
       </div>
 
-      {/* 角色详情模态框 - 添加删除按钮 */}
-      {selectedCharacter && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-gray-800">
-                {selectedCharacter.name}
-              </h3>
-              <div className="flex items-center gap-2">
-                {onDeleteCharacter && (
-                  <button
-                    onClick={() => handleDeleteCharacter(selectedCharacter.id)}
-                    className="p-2 hover:bg-red-100 rounded-full transition-colors text-red-600"
-                    title="删除角色"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
-                )}
-                <button
-                  onClick={() => setSelectedCharacter(null)}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* 头像 */}
-              <div className="text-center">
-                <h4 className="text-lg font-semibold text-gray-700 mb-3">
-                  头像
-                </h4>
-                <img
-                  src={selectedCharacter.avatar_url}
-                  alt={`${selectedCharacter.name} 头像`}
-                  className="w-full max-w-sm mx-auto rounded-lg shadow-lg"
-                />
-              </div>
-
-              {/* 3视图 */}
-              <div className="text-center">
-                <h4 className="text-lg font-semibold text-gray-700 mb-3">
-                  3视图
-                </h4>
-                <img
-                  src={selectedCharacter.three_view_url}
-                  alt={`${selectedCharacter.name} 3视图`}
-                  className="w-full max-w-sm mx-auto rounded-lg shadow-lg"
-                />
-              </div>
-            </div>
-
-            {/* 角色信息 */}
-            <div className="mt-6 bg-gray-50 rounded-lg p-4">
-              <h4 className="text-lg font-semibold text-gray-700 mb-2">
-                角色信息
-              </h4>
-              <div className="space-y-2 text-sm text-gray-600">
-                <p>
-                  <strong>创建时间：</strong>{" "}
-                  {new Date(selectedCharacter.created_at).toLocaleString(
-                    "zh-CN"
+      {/* 角色详情模态框 - 使用 Portal 渲染到 body */}
+      {selectedCharacter &&
+        typeof document !== "undefined" &&
+        createPortal(
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
+            <div className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-gray-800">
+                  {selectedCharacter.name}
+                </h3>
+                <div className="flex items-center gap-2">
+                  {onDeleteCharacter && (
+                    <button
+                      onClick={() =>
+                        handleDeleteCharacter(selectedCharacter.id)
+                      }
+                      className="p-2 hover:bg-red-100 rounded-full transition-colors text-red-600"
+                      title="删除角色"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
                   )}
-                </p>
-                <p>
-                  <strong>角色ID：</strong> {selectedCharacter.id}
-                </p>
-                <p className="text-blue-600 font-medium">
-                  💡 提示：在创作故事时，您可以使用角色名字 &quot;
-                  {selectedCharacter.name}&quot; 来指定这个角色的动作
-                </p>
+                  <button
+                    onClick={() => setSelectedCharacter(null)}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* 头像 */}
+                <div className="text-center">
+                  <h4 className="text-lg font-semibold text-gray-700 mb-3">
+                    头像
+                  </h4>
+                  <img
+                    src={selectedCharacter.avatar_url}
+                    alt={`${selectedCharacter.name} 头像`}
+                    className="w-full max-w-sm mx-auto rounded-lg shadow-lg"
+                  />
+                </div>
+
+                {/* 3视图 */}
+                <div className="text-center">
+                  <h4 className="text-lg font-semibold text-gray-700 mb-3">
+                    3视图
+                  </h4>
+                  <img
+                    src={selectedCharacter.three_view_url}
+                    alt={`${selectedCharacter.name} 3视图`}
+                    className="w-full max-w-sm mx-auto rounded-lg shadow-lg"
+                  />
+                </div>
+              </div>
+
+              {/* 角色信息 */}
+              <div className="mt-6 bg-gray-50 rounded-lg p-4">
+                <h4 className="text-lg font-semibold text-gray-700 mb-2">
+                  角色信息
+                </h4>
+                <div className="space-y-2 text-sm text-gray-600">
+                  <p>
+                    <strong>创建时间：</strong>{" "}
+                    {new Date(selectedCharacter.created_at).toLocaleString(
+                      "zh-CN"
+                    )}
+                  </p>
+                  <p>
+                    <strong>角色ID：</strong> {selectedCharacter.id}
+                  </p>
+                  <p className="text-blue-600 font-medium">
+                    💡 提示：在创作故事时，您可以使用角色名字 &quot;
+                    {selectedCharacter.name}&quot; 来指定这个角色的动作
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </>
   );
 }

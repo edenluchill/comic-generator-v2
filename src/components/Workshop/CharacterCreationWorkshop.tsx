@@ -128,6 +128,13 @@ export default function CharacterCreationWorkshop() {
     router.push(`/workshop?${newSearchParams.toString()}`);
   }, [searchParams, router]);
 
+  // 添加返回workshop概览的函数
+  const handleBackToWorkshop = useCallback(() => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.delete("mode"); // 移除mode参数回到默认页面
+    router.push(`/workshop?${newSearchParams.toString()}`);
+  }, [searchParams, router]);
+
   // 简化的计算属性
   const canGenerate = uploadedFile && !isProcessing;
   const canSwitchToComic = !isProcessing && characters.length > 0;
@@ -201,6 +208,27 @@ export default function CharacterCreationWorkshop() {
 
         {/* 底部操作区域 */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          {/* 返回workshop按钮 */}
+          <button
+            onClick={handleBackToWorkshop}
+            className="px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            返回工作室
+          </button>
+
           <button
             onClick={handleFluxGeneration}
             disabled={!canGenerate}
@@ -219,7 +247,7 @@ export default function CharacterCreationWorkshop() {
             disabled={!canSwitchToComic}
             className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
               canSwitchToComic
-                ? "bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
+                ? "bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >

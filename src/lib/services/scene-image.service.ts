@@ -113,7 +113,7 @@ export class SceneImageService {
       referenceImage || "",
       processedPrompt.processedPrompt, // 使用处理后的prompt
       {
-        aspectRatio: "16:9",
+        aspectRatio: "1:1",
         outputFormat: "png",
         promptUpsampling: true,
         safetyTolerance: 2,

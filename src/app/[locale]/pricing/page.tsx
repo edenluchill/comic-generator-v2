@@ -5,12 +5,10 @@ import { Button } from "@/components/ui/button";
 import {
   Check,
   X,
-  Crown,
   Star,
   Zap,
   Shield,
   Users,
-  Sparkles,
   Clock,
   TrendingUp,
   PhoneOutgoing,

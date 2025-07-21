@@ -98,27 +98,31 @@ export default function ComicGeneration() {
       </div>
 
       <div className="container mx-auto px-4 py-6 relative z-10 max-w-7xl">
-        {/* 标题和返回按钮 */}
+        {/* 返回按钮 */}
         <div
-          className={`flex items-center gap-4 mb-4 transition-all duration-1000 ${
+          className={`mb-6 transition-all duration-1000 ${
             mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
           }`}
         >
           <button
             onClick={handleBackToWorkshop}
-            className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm hover:shadow-md transition-all duration-300 text-amber-700 hover:text-amber-800"
+            className="flex items-center gap-2 px-3 py-1.5 text-amber-600 hover:text-amber-700 hover:bg-white/50 rounded-lg transition-all duration-300 text-sm"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4" />
             返回工作室
           </button>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-amber-800">
-              漫画生成器
-            </h1>
-            <p className="text-amber-700 text-sm md:text-base">
-              用你的角色和故事创作四格漫画
-            </p>
-          </div>
+        </div>
+
+        {/* 标题区域 */}
+        <div
+          className={`text-center mb-4 transition-all duration-1000 delay-200 ${
+            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+          }`}
+        >
+          <h1 className="text-3xl md:text-4xl font-bold text-amber-800 mb-2">
+            漫画生成器
+          </h1>
+          <p className="text-amber-700 text-lg">用你的角色和故事创作四格漫画</p>
         </div>
 
         {/* 角色列表 */}

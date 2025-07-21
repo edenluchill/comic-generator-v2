@@ -3,6 +3,86 @@ import { supabaseAdmin } from "@/lib/supabase/server";
 import { authenticateRequest } from "@/lib/auth-helpers";
 import { deleteStoredImage } from "@/lib/image-storage";
 import { APIResponse } from "@/types/api";
+import { Diary } from "@/types/diary";
+
+// 新增：更新日记
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    // 认证检查
+    const { user, error: authError } = await authenticateRequest(request);
+    if (authError || !user) {
+      return NextResponse.json({ error: "未授权访问" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { title, content, mood, date } = body;
+
+    // 输入验证 - 至少需要提供一个要更新的字段
+    if (
+      title === undefined &&
+      content === undefined &&
+      mood === undefined &&
+      date === undefined
+    ) {
+      return NextResponse.json(
+        { error: "至少需要提供一个要更新的字段" },
+        { status: 400 }
+      );
+    }
+
+    // 构建更新对象，只包含提供的字段
+    const updateData: Partial<
+      Pick<Diary, "title" | "content" | "mood" | "date">
+    > & { updated_at: string } = {
+      updated_at: new Date().toISOString(),
+    };
+    if (title !== undefined) updateData.title = title;
+    if (content !== undefined) updateData.content = content;
+    if (mood !== undefined) updateData.mood = mood;
+    if (date !== undefined) updateData.date = date;
+
+    // 更新日记
+    const { data: diary, error } = await supabaseAdmin
+      .from("diary")
+      .update(updateData)
+      .eq("id", id)
+      .eq("user_id", user.id) // 确保只能更新自己的日记
+      .select()
+      .single();
+
+    if (error) {
+      console.error("更新日记失败:", error);
+      return NextResponse.json({ error: "更新日记失败" }, { status: 500 });
+    }
+
+    if (!diary) {
+      return NextResponse.json(
+        { error: "日记不存在或无权限" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      data: diary,
+      message: "日记更新成功",
+    });
+  } catch (error) {
+    console.error("更新日记API错误:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: error instanceof Error ? error.message : "服务器内部错误",
+      },
+      { status: 500 }
+    );
+  }
+}
 
 export async function DELETE(
   request: NextRequest,

@@ -129,3 +129,76 @@ export function useDeleteDiary() {
     },
   });
 }
+
+export function useUpdateDiary() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      diaryId,
+      updateData,
+    }: {
+      diaryId: string;
+      updateData: {
+        title?: string;
+        content?: string;
+        mood?: string;
+        date?: string;
+      };
+    }) => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        throw new Error("用户未登录");
+      }
+
+      const response = await fetch(`/api/diaries/${diaryId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify(updateData),
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "更新日记失败");
+      }
+
+      return response.json();
+    },
+    onSuccess: (data, variables) => {
+      const { diaryId } = variables;
+      const updatedDiary = data.data;
+
+      // 直接更新缓存中的日记数据
+      queryClient.setQueryData(["diaries"], (oldData: DiariesResponse) => {
+        if (!oldData?.diaries) return oldData;
+
+        return {
+          ...oldData,
+          diaries: oldData.diaries.map((diary: DiaryWithComics) =>
+            diary.id === diaryId ? { ...diary, ...updatedDiary } : diary
+          ),
+        };
+      });
+
+      // 更新单个日记的缓存
+      queryClient.setQueryData(
+        ["diary", diaryId],
+        (oldData: DiaryWithComics) => {
+          if (!oldData) return oldData;
+          return { ...oldData, ...updatedDiary };
+        }
+      );
+
+      // 同时刷新查询以确保数据一致性
+      queryClient.invalidateQueries({ queryKey: ["diaries"] });
+      queryClient.invalidateQueries({ queryKey: ["diary", diaryId] });
+    },
+  });
+}

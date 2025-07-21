@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { authenticateRequest } from "@/lib/auth-helpers";
 import { deleteStoredImage } from "@/lib/image-storage";
+import { UpdateCharacterData } from "@/types/characters";
 
 // 更新角色
 export async function PUT(
@@ -20,19 +21,24 @@ export async function PUT(
     const body = await request.json();
     const { name, avatarUrl, threeViewUrl } = body;
 
-    // 🔒 输入验证
-    if (!name || !avatarUrl || !threeViewUrl) {
-      return NextResponse.json({ error: "缺少必要字段" }, { status: 400 });
+    // 🔒 输入验证 - 现在支持部分更新，至少需要一个字段
+    if (!name && !avatarUrl && !threeViewUrl) {
+      return NextResponse.json(
+        { error: "至少需要提供一个要更新的字段" },
+        { status: 400 }
+      );
     }
+
+    // 构建更新对象，只包含提供的字段
+    const updateData: UpdateCharacterData = {};
+    if (name !== undefined) updateData.name = name;
+    if (avatarUrl !== undefined) updateData.avatar_url = avatarUrl;
+    if (threeViewUrl !== undefined) updateData.three_view_url = threeViewUrl;
 
     // 更新角色
     const { data: character, error } = await supabaseAdmin
       .from("characters")
-      .update({
-        name,
-        avatar_url: avatarUrl,
-        three_view_url: threeViewUrl,
-      })
+      .update(updateData)
       .eq("id", id)
       .eq("user_id", user.id) // 确保只能更新自己的角色
       .select()

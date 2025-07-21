@@ -197,7 +197,7 @@ export default function HomePage() {
           className="mb-16 animate-fade-in-up max-w-7xl mx-auto"
           style={{ animationDelay: "600ms" }}
         >
-          <div className="text-center mb-8 animate-slide-in-right">
+          <div className="text-center mb-4 animate-slide-in-right">
             <h4 className="text-lg font-semibold text-amber-900 mb-3 animate-pulse">
               {t("examples")}
             </h4>

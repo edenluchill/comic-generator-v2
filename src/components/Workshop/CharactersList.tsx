@@ -81,9 +81,6 @@ export default function CharactersList({
             {/* 图标 */}
             <div className="relative">
               <Plus className="w-8 h-8 text-amber-400 group-hover:text-amber-600 transition-all duration-300 group-hover:scale-110" />
-
-              {/* 魔法光效 */}
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full opacity-0 group-hover:opacity-20 blur-lg animate-pulse"></div>
             </div>
           </div>
         </div>

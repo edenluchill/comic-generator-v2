@@ -59,7 +59,7 @@ export default function WorkshopOverview() {
       <div className="container mx-auto px-4 py-8 relative z-10 max-w-6xl">
         {/* 标题 */}
         <div
-          className={`text-center mb-8 transition-all duration-1000 ${
+          className={`text-center mb-4 transition-all duration-1000 ${
             mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
           }`}
         >

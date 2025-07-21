@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/hooks/useTranslations";
-import { Home, Pencil, Palette } from "lucide-react";
+import { Home, Pencil, Palette, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 // import LanguagePicker from "./Header/LanguagePicker";
 // import AccountMenu from "./Header/AccountMenu";
@@ -118,6 +118,44 @@ const Header = memo(function Header() {
                     )}
                   >
                     {t("workshop")}
+                  </span>
+                </Button>
+              </Link>
+
+              {/* 价格模型按钮 - 皇冠图标 */}
+              <Link href={getLocalizedHref("/pricing")}>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "h-10 px-4 transition-all duration-300",
+                    "flex items-center gap-2",
+                    "text-sm font-medium text-yellow-700/80",
+                    "hover:bg-yellow-500/15 hover:backdrop-blur-sm hover:text-yellow-800",
+                    "hover:shadow-md hover:shadow-yellow-500/25",
+                    "rounded-full border border-transparent hover:border-yellow-400/30",
+                    "relative overflow-hidden",
+                    isActive("/pricing") &&
+                      "bg-yellow-500/15 backdrop-blur-sm text-yellow-800 font-semibold scale-[1.02] border-yellow-400/30"
+                  )}
+                >
+                  {/* 背景闪光效果 */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-400/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+
+                  <div
+                    className={cn(
+                      "transition-colors relative z-10",
+                      isActive("/pricing") && "text-yellow-700"
+                    )}
+                  >
+                    <Crown className="w-4 h-4 drop-shadow-sm" />
+                  </div>
+                  <span
+                    className={cn(
+                      "transition-colors relative z-10",
+                      isActive("/pricing") && "text-yellow-800"
+                    )}
+                  >
+                    升级专业版
                   </span>
                 </Button>
               </Link>

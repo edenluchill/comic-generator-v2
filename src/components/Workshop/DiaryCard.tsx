@@ -114,7 +114,7 @@ export default function DiaryCard({
 
         {/* 标题 */}
         <div className="mb-3 mt-2 relative z-10">
-          <h4 className="font-medium text-gray-800 text-sm line-clamp-2 relative bg-gradient-to-r from-amber-50/80 to-transparent px-1 py-0.5 rounded">
+          <h4 className="font-medium text-gray-800 text-sm line-clamp-2 relative bg-gradient-to-r from-amber-50/80 to-transparent rounded">
             {diary.title || "无标题日记"}
             <div className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-amber-300 via-amber-400 to-transparent opacity-40"></div>
           </h4>

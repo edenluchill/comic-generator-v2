@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import CharactersList from "./CharactersList";
 import DiaryInput from "./DiaryInput";
 import ComicDisplay from "./ComicDisplay";
-import { useCharacters } from "@/hooks/useCharacters";
+import { useCharacters, useDeleteCharacter } from "@/hooks/useCharacters";
 import { useComicGeneration } from "@/hooks/useComicGeneration";
 import { Character } from "@/types/characters";
 
@@ -14,6 +14,7 @@ export default function ComicGeneration() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: characters = [], isLoading } = useCharacters();
+  const deleteCharacterMutation = useDeleteCharacter();
   const {
     isGenerating,
     progress,
@@ -45,6 +46,16 @@ export default function ComicGeneration() {
   const handleAddNewCharacter = () => {
     // 切换到角色创建模式
     handleBackToWorkshop();
+  };
+
+  const handleDeleteCharacter = async (id: string) => {
+    try {
+      await deleteCharacterMutation.mutateAsync(id);
+      // 可以在这里添加成功提示
+    } catch (error) {
+      console.error("删除角色失败:", error);
+      // 可以在这里添加错误提示
+    }
   };
 
   const handleGenerateComic = async () => {
@@ -86,7 +97,7 @@ export default function ComicGeneration() {
         <div className="absolute bottom-10 right-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-orange-400/10 to-yellow-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-      <div className="container mx-auto px-3 py-3 relative z-10 max-w-7xl">
+      <div className="container mx-auto px-4 py-6 relative z-10 max-w-7xl">
         {/* 标题和返回按钮 */}
         <div
           className={`flex items-center gap-4 mb-4 transition-all duration-1000 ${
@@ -117,15 +128,21 @@ export default function ComicGeneration() {
             mounted={mounted}
             characters={characters}
             loading={isLoading}
-            onDeleteCharacter={async (id) => {
-              // 实现删除逻辑，可能需要创建一个删除mutation
-              console.log("删除角色:", id);
-            }}
+            onDeleteCharacter={handleDeleteCharacter}
           />
         </div>
 
+        {/* 删除错误信息 */}
+        {deleteCharacterMutation.error && (
+          <div className="mb-4 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm">
+              ❌ {deleteCharacterMutation.error.message}
+            </div>
+          </div>
+        )}
+
         {/* 主要内容区域 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[600px]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* 左列：日记输入 */}
           <div
             className={`transition-all duration-1000 delay-300 ${

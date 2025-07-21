@@ -9,7 +9,11 @@ import UploadAnalysisSection from "./UploadAnalysisSection";
 import AvatarDisplaySection from "./AvatarDisplaySection";
 import CharactersList from "./CharactersList";
 // 替换 Redux imports
-import { useCharacters, useCreateCharacter } from "@/hooks/useCharacters";
+import {
+  useCharacters,
+  useCreateCharacter,
+  useDeleteCharacter,
+} from "@/hooks/useCharacters";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function CharacterCreationWorkshop() {
@@ -21,6 +25,7 @@ export default function CharacterCreationWorkshop() {
   // 使用新的 TanStack Query hooks
   const { data: characters = [], error, isLoading } = useCharacters();
   const createCharacterMutation = useCreateCharacter();
+  const deleteCharacterMutation = useDeleteCharacter();
 
   // 简化状态管理
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
@@ -115,6 +120,19 @@ export default function CharacterCreationWorkshop() {
     ]
   );
 
+  const handleDeleteCharacter = useCallback(
+    async (id: string) => {
+      try {
+        await deleteCharacterMutation.mutateAsync(id);
+        // 可以在这里添加成功提示
+      } catch (error) {
+        console.error("删除角色失败:", error);
+        // 可以在这里添加错误提示
+      }
+    },
+    [deleteCharacterMutation]
+  );
+
   const handleAddNewCharacter = useCallback(() => {
     setUploadedImage(null);
     setUploadedFile(null);
@@ -125,13 +143,6 @@ export default function CharacterCreationWorkshop() {
   const handleSwitchToComic = useCallback(() => {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set("mode", "comic");
-    router.push(`/workshop?${newSearchParams.toString()}`);
-  }, [searchParams, router]);
-
-  // 添加返回workshop概览的函数
-  const handleBackToWorkshop = useCallback(() => {
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.delete("mode"); // 移除mode参数回到默认页面
     router.push(`/workshop?${newSearchParams.toString()}`);
   }, [searchParams, router]);
 
@@ -169,15 +180,12 @@ export default function CharacterCreationWorkshop() {
             mounted={mounted}
             characters={characters}
             loading={isLoading}
-            onDeleteCharacter={async (id) => {
-              // 实现删除逻辑，可能需要创建一个删除mutation
-              console.log("删除角色:", id);
-            }}
+            onDeleteCharacter={handleDeleteCharacter}
           />
         </div>
 
         {/* 主要内容区域 */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
           {/* 左列：上传和分析 */}
           <div className="order-1 xl:order-1">
             <UploadAnalysisSection
@@ -207,41 +215,22 @@ export default function CharacterCreationWorkshop() {
         </div>
 
         {/* 底部操作区域 */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          {/* 返回workshop按钮 */}
-          <button
-            onClick={handleBackToWorkshop}
-            className="px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 bg-gradient-to-r from-gray-400 to-gray-500 hover:from-gray-500 hover:to-gray-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            返回工作室
-          </button>
-
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          {/* 生成按钮 */}
           <button
             onClick={handleFluxGeneration}
             disabled={!canGenerate}
             className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
               canGenerate
-                ? "bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
+                ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
           >
             <Wand2 className="w-5 h-5" />
-            {isProcessing ? "生成中..." : "开始生成角色"}
+            {isProcessing ? "生成中..." : "开始生成"}
           </button>
 
+          {/* 创作漫画按钮 */}
           <button
             onClick={handleSwitchToComic}
             disabled={!canSwitchToComic}
@@ -270,6 +259,15 @@ export default function CharacterCreationWorkshop() {
           <div className="mt-4 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm">
               ❌ {createCharacterMutation.error.message}
+            </div>
+          </div>
+        )}
+
+        {/* 删除错误信息 */}
+        {deleteCharacterMutation.error && (
+          <div className="mt-4 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm">
+              ❌ {deleteCharacterMutation.error.message}
             </div>
           </div>
         )}

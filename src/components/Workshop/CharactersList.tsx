@@ -1,26 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X, Eye, Trash2 } from "lucide-react";
-import { createPortal } from "react-dom";
+import { Plus } from "lucide-react";
+import { Character } from "@/types/characters";
+import CharacterCard from "./CharacterCard";
+import CharacterDetailModal from "./CharacterDetailModal";
 
-// 更新接口以接收角色数据
 interface CharactersListProps {
   onAddNewCharacter: () => void;
   mounted: boolean;
-  characters: Character[]; // 添加角色数据prop
-  loading?: boolean; // 添加loading状态prop
-  onDeleteCharacter?: (id: string) => Promise<void>; // 添加删除回调
-}
-
-// 定义Character类型（如果需要的话）
-interface Character {
-  id: string;
-  name: string;
-  avatar_url: string;
-  three_view_url: string;
-  created_at: string;
-  user_id: string;
+  characters: Character[];
+  loading?: boolean;
+  onDeleteCharacter?: (id: string) => Promise<void>;
 }
 
 export default function CharactersList({
@@ -34,20 +25,6 @@ export default function CharactersList({
     null
   );
 
-  const handleDeleteCharacter = async (characterId: string) => {
-    if (confirm("确定要删除这个角色吗？")) {
-      try {
-        if (onDeleteCharacter) {
-          await onDeleteCharacter(characterId);
-        }
-        setSelectedCharacter(null);
-      } catch (error) {
-        console.error("删除角色失败:", error);
-        // 可以在这里显示错误提示
-      }
-    }
-  };
-
   return (
     <>
       <div
@@ -55,13 +32,25 @@ export default function CharactersList({
           mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
         }`}
       >
-        <div className="mb-4">
-          <h3 className="text-lg font-semibold text-amber-800 mb-3">
-            我的角色 ({characters.length}) {loading && "(加载中...)"}
+        <div className="mb-6">
+          <h3 className="text-xl font-bold text-amber-800 mb-2 flex items-center gap-2">
+            我的角色库
+            <span className="text-base font-normal bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
+              {characters.length}
+            </span>
+            {loading && (
+              <span className="text-sm font-normal text-amber-600 animate-pulse">
+                (同步中...)
+              </span>
+            )}
           </h3>
+          <p className="text-sm text-amber-600/80">
+            点击角色查看详情，或创建新角色开始你的创作之旅
+          </p>
         </div>
 
-        <div className="flex flex-wrap gap-4">
+        {/* 角色网格 - 移除不必要的底部padding，但保留顶部空间给气泡 */}
+        <div className="flex flex-wrap gap-4 items-start">
           {/* 现有角色 */}
           {characters.map((character) => (
             <CharacterCard
@@ -74,126 +63,40 @@ export default function CharactersList({
           {/* 添加新角色按钮 */}
           <div
             onClick={onAddNewCharacter}
-            className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-gray-400 hover:bg-gray-50 group"
+            className="group w-24 h-24 border-2 border-dashed border-amber-300/60 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:border-amber-400 hover:bg-gradient-to-br hover:from-amber-50 hover:to-orange-50 hover:scale-105 hover:shadow-lg hover:shadow-amber-500/20 relative"
           >
-            <Plus className="w-8 h-8 text-gray-400 group-hover:text-gray-600 transition-colors duration-300" />
+            {/* 上方提示气泡 */}
+            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50">
+              <div className="relative">
+                <div className="bg-white/95 backdrop-blur-md text-amber-800 text-xs font-medium px-3 py-2 rounded-xl shadow-lg border border-amber-200/50 whitespace-nowrap">
+                  创建新角色
+                </div>
+                <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-white/95 border-r border-b border-amber-200/50 rotate-45"></div>
+              </div>
+            </div>
+
+            {/* 背景渐变 */}
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-50/50 via-orange-50/30 to-yellow-50/50 rounded-2xl opacity-0 group-hover:opacity-100 transition-all duration-300"></div>
+
+            {/* 图标 */}
+            <div className="relative">
+              <Plus className="w-8 h-8 text-amber-400 group-hover:text-amber-600 transition-all duration-300 group-hover:scale-110" />
+
+              {/* 魔法光效 */}
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full opacity-0 group-hover:opacity-20 blur-lg animate-pulse"></div>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* 角色详情模态框 - 使用 Portal 渲染到 body */}
-      {selectedCharacter &&
-        typeof document !== "undefined" &&
-        createPortal(
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[9999] p-4">
-            <div className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-2xl font-bold text-gray-800">
-                  {selectedCharacter.name}
-                </h3>
-                <div className="flex items-center gap-2">
-                  {onDeleteCharacter && (
-                    <button
-                      onClick={() =>
-                        handleDeleteCharacter(selectedCharacter.id)
-                      }
-                      className="p-2 hover:bg-red-100 rounded-full transition-colors text-red-600"
-                      title="删除角色"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setSelectedCharacter(null)}
-                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* 头像 */}
-                <div className="text-center">
-                  <h4 className="text-lg font-semibold text-gray-700 mb-3">
-                    头像
-                  </h4>
-                  <img
-                    src={selectedCharacter.avatar_url}
-                    alt={`${selectedCharacter.name} 头像`}
-                    className="w-full max-w-sm mx-auto rounded-lg shadow-lg"
-                  />
-                </div>
-
-                {/* 3视图 */}
-                <div className="text-center">
-                  <h4 className="text-lg font-semibold text-gray-700 mb-3">
-                    3视图
-                  </h4>
-                  <img
-                    src={selectedCharacter.three_view_url}
-                    alt={`${selectedCharacter.name} 3视图`}
-                    className="w-full max-w-sm mx-auto rounded-lg shadow-lg"
-                  />
-                </div>
-              </div>
-
-              {/* 角色信息 */}
-              <div className="mt-6 bg-gray-50 rounded-lg p-4">
-                <h4 className="text-lg font-semibold text-gray-700 mb-2">
-                  角色信息
-                </h4>
-                <div className="space-y-2 text-sm text-gray-600">
-                  <p>
-                    <strong>创建时间：</strong>{" "}
-                    {new Date(selectedCharacter.created_at).toLocaleString(
-                      "zh-CN"
-                    )}
-                  </p>
-                  <p>
-                    <strong>角色ID：</strong> {selectedCharacter.id}
-                  </p>
-                  <p className="text-blue-600 font-medium">
-                    💡 提示：在创作故事时，您可以使用角色名字 &quot;
-                    {selectedCharacter.name}&quot; 来指定这个角色的动作
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>,
-          document.body
-        )}
-    </>
-  );
-}
-
-function CharacterCard({
-  character,
-  onClick,
-}: {
-  character: Character;
-  onClick: () => void;
-}) {
-  return (
-    <div className="group relative cursor-pointer" onClick={onClick}>
-      <div className="w-20 h-20 rounded-xl overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg hover:scale-105 relative">
-        <img
-          src={character.avatar_url}
-          alt={character.name}
-          className="w-full h-full object-cover"
+      {/* 角色详情模态框 */}
+      {selectedCharacter && (
+        <CharacterDetailModal
+          character={selectedCharacter}
+          onClose={() => setSelectedCharacter(null)}
+          onDelete={onDeleteCharacter}
         />
-        {/* 查看详情图标 */}
-        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-          <Eye className="w-6 h-6 text-white" />
-        </div>
-      </div>
-
-      {/* 角色名称提示 */}
-      <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <div className="bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-          {character.name}
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }

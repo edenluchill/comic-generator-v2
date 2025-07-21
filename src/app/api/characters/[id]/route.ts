@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase/server";
 import { authenticateRequest } from "@/lib/auth-helpers";
+import { deleteStoredImage } from "@/lib/image-storage";
 
 // 更新角色
 export async function PUT(
@@ -70,15 +71,56 @@ export async function DELETE(
       return NextResponse.json({ error: "未授权访问" }, { status: 401 });
     }
 
-    // 删除角色
-    const { error } = await supabaseAdmin
+    // 首先获取角色信息，包括图片URL
+    const { data: character, error: fetchError } = await supabaseAdmin
+      .from("characters")
+      .select("id, avatar_url, three_view_url")
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single();
+
+    if (fetchError || !character) {
+      return NextResponse.json(
+        { error: "角色不存在或无权限" },
+        { status: 404 }
+      );
+    }
+
+    // 删除 Supabase Storage 中的图片
+    const imageDeletePromises = [];
+
+    if (character.avatar_url) {
+      imageDeletePromises.push(
+        deleteStoredImage(character.avatar_url, "generated-images").catch(
+          (error) => {
+            console.error(`删除头像失败 ${character.avatar_url}:`, error);
+          }
+        )
+      );
+    }
+
+    if (character.three_view_url) {
+      imageDeletePromises.push(
+        deleteStoredImage(character.three_view_url, "generated-images").catch(
+          (error) => {
+            console.error(`删除3视图失败 ${character.three_view_url}:`, error);
+          }
+        )
+      );
+    }
+
+    // 并行删除图片（即使失败也继续删除数据库记录）
+    await Promise.allSettled(imageDeletePromises);
+
+    // 删除数据库中的角色记录
+    const { error: deleteError } = await supabaseAdmin
       .from("characters")
       .delete()
       .eq("id", id)
-      .eq("user_id", user.id); // 确保只能删除自己的角色
+      .eq("user_id", user.id);
 
-    if (error) {
-      console.error("删除角色失败:", error);
+    if (deleteError) {
+      console.error("删除角色失败:", deleteError);
       return NextResponse.json({ error: "删除角色失败" }, { status: 500 });
     }
 

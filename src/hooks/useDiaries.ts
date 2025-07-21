@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/client";
 import { Diary } from "@/types/diary";
 
@@ -91,5 +91,41 @@ export function useDiary(diaryId: string) {
     },
     enabled: !!diaryId,
     staleTime: 5 * 60 * 1000, // 5分钟
+  });
+}
+
+// 新增：删除日记的 mutation hook
+export function useDeleteDiary() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (diaryId: string) => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        throw new Error("用户未登录");
+      }
+
+      const response = await fetch(`/api/diaries/${diaryId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "删除日记失败");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      // 删除成功后刷新日记列表
+      queryClient.invalidateQueries({ queryKey: ["diaries"] });
+    },
   });
 }

@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { useDiaries, DiaryWithComics } from "@/hooks/useDiaries";
+import {
+  useDiaries,
+  DiaryWithComics,
+  useDeleteDiary,
+} from "@/hooks/useDiaries";
 import DiaryCard from "./DiaryCard";
 import CreateDiaryCard from "./CreateDiaryCard";
 import DiaryEmptyState from "./DiaryEmptyState";
@@ -20,6 +24,7 @@ export default function DiaryList({
   mounted,
 }: DiaryListProps) {
   const { data: diariesData, isLoading, error } = useDiaries(1, 20);
+  const deleteDiaryMutation = useDeleteDiary();
   const [selectedDiary, setSelectedDiary] = useState<DiaryWithComics | null>(
     null
   );
@@ -35,6 +40,16 @@ export default function DiaryList({
     setSelectedDiary(null);
   };
 
+  const handleDeleteDiary = async (diaryId: string) => {
+    try {
+      await deleteDiaryMutation.mutateAsync(diaryId);
+      // 删除成功提示可以在这里添加，比如 toast 通知
+    } catch (error) {
+      console.error("删除日记失败:", error);
+      // 错误提示可以在这里添加
+    }
+  };
+
   return (
     <>
       <div
@@ -48,11 +63,20 @@ export default function DiaryList({
         {/* 错误提示 */}
         {error && <ErrorMessage error={error} />}
 
+        {/* 删除状态提示 */}
+        {deleteDiaryMutation.isPending && (
+          <div className="mb-4 p-3 bg-blue-50 text-blue-700 rounded-lg text-sm">
+            正在删除日记...
+          </div>
+        )}
+
         {/* 日记卡片网格 */}
         <DiaryGrid
           diaries={diaries}
           onViewDiary={handleViewDiary}
           onCreateNewDiary={onCreateNewDiary}
+          onDeleteDiary={handleDeleteDiary}
+          isDeleting={deleteDiaryMutation.isPending}
         />
 
         {/* 空状态 */}
@@ -103,10 +127,14 @@ function DiaryGrid({
   diaries,
   onViewDiary,
   onCreateNewDiary,
+  onDeleteDiary,
+  isDeleting,
 }: {
   diaries: DiaryWithComics[];
   onViewDiary: (diary: DiaryWithComics) => void;
   onCreateNewDiary: () => void;
+  onDeleteDiary: (diaryId: string) => void;
+  isDeleting: boolean;
 }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -116,6 +144,7 @@ function DiaryGrid({
           key={diary.id}
           diary={diary}
           onClick={() => onViewDiary(diary)}
+          onDelete={!isDeleting ? onDeleteDiary : undefined}
         />
       ))}
 

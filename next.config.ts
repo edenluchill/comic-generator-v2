@@ -5,21 +5,51 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin("./src/i18n.ts");
 
 const nextConfig: NextConfig = {
-  // 性能优化配置
   experimental: {
-    optimizeCss: true,
-    optimizeServerReact: true,
+    optimizeCss: true, // 启用 CSS 优化
+    optimizeServerReact: true, // 启用服务器 React 优化
+    // 启用并行路由处理
+    parallelServerBuildTraces: true,
+    webpackBuildWorker: true,
   },
 
-  // 指定服务器专用包，防止打包到客户端 (新的配置位置)
-  serverExternalPackages: ["openai", "@google-cloud/translate", "tsx"],
-
-  // Turbopack 配置
+  // 保留单一的turbopack配置
   turbopack: {
     rules: {
       "*.svg": ["@svgr/webpack"],
     },
   },
+
+  // 生产环境路由优化
+  ...(process.env.NODE_ENV === "production" && {
+    // 启用更激进的静态优化
+    trailingSlash: false,
+    // 预编译常用路由
+    async rewrites() {
+      return [
+        {
+          source: "/:locale(en|zh|ja|ko)",
+          destination: "/:locale",
+        },
+        {
+          source: "/:locale(en|zh|ja|ko)/workshop",
+          destination: "/:locale/workshop",
+        },
+        {
+          source: "/:locale(en|zh|ja|ko)/pricing",
+          destination: "/:locale/pricing",
+        },
+      ];
+    },
+  }),
+
+  // 指定服务器专用包，防止打包到客户端 (新的配置位置)
+  serverExternalPackages: [
+    "openai",
+    "@google-cloud/translate",
+    "tsx",
+    "@supabase/supabase-js",
+  ],
 
   // 编译优化
   compiler: {
@@ -84,25 +114,46 @@ const nextConfig: NextConfig = {
       config.optimization.splitChunks = {
         chunks: "all",
         cacheGroups: {
-          // 分离 Supabase 和其他大型库
+          // 更精细的分离 TanStack Query
+          tanstack: {
+            test: /[\\/]node_modules[\\/]@tanstack[\\/]/,
+            name: "tanstack",
+            priority: 25,
+            reuseExistingChunk: true,
+          },
+          // 分离 Radix UI 组件
+          radix: {
+            test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
+            name: "radix",
+            priority: 22,
+            reuseExistingChunk: true,
+          },
+          // 分离 Supabase
           supabase: {
             test: /[\\/]node_modules[\\/]@supabase[\\/]/,
             name: "supabase",
             priority: 15,
             reuseExistingChunk: true,
           },
-          // 分离 React 相关
-          react: {
-            test: /[\\/]node_modules[\\/](react|react-dom|react-redux|@reduxjs)[\\/]/,
-            name: "react",
-            priority: 20,
+          // 分离图标库
+          icons: {
+            test: /[\\/]node_modules[\\/](lucide-react|react-icons)[\\/]/,
+            name: "icons",
+            priority: 18,
             reuseExistingChunk: true,
           },
-          // 分离国际化相关
+          // 分离国际化
           intl: {
-            test: /[\\/]node_modules[\\/](next-intl|@tanstack)[\\/]/,
+            test: /[\\/]node_modules[\\/]next-intl[\\/]/,
             name: "intl",
             priority: 12,
+            reuseExistingChunk: true,
+          },
+          // React 相关
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+            name: "react",
+            priority: 30,
             reuseExistingChunk: true,
           },
           // 通用第三方库
@@ -112,13 +163,37 @@ const nextConfig: NextConfig = {
             priority: 10,
             reuseExistingChunk: true,
           },
-          // 通用代码
-          common: {
-            minChunks: 2,
-            priority: 5,
+          // 分离 OpenAI (如果用在客户端)
+          openai: {
+            test: /[\\/]node_modules[\\/]openai[\\/]/,
+            name: "openai",
+            priority: 24,
+            reuseExistingChunk: true,
+          },
+
+          // 分离工具库
+          utils: {
+            test: /[\\/]node_modules[\\/](clsx|class-variance-authority|tailwind-merge)[\\/]/,
+            name: "utils",
+            priority: 16,
+            reuseExistingChunk: true,
+          },
+
+          // 分离 Next.js 相关
+          next: {
+            test: /[\\/]node_modules[\\/]next[\\/]/,
+            name: "next",
+            priority: 28,
             reuseExistingChunk: true,
           },
         },
+      };
+
+      // 添加性能预算警告
+      config.performance = {
+        maxAssetSize: 200000, // 200KB
+        maxEntrypointSize: 400000, // 400KB
+        hints: "warning",
       };
     }
 

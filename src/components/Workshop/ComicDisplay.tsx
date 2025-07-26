@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { ImageIcon, Download, RefreshCw, Edit, Check, X } from "lucide-react";
 import { ComicScene } from "@/types/diary";
 
@@ -187,10 +188,12 @@ export default function ComicDisplay({
       <div className={STYLES.scenePanel}>
         {/* 场景内容 */}
         {scene.image_url ? (
-          <img
+          <Image
             src={scene.image_url}
             alt={`场景 ${index + 1}`}
             className={STYLES.sceneImage}
+            width={200}
+            height={200}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-50">

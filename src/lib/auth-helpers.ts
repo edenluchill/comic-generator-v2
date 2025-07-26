@@ -5,11 +5,6 @@ export async function authenticateRequest(request: NextRequest) {
   try {
     // 方法1：从Authorization header获取token
     let token = request.headers.get("authorization")?.replace("Bearer ", "");
-    const headers = request.headers.entries();
-
-    headers.forEach(([key, value]) => {
-      console.log(key, value);
-    });
 
     // 方法2：如果没有header token，尝试从cookies获取refresh token
     if (!token) {

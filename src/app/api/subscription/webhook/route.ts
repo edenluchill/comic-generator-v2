@@ -12,16 +12,14 @@ interface ExtendedInvoice extends Stripe.Invoice {
   subscription: string | Stripe.Subscription | null;
 }
 
-const stripe = new Stripe(
-  process.env.NODE_ENV === "development"
-    ? process.env.STRIPE_SECRET_KEY_LOCAL!
-    : process.env.STRIPE_SECRET_KEY!,
-  {
-    apiVersion: "2025-06-30.basil",
-  }
-);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: "2025-06-30.basil",
+});
 
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+const webhookSecret =
+  process.env.NODE_ENV === "development"
+    ? process.env.STRIPE_WEBHOOK_SECRET_LOCAL!
+    : process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: NextRequest) {
   try {

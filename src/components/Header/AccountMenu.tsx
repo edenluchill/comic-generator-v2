@@ -82,6 +82,8 @@ export default function AccountMenu() {
     );
   }
 
+  const isPremium = profile.subscription_tier === "premium";
+
   // 已登录状态：显示用户菜单
   return (
     <div className="relative" ref={menuRef}>
@@ -91,28 +93,31 @@ export default function AccountMenu() {
         onClick={() => setShowMenu(!showMenu)}
         className="h-10 px-4 transition-all duration-300 flex items-center gap-2 text-sm font-medium text-amber-700/80 hover:bg-amber-500/10 hover:backdrop-blur-sm hover:text-amber-800 hover:shadow-md hover:shadow-amber-500/20 rounded-full border border-transparent hover:border-amber-400/30 hover:scale-[1.02]"
       >
-        <div className="relative">
-          {profile.avatar_url ? (
-            <Image
-              src={profile.avatar_url}
-              alt={profile.full_name || "User"}
-              width={20}
-              height={20}
-              className="rounded-full"
-              priority
-            />
-          ) : (
-            <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
-              <User className="w-3 h-3 text-white" />
+        {/* 头像区域 - 不被遮挡 */}
+        {profile.avatar_url ? (
+          <Image
+            src={profile.avatar_url}
+            alt={profile.full_name || "User"}
+            width={20}
+            height={20}
+            className="rounded-full"
+            priority
+          />
+        ) : (
+          <div className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center">
+            <User className="w-3 h-3 text-white" />
+          </div>
+        )}
+
+        {/* 用户名和皇冠区域 */}
+        <div className="hidden sm:flex items-center gap-1">
+          <span>{profile.full_name || tAccount("user")}</span>
+          {isPremium && (
+            <div className="flex items-center justify-center w-4 h-4 ">
+              <Crown className="w-2.5 h-2.5 text-amber-500 drop-shadow-sm" />
             </div>
           )}
-          {profile.subscription_tier === "premium" && (
-            <Crown className="w-3 h-3 text-yellow-500 absolute -top-1 -right-1" />
-          )}
         </div>
-        <span className="hidden sm:inline">
-          {profile.full_name || tAccount("user")}
-        </span>
       </Button>
 
       {showMenu && (
@@ -120,34 +125,33 @@ export default function AccountMenu() {
           {/* 用户信息 */}
           <div className="px-4 py-3 border-b border-amber-100/50">
             <div className="flex items-center space-x-3">
-              <div className="relative">
-                {profile.avatar_url ? (
-                  <Image
-                    src={profile.avatar_url}
-                    alt={profile.full_name || "User"}
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                    unoptimized
-                  />
-                ) : (
-                  <div className="w-8 h-8 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full flex items-center justify-center">
-                    <User className="w-4 h-4 text-white" />
-                  </div>
-                )}
-                {profile.subscription_tier === "premium" && (
-                  <Crown className="w-4 h-4 text-yellow-500 absolute -top-1 -right-1" />
-                )}
-              </div>
+              {/* 头像 - 清晰不被遮挡 */}
+              {profile.avatar_url ? (
+                <Image
+                  src={profile.avatar_url}
+                  alt={profile.full_name || "User"}
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                  unoptimized
+                />
+              ) : (
+                <div className="w-8 h-8 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full flex items-center justify-center">
+                  <User className="w-4 h-4 text-white" />
+                </div>
+              )}
+
               <div className="flex-1">
+                {/* 用户名和Premium标识在同一行 */}
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-amber-900 truncate">
                     {profile.full_name || tAccount("username")}
                   </p>
-                  {profile.subscription_tier === "premium" && (
-                    <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
-                      Premium
-                    </span>
+                  {isPremium && (
+                    <div className="flex items-center gap-1 text-xs text-amber-800 px-2 py-0.5 rounded-full border border-yellow-200/50 font-medium shadow-sm">
+                      <Crown className="w-3 h-3 text-yellow-600" />
+                      <span>Premium</span>
+                    </div>
                   )}
                 </div>
                 <p className="text-xs text-amber-600 truncate">
@@ -163,7 +167,7 @@ export default function AccountMenu() {
               当前积分: {profile.current_credits}
             </div>
             <div className="text-xs text-amber-500">
-              {profile.subscription_tier === "premium"
+              {isPremium
                 ? `每月${profile.monthly_credit_limit}积分`
                 : `免费版限制: ${profile.monthly_credit_limit}积分/月`}
             </div>

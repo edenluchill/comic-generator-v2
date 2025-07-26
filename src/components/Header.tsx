@@ -6,10 +6,9 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/hooks/useTranslations";
 import { Home, Pencil, Palette, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
-// import LanguagePicker from "./Header/LanguagePicker";
-// import AccountMenu from "./Header/AccountMenu";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import { lazy, memo } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const AccountMenu = lazy(() => import("./Header/AccountMenu"));
 const LanguagePicker = lazy(() => import("./Header/LanguagePicker"));
@@ -19,14 +18,16 @@ const Header = memo(function Header() {
   const { getLocalizedHref } = useLocalizedNavigation();
   const t = useTranslations("Navigation");
   const headerT = useTranslations("Header");
+  const { profile } = useAuth();
 
   const isActive = (path: string) => {
-    // 移除语言前缀进行路径比较
     const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}/, "") || "/";
     if (path === "/" && pathWithoutLocale === "/") return true;
     if (path !== "/" && pathWithoutLocale.startsWith(path)) return true;
     return false;
   };
+
+  const isPremium = profile?.subscription_tier === "premium";
 
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r from-amber-50/95 via-orange-50/95 to-yellow-50/95 backdrop-blur-md border-b border-amber-200/30 shadow-sm">
@@ -122,43 +123,45 @@ const Header = memo(function Header() {
                 </Button>
               </Link>
 
-              {/* 价格模型按钮 - 皇冠图标 */}
-              <Link href={getLocalizedHref("/pricing")}>
-                <Button
-                  variant="ghost"
-                  className={cn(
-                    "h-10 px-4 transition-all duration-300",
-                    "flex items-center gap-2",
-                    "text-sm font-medium text-yellow-700/80",
-                    "hover:bg-yellow-500/15 hover:backdrop-blur-sm hover:text-yellow-800",
-                    "hover:shadow-md hover:shadow-yellow-500/25",
-                    "rounded-full border border-transparent hover:border-yellow-400/30",
-                    "relative overflow-hidden",
-                    isActive("/pricing") &&
-                      "bg-yellow-500/15 backdrop-blur-sm text-yellow-800 font-semibold scale-[1.02] border-yellow-400/30"
-                  )}
-                >
-                  {/* 背景闪光效果 */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-400/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+              {/* 只有非Premium用户显示升级按钮 */}
+              {!isPremium && (
+                <Link href={getLocalizedHref("/pricing")}>
+                  <Button
+                    variant="ghost"
+                    className={cn(
+                      "h-10 px-4 transition-all duration-300",
+                      "flex items-center gap-2",
+                      "text-sm font-medium text-yellow-700/80",
+                      "hover:bg-yellow-500/15 hover:backdrop-blur-sm hover:text-yellow-800",
+                      "hover:shadow-md hover:shadow-yellow-500/25",
+                      "rounded-full border border-transparent hover:border-yellow-400/30",
+                      "relative overflow-hidden",
+                      isActive("/pricing") &&
+                        "bg-yellow-500/15 backdrop-blur-sm text-yellow-800 font-semibold scale-[1.02] border-yellow-400/30"
+                    )}
+                  >
+                    {/* 背景闪光效果 */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-400/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
 
-                  <div
-                    className={cn(
-                      "transition-colors relative z-10",
-                      isActive("/pricing") && "text-yellow-700"
-                    )}
-                  >
-                    <Crown className="w-4 h-4 drop-shadow-sm" />
-                  </div>
-                  <span
-                    className={cn(
-                      "transition-colors relative z-10",
-                      isActive("/pricing") && "text-yellow-800"
-                    )}
-                  >
-                    升级专业版
-                  </span>
-                </Button>
-              </Link>
+                    <div
+                      className={cn(
+                        "transition-colors relative z-10",
+                        isActive("/pricing") && "text-yellow-700"
+                      )}
+                    >
+                      <Crown className="w-4 h-4 drop-shadow-sm" />
+                    </div>
+                    <span
+                      className={cn(
+                        "transition-colors relative z-10",
+                        isActive("/pricing") && "text-yellow-800"
+                      )}
+                    >
+                      升级专业版
+                    </span>
+                  </Button>
+                </Link>
+              )}
             </nav>
 
             {/* 语言选择器 - 在所有设备上显示 */}

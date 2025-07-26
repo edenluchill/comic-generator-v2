@@ -19,17 +19,24 @@ import {
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
+import { makeAuthenticatedJsonRequest } from "@/lib/auth-request"; // ✅ 导入新函数
 
 export default function PricingPage() {
-  const { user } = useAuth();
-  const { navigate } = useLocalizedNavigation();
+  const { user, loading } = useAuth(); // ✅ 获取loading状态
+  const { navigate, getLocalizedHref } = useLocalizedNavigation();
 
   // 添加年付/月付切换状态
   const [isYearly, setIsYearly] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [subscriptionLoading, setSubscriptionLoading] = useState(false);
 
   // 处理订阅逻辑
   const handleSubscribe = async () => {
+    // ✅ 先检查是否还在加载中
+    if (loading) {
+      console.log("Still loading auth state, please wait...");
+      return;
+    }
+
     if (!user) {
       // 保存当前页面URL，登录后回到这里
       sessionStorage.setItem("returnUrl", window.location.pathname);
@@ -37,22 +44,23 @@ export default function PricingPage() {
       return;
     }
 
-    setLoading(true);
+    setSubscriptionLoading(true);
     try {
-      const response = await fetch("/api/subscription/create-checkout", {
+      // ✅ 使用新的认证请求函数
+      const data = await makeAuthenticatedJsonRequest<{
+        success: boolean;
+        checkoutUrl: string;
+      }>("/api/subscription/create-checkout", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${user.id}`, // 临时使用，实际应该用session token
-        },
         body: JSON.stringify({
           planId: "premium",
-          successUrl: `${window.location.origin}/subscription/success`,
+          // 🔧 修复：在successUrl中包含session_id模板
+          successUrl: `${window.location.origin}${getLocalizedHref(
+            "/subscription/success"
+          )}/?session_id={CHECKOUT_SESSION_ID}`,
           cancelUrl: window.location.href,
         }),
       });
-
-      const data = await response.json();
 
       if (data.success && data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
@@ -61,13 +69,23 @@ export default function PricingPage() {
       }
     } catch (error) {
       console.error("Subscription error:", error);
-      alert("订阅失败，请稍后重试");
+      if (error instanceof Error && error.message.includes("用户未登录")) {
+        navigate("/login");
+      } else {
+        alert("订阅失败，请稍后重试");
+      }
     } finally {
-      setLoading(false);
+      setSubscriptionLoading(false);
     }
   };
 
   const handleFreeTrial = () => {
+    // ✅ 同样检查loading状态
+    if (loading) {
+      console.log("Still loading auth state, please wait...");
+      return;
+    }
+
     if (!user) {
       sessionStorage.setItem("returnUrl", "/workshop");
       navigate("/login");
@@ -377,10 +395,14 @@ export default function PricingPage() {
                 className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md text-sm font-semibold"
                 size="sm"
                 onClick={handleSubscribe}
-                disabled={loading}
+                disabled={loading || subscriptionLoading} // ✅ 考虑两种loading状态
               >
                 <Heart className="w-3.5 h-3.5 mr-1.5" />
-                {loading ? "处理中..." : "成为拾光伙伴"}
+                {loading
+                  ? "验证登录状态..."
+                  : subscriptionLoading
+                  ? "处理中..."
+                  : "成为拾光伙伴"}
               </Button>
 
               {/* 添加退款保证 */}
@@ -487,10 +509,14 @@ export default function PricingPage() {
                 className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-sm font-semibold"
                 size="sm"
                 onClick={handleSubscribe}
-                disabled={loading}
+                disabled={loading || subscriptionLoading} // ✅ 考虑两种loading状态
               >
                 <Heart className="w-3.5 h-3.5 mr-1.5" />
-                {loading ? "处理中..." : "成为拾光伙伴"}
+                {loading
+                  ? "验证登录状态..."
+                  : subscriptionLoading
+                  ? "处理中..."
+                  : "成为拾光伙伴"}
               </Button>
               <Button
                 variant="outline"

@@ -12,9 +12,14 @@ interface ExtendedInvoice extends Stripe.Invoice {
   subscription: string | Stripe.Subscription | null;
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-06-30.basil",
-});
+const stripe = new Stripe(
+  process.env.NODE_ENV === "development"
+    ? process.env.STRIPE_SECRET_KEY_LOCAL!
+    : process.env.STRIPE_SECRET_KEY!,
+  {
+    apiVersion: "2025-06-30.basil",
+  }
+);
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -23,49 +28,115 @@ export async function POST(request: NextRequest) {
     const body = await request.text();
     const signature = request.headers.get("stripe-signature")!;
 
+    // 🔧 添加调试信息
+    console.log("=== Webhook Debug Info ===");
+    console.log("Webhook secret configured:", !!webhookSecret);
+    console.log("Webhook secret length:", webhookSecret?.length || 0);
+    console.log(
+      "Webhook secret prefix:",
+      webhookSecret?.substring(0, 10) + "..."
+    );
+    console.log("Signature header:", signature);
+    console.log("Body length:", body.length);
+    console.log("Body preview:", body.substring(0, 100) + "...");
+
     let event: Stripe.Event;
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+      console.log("✅ Webhook signature verification SUCCESS");
+      console.log("Event type:", event.type);
+      console.log("Event ID:", event.id);
     } catch (err) {
-      console.error("Webhook signature verification failed:", err);
-      return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+      console.error("❌ Webhook signature verification FAILED:");
+      console.error("Error message:", (err as Error).message);
+      console.error("Error type:", (err as Error).constructor.name);
+
+      // 检查环境变量
+      console.error("Environment check:");
+      console.error(
+        "- STRIPE_SECRET_KEY set:",
+        !!process.env.STRIPE_SECRET_KEY
+      );
+      console.error(
+        "- STRIPE_WEBHOOK_SECRET set:",
+        !!process.env.STRIPE_WEBHOOK_SECRET
+      );
+      console.error("- NODE_ENV:", process.env.NODE_ENV);
+
+      return NextResponse.json(
+        {
+          error: "Invalid signature",
+          debug: {
+            webhookSecretSet: !!webhookSecret,
+            signatureReceived: !!signature,
+            bodyLength: body.length,
+            errorMessage: (err as Error).message,
+          },
+        },
+        { status: 400 }
+      );
     }
 
     // 处理不同的事件类型
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
+        console.log(
+          "Processing checkout.session.completed for session:",
+          session.id
+        );
         await handleCheckoutCompleted(session);
         break;
       }
 
       case "customer.subscription.created": {
         const subscription = event.data.object as ExtendedSubscription;
+        console.log(
+          "Processing customer.subscription.created for subscription:",
+          subscription.id
+        );
+        console.log("Subscription metadata:", subscription.metadata);
         await handleSubscriptionCreated(subscription);
         break;
       }
 
       case "customer.subscription.updated": {
         const subscription = event.data.object as ExtendedSubscription;
+        console.log(
+          "Processing customer.subscription.updated for subscription:",
+          subscription.id
+        );
         await handleSubscriptionUpdated(subscription);
         break;
       }
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as ExtendedSubscription;
+        console.log(
+          "Processing customer.subscription.deleted for subscription:",
+          subscription.id
+        );
         await handleSubscriptionDeleted(subscription);
         break;
       }
 
       case "invoice.payment_succeeded": {
         const invoice = event.data.object as ExtendedInvoice;
+        console.log(
+          "Processing invoice.payment_succeeded for invoice:",
+          invoice.id
+        );
         await handlePaymentSucceeded(invoice);
         break;
       }
 
       case "invoice.payment_failed": {
         const invoice = event.data.object as ExtendedInvoice;
+        console.log(
+          "Processing invoice.payment_failed for invoice:",
+          invoice.id
+        );
         await handlePaymentFailed(invoice);
         break;
       }
@@ -74,9 +145,10 @@ export async function POST(request: NextRequest) {
         console.log(`Unhandled event type: ${event.type}`);
     }
 
+    console.log("✅ Webhook processed successfully");
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("Webhook error:", error);
+    console.error("❌ Webhook processing error:", error);
     return NextResponse.json(
       { error: "Webhook processing failed" },
       { status: 500 }

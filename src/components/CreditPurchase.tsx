@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Zap, Star, CheckCircle, Loader2 } from "lucide-react";
-import { supabase } from "@/lib/supabase/client";
+import { makeAuthenticatedJsonRequest } from "@/lib/auth-request";
 
 interface CreditPackage {
   id: string;
@@ -60,20 +60,11 @@ export function CreditPurchase() {
     setPurchasing(packageId);
 
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        alert("登录状态过期，请重新登录");
-        return;
-      }
-
-      const response = await fetch("/api/credits/purchase", {
+      const data = await makeAuthenticatedJsonRequest<{
+        success: boolean;
+        checkoutUrl: string;
+      }>("/api/credits/purchase", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${session.access_token}`,
-        },
         body: JSON.stringify({
           packageId,
           successUrl: `${window.location.origin}/credits/success`,
@@ -81,16 +72,18 @@ export function CreditPurchase() {
         }),
       });
 
-      const data = await response.json();
-
       if (data.success && data.checkoutUrl) {
         window.location.href = data.checkoutUrl;
       } else {
-        alert("购买失败，请稍后重试");
+        alert("创建支付会话失败，请稍后重试");
       }
     } catch (error) {
       console.error("Purchase error:", error);
-      alert("购买失败，请稍后重试");
+      if (error instanceof Error && error.message.includes("用户未登录")) {
+        alert("登录状态过期，请重新登录");
+      } else {
+        alert("购买失败，请稍后重试");
+      }
     } finally {
       setPurchasing(null);
     }

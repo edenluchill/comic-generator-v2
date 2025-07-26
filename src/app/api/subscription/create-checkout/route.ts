@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateRequest } from "@/lib/auth-helpers";
 import { creditService } from "@/lib/services/credit.service";
+import { supabaseAdmin } from "@/lib/supabase/server";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -20,6 +21,38 @@ export async function POST(request: NextRequest) {
     // 验证计划ID
     if (planId !== "premium") {
       return NextResponse.json({ error: "Invalid plan ID" }, { status: 400 });
+    }
+
+    // 从数据库获取订阅计划信息
+    const { data: subscriptionPlan, error: planError } = await supabaseAdmin
+      .from("subscription_plans")
+      .select("*")
+      .eq("id", planId)
+      .eq("is_active", true)
+      .single();
+
+    if (planError || !subscriptionPlan) {
+      console.error("Failed to fetch subscription plan:", planError);
+      return NextResponse.json(
+        { error: "Subscription plan not found" },
+        { status: 404 }
+      );
+    }
+
+    // 检查Stripe price ID是否已配置
+    if (
+      !subscriptionPlan.stripe_price_id ||
+      subscriptionPlan.stripe_price_id === "price_premium_monthly_placeholder"
+    ) {
+      console.error("Stripe price ID not configured for plan:", planId);
+      return NextResponse.json(
+        {
+          error:
+            "Subscription plan not properly configured. Please contact support.",
+          details: "Stripe price ID is missing or not configured",
+        },
+        { status: 500 }
+      );
     }
 
     // 获取用户档案
@@ -58,7 +91,7 @@ export async function POST(request: NextRequest) {
       payment_method_types: ["card"],
       line_items: [
         {
-          price: process.env.STRIPE_PREMIUM_PRICE_ID!, // 需要在Stripe Dashboard中创建
+          price: subscriptionPlan.stripe_price_id, // 从数据库获取的price ID
           quantity: 1,
         },
       ],

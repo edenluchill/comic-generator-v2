@@ -4,6 +4,8 @@ import { sceneAnalysisService } from "./scene-analysis.service";
 import { comicDatabaseService } from "./comic-database.service";
 import { sceneImageService } from "./scene-image.service";
 import { StreamUtils } from "./stream-utils";
+import { creditService } from "./credit.service";
+import { CREDIT_COSTS } from "@/types/credits";
 
 export interface ComicGenerationOptions {
   userId: string;
@@ -31,6 +33,25 @@ export class ComicGenerationService {
       options;
 
     try {
+      // 步骤0：检查用户credits
+      StreamUtils.encodeProgress(encoder, controller, {
+        step: "checking",
+        message: "正在检查用户余额...",
+        progress: 2,
+      });
+
+      const creditCheck = await creditService.checkCredits(
+        userId,
+        CREDIT_COSTS.COMIC_GENERATION
+      );
+
+      if (!creditCheck.hasEnoughCredits) {
+        throw new Error(
+          creditCheck.message ||
+            `余额不足，需要 ${CREDIT_COSTS.COMIC_GENERATION} credits，当前只有 ${creditCheck.currentCredits} credits`
+        );
+      }
+
       // 步骤1：验证角色信息并创建日记记录
       StreamUtils.encodeProgress(encoder, controller, {
         step: "analyzing",
@@ -111,7 +132,33 @@ export class ComicGenerationService {
         encoder
       );
 
-      // 步骤7：完成漫画生成
+      // 步骤7：扣减用户credits
+      StreamUtils.encodeProgress(encoder, controller, {
+        step: "finalizing",
+        message: "正在扣减积分...",
+        progress: 95,
+      });
+
+      const deductionResult = await creditService.deductCredits({
+        userId,
+        amount: CREDIT_COSTS.COMIC_GENERATION,
+        description: `生成漫画 - ${diary.title || "无标题"}`,
+        relatedEntityType: "comic",
+        relatedEntityId: comic.id,
+        metadata: {
+          comic_id: comic.id,
+          scenes_count: completedScenes.length,
+          style: style,
+        },
+      });
+
+      if (!deductionResult.success) {
+        // 记录错误但不阻止漫画完成，因为用户已经生成了漫画
+        console.error("扣减credits失败:", deductionResult.message);
+        // 可以选择在这里添加补偿逻辑，比如将漫画标记为需要补扣credits
+      }
+
+      // 步骤8：完成漫画生成
       StreamUtils.encodeProgress(encoder, controller, {
         step: "completed",
         message: "漫画生成完成！",

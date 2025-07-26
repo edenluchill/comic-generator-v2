@@ -6,7 +6,15 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
-import { User, LogIn, Settings, Heart, LogOut, Crown } from "lucide-react";
+import {
+  User,
+  LogIn,
+  Settings,
+  Heart,
+  LogOut,
+  Crown,
+  Loader2,
+} from "lucide-react";
 
 export default function AccountMenu() {
   const { navigate } = useLocalizedNavigation();
@@ -47,7 +55,15 @@ export default function AccountMenu() {
 
   if (loading) {
     return (
-      <div className="w-10 h-10 rounded-full bg-amber-100 animate-pulse"></div>
+      <Button
+        variant="ghost"
+        size="sm"
+        disabled
+        className="h-10 px-4 transition-all duration-300 flex items-center gap-2 text-sm font-medium text-amber-700/60 bg-amber-500/5 rounded-full border border-amber-200/30"
+      >
+        <Loader2 className="w-4 h-4 animate-spin" />
+        <span className="hidden sm:inline">加载中...</span>
+      </Button>
     );
   }
 
@@ -79,7 +95,7 @@ export default function AccountMenu() {
           {profile.avatar_url ? (
             <Image
               src={profile.avatar_url}
-              alt={profile.name || "User"}
+              alt={profile.full_name || "User"}
               width={20}
               height={20}
               className="rounded-full"
@@ -90,12 +106,12 @@ export default function AccountMenu() {
               <User className="w-3 h-3 text-white" />
             </div>
           )}
-          {profile.subscription_status === "premium" && (
+          {profile.subscription_tier === "premium" && (
             <Crown className="w-3 h-3 text-yellow-500 absolute -top-1 -right-1" />
           )}
         </div>
         <span className="hidden sm:inline">
-          {profile.name || tAccount("user")}
+          {profile.full_name || tAccount("user")}
         </span>
       </Button>
 
@@ -108,7 +124,7 @@ export default function AccountMenu() {
                 {profile.avatar_url ? (
                   <Image
                     src={profile.avatar_url}
-                    alt={profile.name || "User"}
+                    alt={profile.full_name || "User"}
                     width={32}
                     height={32}
                     className="rounded-full"
@@ -119,16 +135,16 @@ export default function AccountMenu() {
                     <User className="w-4 h-4 text-white" />
                   </div>
                 )}
-                {profile.subscription_status === "premium" && (
+                {profile.subscription_tier === "premium" && (
                   <Crown className="w-4 h-4 text-yellow-500 absolute -top-1 -right-1" />
                 )}
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <p className="font-medium text-amber-900 truncate">
-                    {profile.name || tAccount("username")}
+                    {profile.full_name || tAccount("username")}
                   </p>
-                  {profile.subscription_status === "premium" && (
+                  {profile.subscription_tier === "premium" && (
                     <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">
                       Premium
                     </span>
@@ -141,22 +157,17 @@ export default function AccountMenu() {
             </div>
           </div>
 
-          {/* 使用统计 */}
-          {profile.usage_stats && (
-            <div className="px-4 py-2 border-b border-amber-100/50">
-              <div className="text-xs text-amber-600">
-                {tAccount("generatedThisMonth")}:{" "}
-                {profile.usage_stats.images_generated || 0}
-              </div>
-              <div className="text-xs text-amber-500">
-                {profile.subscription_status === "premium"
-                  ? tAccount("unlimited")
-                  : `${tAccount("remaining")}: ${
-                      50 - (profile.usage_stats.images_generated || 0)
-                    }`}
-              </div>
+          {/* Credit余额显示 */}
+          <div className="px-4 py-2 border-b border-amber-100/50">
+            <div className="text-xs text-amber-600">
+              当前积分: {profile.current_credits}
             </div>
-          )}
+            <div className="text-xs text-amber-500">
+              {profile.subscription_tier === "premium"
+                ? `每月${profile.monthly_credit_limit}积分`
+                : `免费版限制: ${profile.monthly_credit_limit}积分/月`}
+            </div>
+          </div>
 
           {/* 菜单项 */}
           <div className="py-2">
@@ -165,11 +176,9 @@ export default function AccountMenu() {
               <span className="text-sm">
                 {tAccount("myWorks") || "My Works"}
               </span>
-              {profile.usage_stats && (
-                <span className="ml-auto text-xs text-amber-500">
-                  {profile.usage_stats.stories_created || 0}
-                </span>
-              )}
+              <span className="ml-auto text-xs text-amber-500">
+                {profile.total_comics_generated || 0}
+              </span>
             </button>
             <button
               onClick={() => {

@@ -17,25 +17,79 @@ import {
   Coffee,
 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 
 export default function PricingPage() {
+  const { user } = useAuth();
+  const { navigate } = useLocalizedNavigation();
+
   // 添加年付/月付切换状态
   const [isYearly, setIsYearly] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // 处理订阅逻辑
+  const handleSubscribe = async () => {
+    if (!user) {
+      // 保存当前页面URL，登录后回到这里
+      sessionStorage.setItem("returnUrl", window.location.pathname);
+      navigate("/login");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch("/api/subscription/create-checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.id}`, // 临时使用，实际应该用session token
+        },
+        body: JSON.stringify({
+          planId: "premium",
+          successUrl: `${window.location.origin}/subscription/success`,
+          cancelUrl: window.location.href,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      } else {
+        alert("订阅失败，请稍后重试");
+      }
+    } catch (error) {
+      console.error("Subscription error:", error);
+      alert("订阅失败，请稍后重试");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFreeTrial = () => {
+    if (!user) {
+      sessionStorage.setItem("returnUrl", "/workshop");
+      navigate("/login");
+    } else {
+      navigate("/workshop");
+    }
+  };
 
   // 优化功能对比 - 让"痛点"更痛，"爽点"更爽
   const coreFeatures = [
     {
       name: "每月可用额度",
-      free: "100 积分",
-      pro: "1200 积分",
+      free: "60 积分",
+      pro: "1000 积分",
       icon: <Zap className="w-4 h-4" />,
       highlight: true,
-      desc: "角色生成10分，漫画20分",
+      desc: "一个漫画消耗40积分",
     },
     {
       name: "实际可生成",
-      free: "~4次漫画",
-      pro: "~60次漫画",
+      free: "~1次漫画",
+      pro: "~25次漫画",
       icon: <TrendingUp className="w-4 h-4" />,
       highlight: true,
     },
@@ -211,6 +265,7 @@ export default function PricingPage() {
               <Button
                 className="w-full bg-gray-900 hover:bg-gray-800 text-white text-sm"
                 size="sm"
+                onClick={handleFreeTrial}
               >
                 免费试试看
               </Button>
@@ -321,9 +376,11 @@ export default function PricingPage() {
               <Button
                 className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md text-sm font-semibold"
                 size="sm"
+                onClick={handleSubscribe}
+                disabled={loading}
               >
                 <Heart className="w-3.5 h-3.5 mr-1.5" />
-                成为拾光伙伴
+                {loading ? "处理中..." : "成为拾光伙伴"}
               </Button>
 
               {/* 添加退款保证 */}
@@ -429,14 +486,17 @@ export default function PricingPage() {
               <Button
                 className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-sm font-semibold"
                 size="sm"
+                onClick={handleSubscribe}
+                disabled={loading}
               >
                 <Heart className="w-3.5 h-3.5 mr-1.5" />
-                成为拾光伙伴
+                {loading ? "处理中..." : "成为拾光伙伴"}
               </Button>
               <Button
                 variant="outline"
                 className="border-gray-300 text-gray-700 hover:bg-gray-50 text-sm"
                 size="sm"
+                onClick={handleFreeTrial}
               >
                 先用免费版试试
               </Button>

@@ -4,83 +4,31 @@ import { useState, useEffect } from "react";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase/client";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
-
-interface UserProfile {
-  id: string;
-  email: string;
-  name?: string;
-  avatar_url?: string;
-  subscription_status: "free" | "premium";
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  usage_stats?: any;
-}
-
-// 添加缓存避免重复的会话检查
-const sessionCache: {
-  data: { user: User | null } | null;
-  timestamp: number;
-  ttl: number;
-} = {
-  data: null,
-  timestamp: 0,
-  ttl: 5000, // 5秒缓存
-};
+import { useProfile } from "@/hooks/useProfile";
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { getLocalizedHref, navigate } = useLocalizedNavigation();
+
+  // ✅ Use existing useProfile hook instead of duplicating logic
+  const { data: profile } = useProfile();
 
   useEffect(() => {
     let mounted = true;
 
     const getInitialSession = async () => {
-      // 检查缓存
-      const now = Date.now();
-      if (
-        sessionCache.data &&
-        now - sessionCache.timestamp < sessionCache.ttl
-      ) {
-        setUser(sessionCache.data.user);
-        setLoading(false);
-        return;
-      }
-
       try {
-        // 🔒 只使用 Supabase 官方会话管理
         const {
           data: { session },
           error: sessionError,
         } = await supabase.auth.getSession();
 
-        if (sessionError) {
-          throw sessionError;
-        }
+        if (sessionError) throw sessionError;
 
         if (mounted) {
           setUser(session?.user ?? null);
-          if (session?.user) {
-            const profileData = {
-              id: session.user.id,
-              email: session.user.email!,
-              name:
-                session.user.user_metadata?.full_name ||
-                session.user.user_metadata?.name,
-              avatar_url: session.user.user_metadata?.avatar_url,
-              subscription_status: "free" as const,
-              usage_stats: {
-                images_generated: 0,
-                stories_created: 0,
-              },
-            };
-            setProfile(profileData);
-          }
-          // 更新缓存
-          sessionCache.data = { user: session?.user ?? null };
-          sessionCache.timestamp = now;
-
           setLoading(false);
         }
       } catch (err) {
@@ -97,49 +45,7 @@ export function useAuth() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return;
-
-      console.log("Auth state changed:", event, session);
       setUser(session?.user ?? null);
-
-      if (event === "SIGNED_IN" && session?.user) {
-        // 模拟获取用户配置文件
-        setProfile({
-          id: session.user.id,
-          email: session.user.email!,
-          name:
-            session.user.user_metadata?.full_name ||
-            session.user.user_metadata?.name,
-          avatar_url: session.user.user_metadata?.avatar_url,
-          subscription_status: "free",
-          usage_stats: {
-            images_generated: 0,
-            stories_created: 0,
-          },
-        });
-
-        // 更新全局缓存
-        // globalAuthCache = {
-        //   user: session.user,
-        //   profile: {
-        //     id: session.user.id,
-        //     email: session.user.email!,
-        //     name:
-        //       session.user.user_metadata?.full_name ||
-        //       session.user.user_metadata?.name,
-        //     avatar_url: session.user.user_metadata?.avatar_url,
-        //     subscription_status: "free",
-        //     usage_stats: {
-        //       images_generated: 0,
-        //       stories_created: 0,
-        //     },
-        //   },
-        //   timestamp: Date.now(),
-        // };
-      } else if (event === "SIGNED_OUT") {
-        setProfile(null);
-        // globalAuthCache = null; // 清除全局缓存
-      }
-
       setLoading(false);
     });
 

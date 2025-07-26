@@ -25,6 +25,11 @@ export default function LoginPage() {
       setLoading(true);
       setError("");
       await signInWithGoogle();
+
+      // 登录成功后跳转
+      const returnUrl = sessionStorage.getItem("returnUrl") || "/";
+      sessionStorage.removeItem("returnUrl");
+      navigate(returnUrl);
     } catch (error) {
       console.error("Google login failed:", error);
       setError("Google login failed, please try again");

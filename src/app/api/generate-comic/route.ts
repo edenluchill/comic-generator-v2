@@ -1,70 +1,81 @@
-import { NextRequest, NextResponse } from "next/server";
-import { authenticateRequest } from "@/lib/auth-helpers";
+import { NextRequest } from "next/server";
 import { ComicGenerationRequest } from "@/types/diary";
-import { APIResponse } from "@/types/api";
 import { comicGenerationService } from "@/lib/services/comic-generation.service";
-import { StreamUtils } from "@/lib/services/stream-utils";
+import { StreamGenerationHelper } from "@/lib/helpers/stream-generation.helpers";
+import { authenticateRequired } from "@/lib/helpers/auth-extensions.helpers";
+import {
+  createAuthErrorResponse,
+  createValidationErrorResponse,
+  handleApiError,
+} from "@/lib/helpers/api-response.helpers";
+import {
+  validateRequestBody,
+  validateRequiredFields,
+  validateArrayField,
+} from "@/lib/helpers/request-validation.helpers";
+
+const COMIC_GENERATION_STEPS = [
+  { name: "checking", message: "正在检查用户余额...", weight: 10 },
+  { name: "analyzing", message: "正在验证角色信息...", weight: 15 },
+  { name: "creating", message: "正在创建漫画...", weight: 60 },
+  { name: "finalizing", message: "正在完成处理...", weight: 15 },
+];
 
 export async function POST(request: NextRequest) {
   try {
     // 认证检查
-    const { user, error: authError } = await authenticateRequest(request);
+    const { user, error: authError } = await authenticateRequired(request);
     if (authError || !user) {
-      return NextResponse.json({ error: "未授权访问" }, { status: 401 });
+      return createAuthErrorResponse(authError ?? undefined);
     }
 
-    const body: ComicGenerationRequest = await request.json();
-    const { diary_content, characters, style = "cute" } = body;
+    // 请求体验证
+    const {
+      isValid: bodyValid,
+      data: body,
+      errors: bodyErrors,
+    } = await validateRequestBody<ComicGenerationRequest>(request);
 
-    // 输入验证
-    if (!diary_content || !characters || characters.length === 0) {
-      return NextResponse.json({ error: "缺少必要字段" }, { status: 400 });
+    if (!bodyValid) {
+      return createValidationErrorResponse(bodyErrors.join(", "));
     }
+
+    // 字段验证
+    const { isValid: fieldsValid, errors: fieldErrors } =
+      validateRequiredFields(body!, ["diary_content", "characters"]);
+
+    if (!fieldsValid) {
+      return createValidationErrorResponse(fieldErrors.join(", "));
+    }
+
+    // 角色数组验证
+    const { isValid: charactersValid, errors: charactersErrors } =
+      validateArrayField(body!.characters, "characters");
+
+    if (!charactersValid) {
+      return createValidationErrorResponse(charactersErrors.join(", "));
+    }
+
+    const { diary_content, characters, style = "cute" } = body!;
 
     // 创建流式响应
-    const encoder = StreamUtils.createEncoder();
-    const stream = new ReadableStream({
-      async start(controller) {
-        try {
-          // 使用漫画生成服务
-          const result = await comicGenerationService.generateComic({
-            userId: user.id,
-            diaryContent: diary_content,
-            characters,
-            style,
-            controller,
-            encoder,
-          });
+    return StreamGenerationHelper.createStreamResponse(
+      COMIC_GENERATION_STEPS,
+      async (helper) => {
+        const result = await comicGenerationService.generateComic({
+          userId: user.id,
+          diaryContent: diary_content,
+          characters,
+          style,
+          controller: helper["controller"], // 访问私有属性，需要改进
+          encoder: helper["encoder"],
+        });
 
-          // 发送最终结果
-          StreamUtils.encodeComplete(
-            encoder,
-            controller,
-            result,
-            "漫画生成完成！"
-          );
-        } catch (error) {
-          console.error("漫画生成过程中出错:", error);
-          StreamUtils.encodeError(
-            encoder,
-            controller,
-            error instanceof Error ? error.message : "生成过程中出现未知错误"
-          );
-        } finally {
-          controller.close();
-        }
-      },
-    });
-
-    return new Response(stream, {
-      headers: StreamUtils.createStreamHeaders(),
-    });
+        helper.sendComplete(result, "漫画生成完成！");
+      }
+    );
   } catch (error) {
     console.error("启动漫画生成时出错:", error);
-    return NextResponse.json<APIResponse>({
-      success: false,
-      error:
-        error instanceof Error ? error.message : "启动漫画生成时出现未知错误",
-    });
+    return handleApiError(error);
   }
 }

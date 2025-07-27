@@ -11,6 +11,10 @@ export function useProfile() {
       }>("/api/user/profile");
       return data.profile;
     },
-    staleTime: 5 * 60 * 1000, // 5分钟缓存
+    staleTime: 2 * 60 * 1000, // 缩短到2分钟缓存
+    gcTime: 5 * 60 * 1000, // 5分钟垃圾回收
+    refetchOnWindowFocus: false, // 防止切换窗口时重复请求
+    retry: 1, // 只重试1次，减少失败时的等待时间
+    refetchOnMount: false, // 如果数据还新鲜，不重新请求
   });
 }

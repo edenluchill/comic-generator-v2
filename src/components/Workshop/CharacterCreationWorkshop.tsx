@@ -161,7 +161,7 @@ export default function CharacterCreationWorkshop() {
         <div className="absolute bottom-10 right-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-orange-400/10 to-yellow-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-      <div className="container mx-auto px-3 py-3 relative z-10 max-w-7xl">
+      <div className="container mx-auto px-3 py-3 relative z-10 max-w-6xl">
         {/* 标题 */}
         <div
           className={`text-center mb-3 transition-all duration-1000 ${

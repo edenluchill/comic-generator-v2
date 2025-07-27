@@ -44,9 +44,6 @@ export default function CharactersList({
               </span>
             )}
           </h3>
-          <p className="text-sm text-amber-600/80">
-            点击角色查看详情，或创建新角色开始你的创作之旅
-          </p>
         </div>
 
         {/* 角色网格 - 移除不必要的底部padding，但保留顶部空间给气泡 */}

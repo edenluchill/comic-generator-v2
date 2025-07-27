@@ -97,10 +97,10 @@ export default function ComicGeneration() {
         <div className="absolute bottom-10 right-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-orange-400/10 to-yellow-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
-      <div className="container mx-auto px-4 py-6 relative z-10 max-w-7xl">
+      <div className="container mx-auto px-4 py-6 relative z-10 max-w-6xl">
         {/* 返回按钮 */}
         <div
-          className={`mb-6 transition-all duration-1000 ${
+          className={`transition-all duration-1000 ${
             mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
           }`}
         >
@@ -119,9 +119,6 @@ export default function ComicGeneration() {
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
         >
-          <h1 className="text-3xl md:text-4xl font-bold text-amber-800 mb-2">
-            漫画生成器
-          </h1>
           <p className="text-amber-700 text-lg">用你的角色和故事创作四格漫画</p>
         </div>
 

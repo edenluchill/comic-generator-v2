@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAuth } from "@/hooks/useAuth";
@@ -17,7 +18,7 @@ import {
 } from "lucide-react";
 
 export default function AccountMenu() {
-  const { navigate } = useLocalizedNavigation();
+  const { getLocalizedHref } = useLocalizedNavigation();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { user, profile, loading, signOut } = useAuth();
@@ -39,10 +40,6 @@ export default function AccountMenu() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showMenu]);
-
-  const handleLogin = () => {
-    navigate("/login");
-  };
 
   const handleLogout = async () => {
     try {
@@ -70,15 +67,16 @@ export default function AccountMenu() {
   // 未登录状态：显示简约的登录按钮
   if (!user || !profile) {
     return (
-      <Button
-        onClick={handleLogin}
-        variant="ghost"
-        size="sm"
-        className="h-10 px-4 transition-all duration-300 flex items-center gap-2 text-sm font-medium text-amber-700/80 hover:bg-amber-500/10 hover:backdrop-blur-sm hover:text-amber-800 hover:shadow-md hover:shadow-amber-500/20 rounded-full border border-transparent hover:border-amber-400/30 hover:scale-[1.02]"
-      >
-        <LogIn className="w-4 h-4" />
-        <span>{tAccount("login") || "登录"}</span>
-      </Button>
+      <Link href={getLocalizedHref("/login")}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-10 px-4 transition-all duration-300 flex items-center gap-2 text-sm font-medium text-amber-700/80 hover:bg-amber-500/10 hover:backdrop-blur-sm hover:text-amber-800 hover:shadow-md hover:shadow-amber-500/20 rounded-full border border-transparent hover:border-amber-400/30 hover:scale-[1.02]"
+        >
+          <LogIn className="w-4 h-4" />
+          <span>{tAccount("login") || "登录"}</span>
+        </Button>
+      </Link>
     );
   }
 
@@ -164,36 +162,35 @@ export default function AccountMenu() {
           {/* Credit余额显示 */}
           <div className="px-4 py-2 border-b border-amber-100/50">
             <div className="text-xs text-amber-600">
-              当前积分: {profile.current_credits}
-            </div>
-            <div className="text-xs text-amber-500">
-              {isPremium
-                ? `每月${profile.monthly_credit_limit}积分`
-                : `免费版限制: ${profile.monthly_credit_limit}积分/月`}
+              积分: {profile.current_credits}
             </div>
           </div>
 
           {/* 菜单项 */}
           <div className="py-2">
-            <button className="w-full px-4 py-2 text-left text-amber-700 hover:bg-amber-50/60 transition-colors duration-200 flex items-center space-x-3">
+            <Link
+              href={getLocalizedHref("/profile")}
+              onClick={() => setShowMenu(false)}
+              className="w-full px-4 py-2 text-left text-amber-700 hover:bg-amber-50/60 transition-colors duration-200 flex items-center space-x-3"
+            >
+              <Settings className="w-4 h-4" />
+              <span className="text-sm">
+                {tAccount("profile") || "个人资料"}
+              </span>
+            </Link>
+            <Link
+              href={getLocalizedHref("/profile")}
+              onClick={() => setShowMenu(false)}
+              className="w-full px-4 py-2 text-left text-amber-700 hover:bg-amber-50/60 transition-colors duration-200 flex items-center space-x-3"
+            >
               <Heart className="w-4 h-4" />
               <span className="text-sm">
-                {tAccount("myWorks") || "My Works"}
+                {tAccount("myWorks") || "我的作品"}
               </span>
               <span className="ml-auto text-xs text-amber-500">
                 {profile.total_comics_generated || 0}
               </span>
-            </button>
-            <button
-              onClick={() => {
-                navigate("/profile");
-                setShowMenu(false);
-              }}
-              className="w-full px-4 py-2 text-left text-amber-700 hover:bg-amber-50/60 transition-colors duration-200 flex items-center space-x-3"
-            >
-              <Settings className="w-4 h-4" />
-              <span className="text-sm">{tAccount("settings") || "设置"}</span>
-            </button>
+            </Link>
             <div className="border-t border-amber-100/50 mt-2 pt-2">
               <button
                 onClick={handleLogout}

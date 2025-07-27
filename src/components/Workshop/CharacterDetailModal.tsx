@@ -8,7 +8,6 @@ import {
   Calendar,
   Hash,
   Sparkles,
-  Heart,
   Edit3,
   Check,
   X as XIcon,
@@ -246,14 +245,9 @@ export default function CharacterDetailModal({
         {/* 主要内容区域 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           {/* 头像展示区 */}
-          <div className="text-center group">
+          <div className="text-center flex items-center justify-center">
             <div className="relative inline-block">
-              <h4 className="text-xl font-bold text-amber-800 mb-4 flex items-center justify-center gap-2">
-                <Heart className="w-5 h-5 text-amber-600" />
-                专属头像
-                <Sparkles className="w-4 h-4 text-yellow-600" />
-              </h4>
-              <div className="relative">
+              <div className="relative ">
                 <Image
                   src={character.avatar_url}
                   alt={`${displayName} 头像`}
@@ -269,11 +263,6 @@ export default function CharacterDetailModal({
           {/* 3视图展示区 */}
           <div className="text-center group">
             <div className="relative inline-block">
-              <h4 className="text-xl font-bold text-amber-800 mb-4 flex items-center justify-center gap-2">
-                <Sparkles className="w-5 h-5 text-orange-600" />
-                3D 视图
-                <Heart className="w-4 h-4 text-yellow-600" />
-              </h4>
               <div className="relative">
                 <Image
                   src={character.three_view_url}

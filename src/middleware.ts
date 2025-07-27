@@ -8,8 +8,8 @@ export default createMiddleware({
   // 默认语言
   defaultLocale: "en",
 
-  // 当访问根路径时是否重定向到默认语言
-  localePrefix: "as-needed",
+  // 修改为 "always" - 所有语言都显示前缀，包括默认语言
+  localePrefix: "always",
 });
 
 export const config = {

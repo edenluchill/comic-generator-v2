@@ -64,7 +64,7 @@ export interface SceneDescription {
   mood?: string; // 场景情绪
 }
 
-export interface ComicGenerationRequest {
+export interface ComicGenerationRequest extends Record<string, unknown> {
   diary_content: string;
   characters: SceneCharacter[]; // 完整的角色信息数组
   style?: "cute" | "realistic" | "minimal" | "kawaii";

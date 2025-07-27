@@ -1,5 +1,9 @@
 import { useState, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { FluxGenerationResult } from "@/types/flux";
+import { makeAuthenticatedRequest } from "@/lib/auth-request";
+import { makeAuthenticatedJsonRequest } from "@/lib/auth-request";
+import { CREDIT_COSTS, UserProfile } from "@/types/credits";
 
 export interface FluxGenerationState {
   isProcessing: boolean;
@@ -25,6 +29,8 @@ export interface FluxGenerationOptions {
 }
 
 export function useFluxGeneration() {
+  const queryClient = useQueryClient();
+
   const [state, setState] = useState<FluxGenerationState>({
     isProcessing: false,
     currentStep: 0,
@@ -104,22 +110,34 @@ export function useFluxGeneration() {
           progress: 30,
         }));
 
+        const { profile } = (await makeAuthenticatedJsonRequest<{
+          profile: UserProfile;
+        }>("/api/user/profile")) as {
+          profile: UserProfile;
+        };
+
+        if (profile.current_credits < CREDIT_COSTS.FLUX_CHARACTER_GENERATION) {
+          throw new Error(
+            `积分不足，需要 ${CREDIT_COSTS.FLUX_CHARACTER_GENERATION} 积分，当前只有 ${profile.current_credits} 积分`
+          );
+        }
+
         // 调用流式 API 端点
-        const response = await fetch("/api/generate-flux-character", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            aspectRatio: "1:1",
-            outputFormat: "png",
-            promptUpsampling: false,
-            safetyTolerance: 2,
-            input_image: uploadedImage,
-            seed: 390804,
-            tags: currentTags,
-          }),
-        });
+        const response = await makeAuthenticatedRequest(
+          "/api/generate-flux-character",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              aspectRatio: "1:1",
+              outputFormat: "png",
+              promptUpsampling: false,
+              safetyTolerance: 2,
+              input_image: uploadedImage,
+              seed: 390804,
+              tags: currentTags,
+            }),
+          }
+        );
 
         if (!response.ok) {
           throw new Error(`生成请求失败: ${response.statusText}`);
@@ -193,10 +211,36 @@ export function useFluxGeneration() {
                       isProcessing: false,
                       processingStep: null,
                     }));
+                    // 刷新用户profile和交易历史，确保credit余额及时更新
+                    queryClient.invalidateQueries({ queryKey: ["profile"] });
+                    queryClient.invalidateQueries({
+                      queryKey: ["transactions"],
+                    });
                     break;
 
                   case "error":
                     throw new Error(data.error);
+
+                  case "credit_deducted":
+                    // 更新UI显示积分扣除信息并立即刷新profile数据
+                    setState((prev) => ({
+                      ...prev,
+                      message: data.message,
+                    }));
+                    // 立即刷新用户profile和交易历史，确保UI显示最新的credit余额
+                    queryClient.invalidateQueries({ queryKey: ["profile"] });
+                    queryClient.invalidateQueries({
+                      queryKey: ["transactions"],
+                    });
+                    break;
+
+                  case "credit_warning":
+                    // 显示积分扣除警告
+                    setState((prev) => ({
+                      ...prev,
+                      error: data.message,
+                    }));
+                    break;
                 }
               } catch (parseError) {
                 console.warn("解析流式响应数据时出错:", parseError);
@@ -216,7 +260,7 @@ export function useFluxGeneration() {
         throw error;
       }
     },
-    [state.tags]
+    [state.tags, queryClient]
   );
 
   const reset = useCallback(() => {

@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
 
     // 使用OpenAI Vision API进行简单的标签识别
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4.1-mini",
       messages: [
         {
           role: "user",

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/hooks/useTranslations";
-import { Home, Pencil, Palette, Crown } from "lucide-react";
+import { Home, Pencil, Palette, Crown, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import { lazy, memo } from "react";
@@ -18,7 +18,7 @@ const Header = memo(function Header() {
   const { getLocalizedHref } = useLocalizedNavigation();
   const t = useTranslations("Navigation");
   const headerT = useTranslations("Header");
-  const { profile } = useAuth();
+  const { profile, loading } = useAuth();
 
   const isActive = (path: string) => {
     const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}/, "") || "/";
@@ -31,7 +31,7 @@ const Header = memo(function Header() {
 
   return (
     <header className="sticky top-0 z-50 bg-gradient-to-r from-amber-50/95 via-orange-50/95 to-yellow-50/95 backdrop-blur-md border-b border-amber-200/30 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 py-4">
+      <div className="max-w-6xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo区域 */}
           <Link
@@ -54,122 +54,92 @@ const Header = memo(function Header() {
           </Link>
 
           {/* 右侧功能区 */}
-          <div className="flex items-center gap-3">
-            {/* 桌面端导航链接 */}
-            <nav className="hidden md:flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {/* 桌面端导航链接 - 独立分组 */}
+            <nav className="hidden md:flex items-center gap-1 bg-white/50 backdrop-blur-sm rounded-lg p-1 border border-amber-200/40 shadow-sm">
               <Link href={getLocalizedHref("/")}>
                 <Button
                   variant="ghost"
+                  size="sm"
                   className={cn(
-                    "h-10 px-4 transition-all duration-300",
-                    "flex items-center gap-2",
-                    "text-sm font-medium text-amber-700/80",
-                    "hover:bg-amber-500/10 hover:backdrop-blur-sm hover:text-amber-800",
-                    "hover:shadow-md hover:shadow-amber-500/20",
-                    "rounded-full border border-transparent hover:border-amber-400/30",
-                    isActive("/") &&
-                      "bg-amber-500/10 backdrop-blur-sm text-amber-800 font-semibold scale-[1.02] border-amber-400/30"
+                    "h-8 px-3 transition-all duration-200",
+                    "flex items-center gap-0.5",
+                    "text-sm font-medium",
+                    isActive("/")
+                      ? "bg-amber-500/20 text-amber-800 shadow-sm border-amber-300/50"
+                      : "text-amber-700/90 hover:bg-amber-500/10 hover:text-amber-800",
+                    "rounded-md border border-transparent"
                   )}
                 >
-                  <div
-                    className={cn(
-                      "transition-colors",
-                      isActive("/") && "text-amber-700"
-                    )}
-                  >
-                    <Home className="w-4 h-4" />
-                  </div>
-                  <span
-                    className={cn(
-                      "transition-colors",
-                      isActive("/") && "text-amber-800"
-                    )}
-                  >
-                    {t("home")}
-                  </span>
+                  <Home className="w-4 h-4" />
+                  <span>{t("home")}</span>
                 </Button>
               </Link>
 
               <Link href={getLocalizedHref("/workshop")}>
                 <Button
                   variant="ghost"
+                  size="sm"
                   className={cn(
-                    "h-10 px-4 transition-all duration-300",
-                    "flex items-center gap-2",
-                    "text-sm font-medium text-orange-700/80",
-                    "hover:bg-orange-500/10 hover:backdrop-blur-sm hover:text-orange-800",
-                    "hover:shadow-md hover:shadow-orange-500/20",
-                    "rounded-full border border-transparent hover:border-orange-400/30",
-                    isActive("/workshop") &&
-                      "bg-orange-500/10 backdrop-blur-sm text-orange-800 font-semibold scale-[1.02] border-orange-400/30"
+                    "h-8 px-3 transition-all duration-200",
+                    "flex items-center gap-1.5",
+                    "text-sm font-medium",
+                    isActive("/workshop")
+                      ? "bg-orange-500/20 text-orange-800 shadow-sm border-orange-300/50"
+                      : "text-orange-700/90 hover:bg-orange-500/10 hover:text-orange-800",
+                    "rounded-md border border-transparent"
                   )}
                 >
-                  <div
-                    className={cn(
-                      "transition-colors",
-                      isActive("/workshop") && "text-orange-700"
-                    )}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </div>
-                  <span
-                    className={cn(
-                      "transition-colors",
-                      isActive("/workshop") && "text-orange-800"
-                    )}
-                  >
-                    {t("workshop")}
-                  </span>
+                  <Pencil className="w-4 h-4" />
+                  <span>{t("workshop")}</span>
                 </Button>
               </Link>
+            </nav>
 
-              {/* 只有非Premium用户显示升级按钮 */}
-              {!isPremium && (
+            {/* 功能按钮组 */}
+            <div className="flex items-center gap-1.5">
+              {/* 语言选择器 */}
+              <LanguagePicker />
+
+              {/* 升级按钮 - 根据loading和premium状态显示 */}
+              {loading ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  disabled
+                  className="h-8 px-3 transition-all duration-200 flex items-center gap-1.5 text-sm font-medium text-yellow-700/60 bg-yellow-500/5 rounded-md border border-yellow-200/30"
+                >
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span className="hidden sm:inline">检查中...</span>
+                </Button>
+              ) : !isPremium ? (
                 <Link href={getLocalizedHref("/pricing")}>
                   <Button
                     variant="ghost"
+                    size="sm"
                     className={cn(
-                      "h-10 px-4 transition-all duration-300",
-                      "flex items-center gap-2",
-                      "text-sm font-medium text-yellow-700/80",
-                      "hover:bg-yellow-500/15 hover:backdrop-blur-sm hover:text-yellow-800",
-                      "hover:shadow-md hover:shadow-yellow-500/25",
-                      "rounded-full border border-transparent hover:border-yellow-400/30",
+                      "h-8 px-3 transition-all duration-200",
+                      "flex items-center gap-1.5",
+                      "text-sm font-medium text-yellow-700/90",
+                      "hover:bg-yellow-500/15 hover:text-yellow-800",
+                      "hover:shadow-sm",
+                      "rounded-md border border-transparent hover:border-yellow-400/30",
                       "relative overflow-hidden",
                       isActive("/pricing") &&
-                        "bg-yellow-500/15 backdrop-blur-sm text-yellow-800 font-semibold scale-[1.02] border-yellow-400/30"
+                        "bg-yellow-500/15 text-yellow-800 border-yellow-400/30"
                     )}
                   >
-                    {/* 背景闪光效果 */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-400/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-
-                    <div
-                      className={cn(
-                        "transition-colors relative z-10",
-                        isActive("/pricing") && "text-yellow-700"
-                      )}
-                    >
-                      <Crown className="w-4 h-4 drop-shadow-sm" />
-                    </div>
-                    <span
-                      className={cn(
-                        "transition-colors relative z-10",
-                        isActive("/pricing") && "text-yellow-800"
-                      )}
-                    >
-                      升级专业版
-                    </span>
+                    <Crown className="w-4 h-4 drop-shadow-sm" />
+                    <span className="hidden sm:inline">升级专业版</span>
+                    <span className="sm:hidden">升级</span>
                   </Button>
                 </Link>
-              )}
-            </nav>
+              ) : null}
 
-            {/* 语言选择器 - 在所有设备上显示 */}
-            <LanguagePicker />
-
-            {/* 账户菜单 - 只在桌面端显示 */}
-            <div className="hidden md:block">
-              <AccountMenu />
+              {/* 账户菜单 */}
+              <div className="hidden md:block">
+                <AccountMenu />
+              </div>
             </div>
           </div>
         </div>

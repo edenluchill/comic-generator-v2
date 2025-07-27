@@ -49,7 +49,7 @@ export default function HomePage() {
       {/* 主要内容区域 */}
       <div className="container mx-auto px-4 py-12 relative z-10">
         {/* 主要展示区 - 左右布局 */}
-        <div className="grid lg:grid-cols-2 max-w-7xl mx-auto py-12 gap-12 items-center">
+        <div className="grid lg:grid-cols-2 max-w-6xl mx-auto py-12 gap-12 items-center">
           {/* 左侧内容区 */}
           <div className="space-y-8 animate-fade-in-up">
             <div className="space-y-6">
@@ -194,7 +194,7 @@ export default function HomePage() {
 
         {/* 示例作品区域 */}
         <div
-          className="mb-16 animate-fade-in-up max-w-7xl mx-auto"
+          className="mb-16 animate-fade-in-up max-w-6xl mx-auto"
           style={{ animationDelay: "600ms" }}
         >
           <div className="text-center mb-4 animate-slide-in-right">
@@ -256,7 +256,7 @@ export default function HomePage() {
 
         {/* 底部特性说明 */}
         <div
-          className="grid md:grid-cols-3 gap-8 animate-fade-in-up max-w-7xl mx-auto"
+          className="grid md:grid-cols-3 gap-8 animate-fade-in-up max-w-6xl mx-auto"
           style={{ animationDelay: "1000ms" }}
         >
           {[

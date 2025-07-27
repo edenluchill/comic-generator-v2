@@ -28,12 +28,10 @@ export class SceneAnalysisService {
       temperature = 0.7,
     } = options;
 
-    const characterList = characters
-      .map((c) => `ID: ${c.id}, Name: ${c.name}`)
-      .join(", ");
+    const characterList = characters.map((c) => `${c.name}`).join(", ");
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: "gpt-4.1-mini",
       messages: [
         {
           role: "user",
@@ -50,78 +48,78 @@ Please create 4 scenes that:
 4. Include emotions and actions
 5. Identify the overall mood of each scene
 6. When mentioning character names in scene descriptions, wrap them with angle brackets like <character_name>
+7. IMPORTANT: Use the exact character names from the available characters list: ${characterList}
 
-Use the character IDs (not names) in the character_ids array.`,
+Example: If a scene involves a character named "菠萝塞东", describe it as: "The scene shows <菠萝塞东> walking in the park..."`,
         },
       ],
-      functions: [
+      tools: [
         {
-          name: "analyze_diary_scenes",
-          description:
-            "Split diary content into 4 comic scenes with character assignments and mood analysis",
-          parameters: {
-            type: "object",
-            properties: {
-              scenes: {
-                type: "array",
-                items: {
-                  type: "object",
-                  properties: {
-                    scene_number: {
-                      type: "integer",
-                      description: "Scene number (1-4)",
-                    },
-                    description: {
-                      type: "string",
-                      description:
-                        "English scene description suitable for AI image generation",
-                    },
-                    character_ids: {
-                      type: "array",
-                      items: {
-                        type: "string",
+          type: "function",
+          function: {
+            name: "analyze_diary_scenes",
+            description:
+              "Split diary content into 4 comic scenes with character names marked in angle brackets and mood analysis",
+            parameters: {
+              type: "object",
+              properties: {
+                scenes: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      scene_number: {
+                        type: "integer",
+                        description: "Scene number (1-4)",
                       },
-                      description:
-                        "Array of character IDs involved in this scene",
+                      description: {
+                        type: "string",
+                        description:
+                          "English scene description suitable for AI image generation. Character names should be wrapped in angle brackets like <character_name>",
+                      },
+                      mood: {
+                        type: "string",
+                        description:
+                          "Overall mood/emotion of the scene (e.g., happy, sad, excited, peaceful, etc.)",
+                      },
                     },
-                    mood: {
-                      type: "string",
-                      description:
-                        "Overall mood/emotion of the scene (e.g., happy, sad, excited, peaceful, etc.)",
-                    },
+                    required: ["scene_number", "description", "mood"],
                   },
-                  required: [
-                    "scene_number",
-                    "description",
-                    "character_ids",
-                    "mood",
-                  ],
+                  minItems: 4,
+                  maxItems: 4,
                 },
-                minItems: 4,
-                maxItems: 4,
               },
+              required: ["scenes"],
             },
-            required: ["scenes"],
           },
         },
       ],
-      function_call: { name: "analyze_diary_scenes" },
+      tool_choice: {
+        type: "function",
+        function: { name: "analyze_diary_scenes" },
+      },
       max_tokens: maxTokens,
       temperature: temperature,
     });
 
-    const functionCall = response.choices[0]?.message?.function_call;
-    if (!functionCall || !functionCall.arguments) {
-      throw new Error("场景分析失败：无法获取GPT函数调用响应");
+    const toolCall = response.choices[0]?.message?.tool_calls?.[0];
+    if (!toolCall || !toolCall.function?.arguments) {
+      throw new Error("场景分析失败：无法获取GPT工具调用响应");
     }
 
-    return this.parseFunctionCallResult(functionCall.arguments);
+    return this.parseFunctionCallResult(
+      toolCall.function.arguments,
+      characters
+    );
   }
 
   /**
-   * 解析函数调用结果
+   * 解析函数调用结果并从描述中提取角色IDs
    */
-  private parseFunctionCallResult(argumentsString: string): SceneDescription[] {
+  private parseFunctionCallResult(
+    argumentsString: string,
+    characters: Character[]
+  ): SceneDescription[] {
     try {
       const result = JSON.parse(argumentsString);
 
@@ -129,23 +127,62 @@ Use the character IDs (not names) in the character_ids array.`,
         throw new Error("场景分析结果格式错误：缺少scenes数组");
       }
 
-      // 验证每个场景的必需字段
-      for (const scene of result.scenes) {
-        if (
-          !scene.scene_number ||
-          !scene.description ||
-          !scene.character_ids ||
-          !scene.mood
-        ) {
-          throw new Error("场景分析结果格式错误：缺少必需字段");
-        }
-      }
+      // 验证每个场景的必需字段并解析角色IDs
+      const parsedScenes: SceneDescription[] = result.scenes.map(
+        (scene: SceneDescription) => {
+          if (!scene.scene_number || !scene.description || !scene.mood) {
+            throw new Error("场景分析结果格式错误：缺少必需字段");
+          }
 
-      return result.scenes;
+          // 从描述中提取角色名并转换为IDs
+          const character_ids = this.extractCharacterIds(
+            scene.description,
+            characters
+          );
+
+          return {
+            scene_number: scene.scene_number,
+            description: scene.description,
+            character_ids: character_ids,
+            mood: scene.mood,
+          };
+        }
+      );
+
+      return parsedScenes;
     } catch (parseError) {
       console.error("函数调用结果解析错误:", parseError);
       throw new Error("场景分析结果格式错误");
     }
+  }
+
+  /**
+   * 从场景描述中提取角色名并转换为角色IDs
+   */
+  private extractCharacterIds(
+    description: string,
+    characters: Character[]
+  ): string[] {
+    const characterIds: string[] = [];
+
+    // 使用正则表达式匹配 <角色名> 格式
+    const characterNameMatches = description.match(/<([^>]+)>/g);
+
+    if (characterNameMatches) {
+      for (const match of characterNameMatches) {
+        // 提取尖括号内的角色名
+        const characterName = match.replace(/[<>]/g, "");
+
+        // 在角色列表中查找对应的ID
+        const character = characters.find((c) => c.name === characterName);
+
+        if (character && !characterIds.includes(character.id)) {
+          characterIds.push(character.id);
+        }
+      }
+    }
+
+    return characterIds;
   }
 }
 

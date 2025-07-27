@@ -137,6 +137,7 @@ export interface SubscriptionCheckoutResult {
 export const CREDIT_COSTS = {
   COMIC_GENERATION: 40, // 一个漫画4个场景，每个场景10个credit
   CHARACTER_CREATION: 10, // 创建一个角色
+  FLUX_CHARACTER_GENERATION: 20, // 生成Flux角色（头像+3视图）
   SCENE_REGENERATION: 10, // 重新生成单个场景
 } as const;
 

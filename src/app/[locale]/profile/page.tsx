@@ -8,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { CreditDisplay } from "@/components/CreditDisplay";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import { AlertCircle } from "lucide-react";
+import { useEffect } from "react";
 import {
   ProfileHeader,
   UserInfoCard,
@@ -68,14 +69,21 @@ export default function ProfilePage() {
   const { data: transactions = [], isLoading: transactionsLoading } =
     useTransactions(10);
 
+  // ✅ Move navigation to useEffect to avoid render-time side effects
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/login");
+    }
+  }, [authLoading, user, navigate]);
+
   // ✅ 简单的认证检查
   if (authLoading) {
     return <LoadingState />;
   }
 
+  // ✅ Show loading while redirecting to login
   if (!user) {
-    navigate("/login");
-    return null;
+    return <LoadingState />;
   }
 
   if (profileLoading) {

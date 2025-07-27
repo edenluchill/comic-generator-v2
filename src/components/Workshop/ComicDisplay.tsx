@@ -192,8 +192,8 @@ export default function ComicDisplay({
             src={scene.image_url}
             alt={`场景 ${index + 1}`}
             className={STYLES.sceneImage}
-            width={200}
-            height={200}
+            width={300}
+            height={300}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-50">

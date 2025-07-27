@@ -147,14 +147,30 @@ CREATE TRIGGER update_subscription_plans_updated_at
 CREATE OR REPLACE FUNCTION handle_new_user() 
 RETURNS TRIGGER AS $$
 BEGIN
+  -- 记录开始
+  RAISE LOG 'Trigger: Creating profile for user % (email: %)', NEW.id, NEW.email;
+  
+  -- 尝试插入
   INSERT INTO user_profiles (id, email, full_name, avatar_url)
   VALUES (
     NEW.id,
-    NEW.email,
+    COALESCE(NEW.email, ''), -- 确保不是 NULL
     NEW.raw_user_meta_data->>'full_name',
     NEW.raw_user_meta_data->>'avatar_url'
   );
+  
+  RAISE LOG 'Trigger: Successfully created profile for user %', NEW.id;
   RETURN NEW;
+  
+EXCEPTION
+  WHEN unique_violation THEN
+    RAISE LOG 'Trigger: Profile already exists for user %', NEW.id;
+    RETURN NEW;
+  WHEN others THEN
+    RAISE LOG 'Trigger: Failed to create profile for user %: % (SQLSTATE: %)', 
+              NEW.id, SQLERRM, SQLSTATE;
+    -- 不阻止用户创建，但记录错误
+    RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

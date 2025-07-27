@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import CharactersList from "./CharactersList";
 import DiaryInput from "./DiaryInput";
 import ComicDisplay from "./ComicDisplay";
+import WorkshopHeader, { createBackAction } from "./WorkshopHeader";
 import { useCharacters, useDeleteCharacter } from "@/hooks/useCharacters";
 import { useComicGeneration } from "@/hooks/useComicGeneration";
 import { Character } from "@/types/characters";
@@ -45,7 +46,9 @@ export default function ComicGeneration() {
 
   const handleAddNewCharacter = () => {
     // 切换到角色创建模式
-    handleBackToWorkshop();
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set("mode", "character");
+    router.push(`/workshop?${newSearchParams.toString()}`);
   };
 
   const handleDeleteCharacter = async (id: string) => {
@@ -89,6 +92,14 @@ export default function ComicGeneration() {
   const canGenerate =
     storyText.trim().length > 0 && characters.length > 0 && !isGenerating;
 
+  // Header配置
+  const backAction = createBackAction(
+    ArrowLeft,
+    "返回工作室",
+    "工作室",
+    handleBackToWorkshop
+  );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 relative">
       {/* 背景装饰元素 */}
@@ -98,29 +109,12 @@ export default function ComicGeneration() {
       </div>
 
       <div className="container mx-auto px-4 py-6 relative z-10 max-w-6xl">
-        {/* 返回按钮 */}
-        <div
-          className={`transition-all duration-1000 ${
-            mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
-          }`}
-        >
-          <button
-            onClick={handleBackToWorkshop}
-            className="flex items-center gap-2 px-3 py-1.5 text-amber-600 hover:text-amber-700 hover:bg-white/50 rounded-lg transition-all duration-300 text-sm"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            返回工作室
-          </button>
-        </div>
-
-        {/* 标题区域 */}
-        <div
-          className={`text-center mb-4 transition-all duration-1000 delay-200 ${
-            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          }`}
-        >
-          <p className="text-amber-700 text-lg">用你的角色和故事创作四格漫画</p>
-        </div>
+        {/* 使用可重用的Header组件 */}
+        <WorkshopHeader
+          leftAction={backAction}
+          title="用你的角色和故事创作四格漫画"
+          mounted={mounted}
+        />
 
         {/* 角色列表 */}
         <div className="mb-4">

@@ -40,19 +40,10 @@ export default function ImageUploadSection({
 
   return (
     <div
-      className={`bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-4 lg:p-6 border border-amber-100/50 transition-all duration-700 delay-100 ${
+      className={`bg-white/80 backdrop-blur-sm rounded-2xl p-4 lg:p-6 border-none transition-all duration-700 delay-100 ${
         mounted ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"
       }`}
     >
-      <div className="flex items-center gap-2 lg:gap-3 mb-4 lg:mb-6">
-        <div className="w-6 h-6 lg:w-8 lg:h-8 border-2 border-amber-400/50 rounded-xl flex items-center justify-center transition-all duration-300 hover:border-amber-500 hover:scale-105">
-          <Upload className="w-3 h-3 lg:w-4 lg:h-4 text-amber-600" />
-        </div>
-        <h2 className="text-lg lg:text-xl font-bold text-amber-800">
-          {t("uploadImage")}
-        </h2>
-      </div>
-
       <div className="mb-4">
         {!uploadedImage ? (
           <div
@@ -94,7 +85,7 @@ export default function ImageUploadSection({
           </div>
         ) : (
           <div className="relative group">
-            <div className="relative flex justify-center items-center border-2 border-amber-200 rounded-2xl overflow-hidden shadow-md transition-all duration-300 hover:shadow-lg">
+            <div className="relative flex justify-center items-center border-2 border-amber-200 rounded-2xl overflow-hidden transition-all duration-300 ">
               <Image
                 src={uploadedImage}
                 alt="Uploaded image for comic generation"

@@ -5,7 +5,7 @@ import { makeAuthenticatedRequest } from "@/lib/auth-request";
 import { makeAuthenticatedJsonRequest } from "@/lib/auth-request";
 import { CREDIT_COSTS, UserProfile } from "@/types/credits";
 
-export interface FluxGenerationState {
+export interface CharacterGenerationState {
   isProcessing: boolean;
   currentStep: number;
   totalSteps: number;
@@ -20,21 +20,26 @@ export interface FluxGenerationState {
     | "analyzing"
     | "generating-avatar"
     | "generating-three-view"
+    | "storing"
+    | "processing-credits"
     | null;
 }
 
-export interface FluxGenerationOptions {
+export interface CharacterGenerationOptions {
   uploadedFile: File;
-  uploadedImage: string;
+  aspectRatio?: string;
+  outputFormat?: "png" | "jpeg";
+  promptUpsampling?: boolean;
+  safetyTolerance?: number;
 }
 
-export function useFluxGeneration() {
+export function useCharacterGeneration() {
   const queryClient = useQueryClient();
 
-  const [state, setState] = useState<FluxGenerationState>({
+  const [state, setState] = useState<CharacterGenerationState>({
     isProcessing: false,
     currentStep: 0,
-    totalSteps: 3,
+    totalSteps: 5, // 更新为5步：分析、头像、3视图、存储、积分
     progress: 0,
     status: "",
     message: "",
@@ -46,8 +51,14 @@ export function useFluxGeneration() {
   });
 
   const generateCharacter = useCallback(
-    async (options: FluxGenerationOptions) => {
-      const { uploadedFile, uploadedImage } = options;
+    async (options: CharacterGenerationOptions) => {
+      const {
+        uploadedFile,
+        aspectRatio = "1:1",
+        outputFormat = "png",
+        promptUpsampling = false,
+        safetyTolerance = 2,
+      } = options;
 
       setState((prev) => ({
         ...prev,
@@ -56,86 +67,41 @@ export function useFluxGeneration() {
         progress: 0,
         avatarResult: null,
         threeViewResult: null,
+        tags: null,
         error: null,
         processingStep: "analyzing",
-        status: "正在分析图片特征...",
-        message: "开始分析面部特征...",
+        status: "正在准备生成...",
+        message: "开始处理图片...",
       }));
 
       try {
-        // 第一步：分析脸部特征
-        let currentTags = state.tags;
-
-        if (!currentTags) {
-          setState((prev) => ({
-            ...prev,
-            processingStep: "analyzing",
-            status: "正在分析面部特征...",
-            message: "分析中...",
-            progress: 10,
-          }));
-
-          const formData = new FormData();
-          formData.append("image", uploadedFile);
-
-          const analysisResponse = await fetch("/api/analyze-face", {
-            method: "POST",
-            body: formData,
-          });
-
-          const analysisResponseData = await analysisResponse.json();
-
-          if (!analysisResponseData.success) {
-            throw new Error("分析失败: " + analysisResponseData.error);
-          }
-
-          currentTags = analysisResponseData.data;
-
-          setState((prev) => ({
-            ...prev,
-            tags: currentTags,
-            currentStep: 1,
-            progress: 20,
-            status: "分析完成，开始生成卡通头像...",
-            message: "面部特征分析完成",
-          }));
-        }
-
-        // 第二步和第三步：通过 API 路由生成角色
-        setState((prev) => ({
-          ...prev,
-          processingStep: "generating-avatar",
-          status: "正在生成卡通头像...",
-          message: "启动头像生成...",
-          progress: 30,
-        }));
-
+        // 检查用户积分
         const { profile } = (await makeAuthenticatedJsonRequest<{
           profile: UserProfile;
         }>("/api/user/profile")) as {
           profile: UserProfile;
         };
 
-        if (profile.current_credits < CREDIT_COSTS.FLUX_CHARACTER_GENERATION) {
+        if (profile.current_credits < CREDIT_COSTS.CHARACTER_GENERATION) {
           throw new Error(
-            `积分不足，需要 ${CREDIT_COSTS.FLUX_CHARACTER_GENERATION} 积分，当前只有 ${profile.current_credits} 积分`
+            `积分不足，需要 ${CREDIT_COSTS.CHARACTER_GENERATION} 积分，当前只有 ${profile.current_credits} 积分`
           );
         }
 
-        // 调用流式 API 端点
+        // 准备FormData
+        const formData = new FormData();
+        formData.append("image", uploadedFile);
+        formData.append("aspectRatio", aspectRatio);
+        formData.append("outputFormat", outputFormat);
+        formData.append("promptUpsampling", promptUpsampling.toString());
+        formData.append("safetyTolerance", safetyTolerance.toString());
+
+        // 调用集成的API端点
         const response = await makeAuthenticatedRequest(
-          "/api/generate-flux-character",
+          "/api/generate-character",
           {
             method: "POST",
-            body: JSON.stringify({
-              aspectRatio: "1:1",
-              outputFormat: "png",
-              promptUpsampling: false,
-              safetyTolerance: 2,
-              input_image: uploadedImage,
-              seed: 390804,
-              tags: currentTags,
-            }),
+            body: formData,
           }
         );
 
@@ -164,26 +130,57 @@ export function useFluxGeneration() {
                 const data = JSON.parse(line.slice(6));
 
                 switch (data.type) {
-                  case "status":
+                  case "step_start":
+                    let processingStep: CharacterGenerationState["processingStep"] =
+                      null;
+                    let currentStep = 0;
+
+                    switch (data.step) {
+                      case "analysis":
+                        processingStep = "analyzing";
+                        currentStep = 1;
+                        break;
+                      case "avatar":
+                        processingStep = "generating-avatar";
+                        currentStep = 2;
+                        break;
+                      case "three_view":
+                        processingStep = "generating-three-view";
+                        currentStep = 3;
+                        break;
+                      case "storage":
+                        processingStep = "storing";
+                        currentStep = 4;
+                        break;
+                      case "credits":
+                        processingStep = "processing-credits";
+                        currentStep = 5;
+                        break;
+                    }
+
                     setState((prev) => ({
                       ...prev,
+                      currentStep,
+                      processingStep,
                       status: data.message,
-                      currentStep: data.step,
-                      processingStep:
-                        data.step === 1
-                          ? "generating-avatar"
-                          : "generating-three-view",
+                      progress: data.progress || prev.progress,
                     }));
                     break;
 
                   case "progress":
-                    const baseProgress = data.step === 1 ? 30 : 65;
-                    const stepProgress = data.step === 1 ? 0.35 : 0.35;
                     setState((prev) => ({
                       ...prev,
-                      progress: baseProgress + data.progress * stepProgress,
+                      progress: data.progress,
+                      message: data.message,
+                    }));
+                    break;
+
+                  case "analysis_complete":
+                    setState((prev) => ({
+                      ...prev,
+                      tags: data.data.tags,
                       status: data.message,
-                      message: data.status,
+                      message: `识别到 ${data.data.tags.length} 个特征标签`,
                     }));
                     break;
 
@@ -191,11 +188,8 @@ export function useFluxGeneration() {
                     setState((prev) => ({
                       ...prev,
                       avatarResult: data.data,
-                      currentStep: 2,
-                      progress: 65,
                       status: data.message,
-                      message: "头像生成完成",
-                      processingStep: "generating-three-view",
+                      message: "头像生成完成！",
                     }));
                     break;
 
@@ -204,14 +198,16 @@ export function useFluxGeneration() {
                       ...prev,
                       avatarResult: data.data.avatar,
                       threeViewResult: data.data.threeView,
-                      currentStep: 3,
+                      tags: data.data.analyzedTags, // 从结果中获取分析的标签
+                      currentStep: 5,
                       progress: 100,
                       status: "生成完成！",
                       message: "所有角色图片生成完成",
                       isProcessing: false,
                       processingStep: null,
                     }));
-                    // 刷新用户profile和交易历史，确保credit余额及时更新
+
+                    // 刷新用户profile和交易历史
                     queryClient.invalidateQueries({ queryKey: ["profile"] });
                     queryClient.invalidateQueries({
                       queryKey: ["transactions"],
@@ -222,12 +218,12 @@ export function useFluxGeneration() {
                     throw new Error(data.error);
 
                   case "credit_deducted":
-                    // 更新UI显示积分扣除信息并立即刷新profile数据
                     setState((prev) => ({
                       ...prev,
                       message: data.message,
                     }));
-                    // 立即刷新用户profile和交易历史，确保UI显示最新的credit余额
+
+                    // 立即刷新积分信息
                     queryClient.invalidateQueries({ queryKey: ["profile"] });
                     queryClient.invalidateQueries({
                       queryKey: ["transactions"],
@@ -235,11 +231,15 @@ export function useFluxGeneration() {
                     break;
 
                   case "credit_warning":
-                    // 显示积分扣除警告
                     setState((prev) => ({
                       ...prev,
                       error: data.message,
                     }));
+                    break;
+
+                  default:
+                    // 处理其他类型的事件
+                    console.log("未处理的事件类型:", data.type, data);
                     break;
                 }
               } catch (parseError) {
@@ -260,14 +260,14 @@ export function useFluxGeneration() {
         throw error;
       }
     },
-    [state.tags, queryClient]
+    [queryClient]
   );
 
   const reset = useCallback(() => {
     setState({
       isProcessing: false,
       currentStep: 0,
-      totalSteps: 3,
+      totalSteps: 5,
       progress: 0,
       status: "",
       message: "",

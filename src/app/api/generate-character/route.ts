@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { createFluxCharacterGenerator } from "@/lib/flux-generator";
 import { storeFluxCharacterImages } from "@/lib/image-storage";
 import { creditService } from "@/lib/services/credit.service";
+import { faceAnalysisService } from "@/lib/services/face-analysis.service";
 import { CREDIT_COSTS } from "@/types/credits";
 import { StreamGenerationHelper } from "@/lib/helpers/stream-generation.helpers";
 import { authenticateOptional } from "@/lib/helpers/auth-extensions.helpers";
@@ -10,10 +11,6 @@ import {
   handleApiError,
   createValidationErrorResponse,
 } from "@/lib/helpers/api-response.helpers";
-import {
-  validateRequestBody,
-  validateRequiredFields,
-} from "@/lib/helpers/request-validation.helpers";
 import { handleOptionsRequest } from "@/lib/helpers/cors.helpers";
 
 interface FluxGenerationRequest extends Record<string, unknown> {
@@ -21,19 +18,21 @@ interface FluxGenerationRequest extends Record<string, unknown> {
   outputFormat?: "png" | "jpeg";
   promptUpsampling?: boolean;
   safetyTolerance?: number;
-  input_image: string;
-  tags: string[];
+  input_image?: string; // 可选，用于向后兼容
+  tags?: string[]; // 可选，用于向后兼容
 }
 
 const FLUX_GENERATION_STEPS = [
-  { name: "avatar", message: "开始生成卡通头像...", weight: 35 },
-  { name: "three_view", message: "开始生成3视图全身图...", weight: 35 },
+  { name: "analysis", message: "正在分析图片特征...", weight: 15 },
+  { name: "avatar", message: "开始生成卡通头像...", weight: 30 },
+  { name: "three_view", message: "开始生成3视图全身图...", weight: 30 },
   { name: "storage", message: "正在保存图片到数据库...", weight: 15 },
-  { name: "credits", message: "正在处理积分...", weight: 15 },
+  { name: "credits", message: "正在处理积分...", weight: 10 },
 ];
 
 async function processFluxGeneration(
   helper: StreamGenerationHelper,
+  imageFile: File | null,
   request: FluxGenerationRequest,
   userId?: string
 ) {
@@ -43,11 +42,45 @@ async function processFluxGeneration(
     outputFormat = "png",
     promptUpsampling = false,
     safetyTolerance = 2,
-    input_image,
-    tags,
   } = request;
 
-  // 步骤1: 生成卡通头像
+  let input_image: string;
+  let tags: string[];
+
+  // 步骤1: 分析图片特征（如果提供了图片）
+  if (imageFile) {
+    helper.startStep("analysis");
+
+    try {
+      // 分析面部特征
+      tags = await faceAnalysisService.analyzeFace(imageFile);
+
+      // 将图片转换为base64用于后续生成
+      const bytes = await imageFile.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      input_image = `data:${imageFile.type};base64,${buffer.toString(
+        "base64"
+      )}`;
+
+      helper.sendCustomEvent("analysis_complete", {
+        data: { tags },
+        message: `图片分析完成！识别到 ${tags.length} 个特征标签`,
+      });
+    } catch (error) {
+      throw new Error(
+        `图片分析失败: ${error instanceof Error ? error.message : "未知错误"}`
+      );
+    }
+  } else {
+    // 使用传入的参数（向后兼容）
+    if (!request.input_image || !request.tags) {
+      throw new Error("缺少必要的图片或标签参数");
+    }
+    input_image = request.input_image;
+    tags = request.tags;
+  }
+
+  // 步骤2: 生成卡通头像
   helper.startStep("avatar");
   const avatarResult = await generator.generateCartoonAvatar(
     input_image,
@@ -73,7 +106,7 @@ async function processFluxGeneration(
     message: "头像生成完成！开始生成3视图...",
   });
 
-  // 步骤2: 生成3视图
+  // 步骤3: 生成3视图
   helper.startStep("three_view");
   const threeViewResult = await generator.generateThreeViewFromAvatar(
     completedAvatar.imageUrl!,
@@ -88,7 +121,7 @@ async function processFluxGeneration(
     }
   );
 
-  // 步骤3: 存储图片
+  // 步骤4: 存储图片
   helper.startStep("storage");
   const { storedAvatarUrl, storedThreeViewUrl } =
     await storeFluxCharacterImages(
@@ -100,22 +133,23 @@ async function processFluxGeneration(
   const finalResults = {
     avatar: { ...completedAvatar, imageUrl: storedAvatarUrl },
     threeView: { ...completedThreeView, imageUrl: storedThreeViewUrl },
+    analyzedTags: tags, // 包含分析得到的标签
   };
 
-  // 步骤4: 处理积分（仅对登录用户）
+  // 步骤5: 处理积分（仅对登录用户）
   if (userId) {
     helper.startStep("credits");
 
     const deductionResult = await creditService.deductCredits({
       userId,
-      amount: CREDIT_COSTS.FLUX_CHARACTER_GENERATION,
+      amount: CREDIT_COSTS.CHARACTER_GENERATION,
       description: "生成Flux角色（头像+3视图）",
       relatedEntityType: "flux_character",
       relatedEntityId: undefined,
       metadata: {
         avatar_url: storedAvatarUrl,
         three_view_url: storedThreeViewUrl,
-        input_tags: tags.join(", "), // Convert array to string
+        input_tags: tags.join(", "),
       },
     });
 
@@ -126,7 +160,7 @@ async function processFluxGeneration(
       });
     } else {
       helper.sendCustomEvent("credit_deducted", {
-        message: `成功扣除 ${CREDIT_COSTS.FLUX_CHARACTER_GENERATION} 积分`,
+        message: `成功扣除 ${CREDIT_COSTS.CHARACTER_GENERATION} 积分`,
         remainingCredits: deductionResult.remainingCredits,
       });
     }
@@ -144,29 +178,56 @@ export async function POST(request: NextRequest) {
     // 可选认证（支持匿名用户）
     const { userId } = await authenticateOptional(request);
 
-    // 请求体验证
-    const {
-      isValid: bodyValid,
-      data: body,
-      errors: bodyErrors,
-    } = await validateRequestBody<FluxGenerationRequest>(request);
+    // 检查Content-Type来决定如何处理请求
+    const contentType = request.headers.get("content-type") || "";
 
-    if (!bodyValid) {
-      return createValidationErrorResponse(bodyErrors.join(", "));
-    }
+    let imageFile: File | null = null;
+    let requestData: FluxGenerationRequest = {};
 
-    const { isValid: fieldsValid, errors: fieldErrors } =
-      validateRequiredFields(body!, ["input_image", "tags"]);
+    if (contentType.includes("multipart/form-data")) {
+      // 处理FormData（新的图片上传方式）
+      const formData = await request.formData();
+      imageFile = formData.get("image") as File;
 
-    if (!fieldsValid) {
-      return createValidationErrorResponse(fieldErrors.join(", "));
+      if (!imageFile) {
+        return createValidationErrorResponse("未上传图片");
+      }
+
+      // 获取其他参数
+      const aspectRatio = formData.get("aspectRatio") as string;
+      const outputFormat = formData.get("outputFormat") as "png" | "jpeg";
+      const promptUpsampling = formData.get("promptUpsampling") === "true";
+      const safetyTolerance =
+        parseInt(formData.get("safetyTolerance") as string) || 2;
+
+      requestData = {
+        aspectRatio,
+        outputFormat,
+        promptUpsampling,
+        safetyTolerance,
+      };
+    } else {
+      // 处理JSON（向后兼容）
+      try {
+        requestData = await request.json();
+        if (!requestData.input_image || !requestData.tags) {
+          return createValidationErrorResponse(
+            "缺少必要的参数: input_image 和 tags"
+          );
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          return createValidationErrorResponse(error.message);
+        }
+        return createValidationErrorResponse("请求体格式错误");
+      }
     }
 
     // 创建流式响应
     return StreamGenerationHelper.createStreamResponse(
       FLUX_GENERATION_STEPS,
       async (helper) => {
-        await processFluxGeneration(helper, body!, userId);
+        await processFluxGeneration(helper, imageFile, requestData, userId);
       }
     );
   } catch (error) {

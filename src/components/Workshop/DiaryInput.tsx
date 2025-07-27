@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, PenTool } from "lucide-react";
+import { BookOpen } from "lucide-react";
 
 interface DiaryInputProps {
   onTextChange: (text: string) => void;
@@ -33,10 +33,9 @@ export default function DiaryInput({
 
       {/* 标题区域 */}
       <div className="relative z-10 mb-6">
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-4 mx-4">
           <BookOpen className="w-6 h-6 text-amber-700" />
           <h3 className="text-xl font-bold text-amber-800">故事日记</h3>
-          <PenTool className="w-5 h-5 text-amber-600" />
         </div>
         <div className="w-full h-px bg-gradient-to-r from-amber-300 via-orange-300 to-transparent"></div>
       </div>
@@ -56,6 +55,8 @@ export default function DiaryInput({
             backgroundImage:
               "repeating-linear-gradient(transparent, transparent 1.4rem, #e5e7eb 1.4rem, #e5e7eb calc(1.4rem + 1px))",
             lineHeight: "1.4rem",
+            paddingTop: "0.2rem", // 添加顶部内边距，让文字稍微离开线条
+            backgroundPosition: "0 0.2rem", // 调整背景位置，使线条在文字下方
           }}
         />
       </div>

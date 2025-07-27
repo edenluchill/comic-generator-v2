@@ -1,10 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Wand2, BookOpen } from "lucide-react";
+import {
+  Wand2,
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle,
+  Sparkles,
+} from "lucide-react";
 import { useTranslations } from "@/hooks/useTranslations";
-import { useFluxGeneration } from "@/hooks/useFluxGeneration";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import UploadAnalysisSection from "./UploadAnalysisSection";
 import AvatarDisplaySection from "./AvatarDisplaySection";
 import CharactersList from "./CharactersList";
@@ -15,10 +21,15 @@ import {
   useDeleteCharacter,
 } from "@/hooks/useCharacters";
 import { useAuth } from "@/hooks/useAuth";
+import { useCharacterGeneration } from "@/hooks/useCharacterGeneration";
+import WorkshopHeader, {
+  createBackAction,
+  createForwardAction,
+} from "./WorkshopHeader";
 
 export default function CharacterCreationWorkshop() {
   const t = useTranslations("WorkshopPage");
-  const router = useRouter();
+  const { navigate } = useLocalizedNavigation();
   const searchParams = useSearchParams();
   const { user } = useAuth();
 
@@ -33,7 +44,7 @@ export default function CharacterCreationWorkshop() {
   const [mounted, setMounted] = useState(false);
   const [characterSaved, setCharacterSaved] = useState(false);
 
-  // 使用Flux生成hook
+  // 使用角色生成hook
   const {
     isProcessing,
     currentStep,
@@ -41,13 +52,11 @@ export default function CharacterCreationWorkshop() {
     status,
     avatarResult,
     threeViewResult,
-    tags,
-    processingStep,
+    // tags,
+    // processingStep,
     generateCharacter,
-    reset: resetFlux,
-  } = useFluxGeneration();
-
-  // 不再需要手动获取角色列表的 useEffect - TanStack Query 自动处理
+    reset: resetCharacterGeneration,
+  } = useCharacterGeneration();
 
   useEffect(() => {
     setMounted(true);
@@ -68,32 +77,31 @@ export default function CharacterCreationWorkshop() {
         reader.onload = (e) => {
           setUploadedImage(e.target?.result as string);
           setUploadedFile(file);
-          resetFlux();
+          resetCharacterGeneration();
         };
         reader.readAsDataURL(file);
       }
     },
-    [resetFlux]
+    [resetCharacterGeneration]
   );
 
   const handleClearImage = useCallback(() => {
     setUploadedImage(null);
     setUploadedFile(null);
-    resetFlux();
-  }, [resetFlux]);
+    resetCharacterGeneration();
+  }, [resetCharacterGeneration]);
 
-  const handleFluxGeneration = useCallback(async () => {
-    if (!uploadedFile || !uploadedImage) return;
+  const handleCharacterGeneration = useCallback(async () => {
+    if (!uploadedFile) return;
 
     try {
       await generateCharacter({
         uploadedFile,
-        uploadedImage,
       });
     } catch (error) {
       console.error("生成失败:", error);
     }
-  }, [uploadedFile, uploadedImage, generateCharacter]);
+  }, [uploadedFile, generateCharacter]);
 
   const handleSaveCharacter = useCallback(
     async (characterName: string) => {
@@ -137,14 +145,18 @@ export default function CharacterCreationWorkshop() {
     setUploadedImage(null);
     setUploadedFile(null);
     setCharacterSaved(false);
-    resetFlux();
-  }, [resetFlux]);
+    resetCharacterGeneration();
+  }, [resetCharacterGeneration]);
 
   const handleSwitchToComic = useCallback(() => {
     const newSearchParams = new URLSearchParams(searchParams);
     newSearchParams.set("mode", "comic");
-    router.push(`/workshop?${newSearchParams.toString()}`);
-  }, [searchParams, router]);
+    navigate(`/workshop?${newSearchParams.toString()}`);
+  }, [searchParams, navigate]);
+
+  const handleBackToDashboard = useCallback(() => {
+    navigate("/");
+  }, [navigate]);
 
   // 简化的计算属性
   const canGenerate = uploadedFile && !isProcessing;
@@ -152,6 +164,22 @@ export default function CharacterCreationWorkshop() {
 
   // 检查是否正在创建角色
   const isCreatingCharacter = createCharacterMutation.isPending;
+
+  // Header配置
+  const backAction = createBackAction(
+    ArrowLeft,
+    "返回控制台",
+    "控制台",
+    handleBackToDashboard
+  );
+
+  const forwardAction = createForwardAction(
+    ArrowRight,
+    "创作漫画",
+    "漫画",
+    handleSwitchToComic,
+    !canSwitchToComic
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 relative">
@@ -162,16 +190,13 @@ export default function CharacterCreationWorkshop() {
       </div>
 
       <div className="container mx-auto px-3 py-3 relative z-10 max-w-6xl">
-        {/* 标题 */}
-        <div
-          className={`text-center mb-3 transition-all duration-1000 ${
-            mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"
-          }`}
-        >
-          <p className="text-amber-700 text-base md:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
-            {t("subtitle")}
-          </p>
-        </div>
+        {/* 使用可重用的Header组件 */}
+        <WorkshopHeader
+          leftAction={backAction}
+          title={t("subtitle")}
+          rightAction={forwardAction}
+          mounted={mounted}
+        />
 
         {/* 角色列表 */}
         <div className="mb-4">
@@ -191,8 +216,6 @@ export default function CharacterCreationWorkshop() {
             <UploadAnalysisSection
               uploadedImage={uploadedImage}
               uploadedFile={uploadedFile}
-              tags={tags}
-              processingStep={processingStep}
               mounted={mounted}
               onImageUpload={handleImageUpload}
               onClearImage={handleClearImage}
@@ -214,11 +237,64 @@ export default function CharacterCreationWorkshop() {
           </div>
         </div>
 
-        {/* 底部操作区域 */}
+        {/* 在保存角色成功后显示明显的下一步提示 */}
+        {characterSaved && (
+          <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+            <div className="bg-white shadow-2xl rounded-2xl p-6 border border-green-200 animate-bounce-once">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800">
+                    角色创建成功！
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    现在可以用这个角色创作漫画了
+                  </p>
+                </div>
+                <button
+                  onClick={handleSwitchToComic}
+                  className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all"
+                >
+                  立即创作
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 当用户首次创建角色时显示提示 */}
+        {characters.length === 1 &&
+          !localStorage.getItem("comic-tip-shown") && (
+            <div className="absolute top-16 right-4 z-10">
+              <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-3 shadow-lg">
+                <div className="flex items-start gap-2">
+                  <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                    <span className="text-xs">💡</span>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-800">
+                      太棒了！现在可以点击右上角创作漫画了
+                    </p>
+                    <button
+                      onClick={() =>
+                        localStorage.setItem("comic-tip-shown", "true")
+                      }
+                      className="text-xs text-yellow-600 underline mt-1"
+                    >
+                      知道了
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+        {/* 底部操作区域 - 只保留生成按钮 */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          {/* 生成按钮 */}
           <button
-            onClick={handleFluxGeneration}
+            onClick={handleCharacterGeneration}
             disabled={!canGenerate}
             className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
               canGenerate
@@ -227,22 +303,26 @@ export default function CharacterCreationWorkshop() {
             }`}
           >
             <Wand2 className="w-5 h-5" />
-            {isProcessing ? "生成中..." : "开始生成"}
+            <span className="hidden sm:inline">
+              {isProcessing ? "生成中..." : "开始生成"}
+            </span>
+            <span className="inline sm:hidden">
+              {isProcessing ? "生成中" : "生成"}
+            </span>
           </button>
 
-          {/* 创作漫画按钮 */}
-          <button
-            onClick={handleSwitchToComic}
-            disabled={!canSwitchToComic}
-            className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center gap-2 ${
-              canSwitchToComic
-                ? "bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
-          >
-            <BookOpen className="w-5 h-5" />
-            创作漫画
-          </button>
+          {characters.length > 0 && (
+            <div className="flex flex-col items-center gap-2">
+              <div className="text-xs text-gray-500">下一步</div>
+              <button
+                onClick={handleSwitchToComic}
+                className="px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-600 text-white rounded-xl hover:shadow-lg transition-all flex items-center gap-2"
+              >
+                <Sparkles className="w-5 h-5" />
+                创作漫画
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 错误信息显示 */}

@@ -95,7 +95,7 @@ export default function AvatarDisplaySection({
   };
 
   const renderContent = () => {
-    if (currentStep === 1 && isProcessing) {
+    if (currentStep < 2 && isProcessing) {
       return renderLoadingSpinner(1, "blue");
     }
 
@@ -186,23 +186,12 @@ export default function AvatarDisplaySection({
       );
     }
 
-    return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center text-gray-500">
-          <p className="text-sm">卡通头像将在这里显示</p>
-        </div>
-      </div>
-    );
+    return null;
   };
 
   return (
     <>
-      <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-amber-200/50 flex flex-col relative">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-3 h-3 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full animate-pulse"></div>
-          <h3 className="text-lg font-bold text-gray-800">卡通头像</h3>
-        </div>
-
+      <div className="bg-white/80 backdrop-blur-sm rounded-3xl flex flex-col relative">
         {/* 3视图浮动按钮 */}
         {threeViewResult && (
           <button

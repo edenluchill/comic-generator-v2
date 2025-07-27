@@ -8,7 +8,6 @@ import {
 } from "@/hooks/useDiaries";
 import DiaryCard from "./DiaryCard";
 import CreateDiaryCard from "./CreateDiaryCard";
-import DiaryEmptyState from "./DiaryEmptyState";
 import DiaryDetailModal from "./DiaryDetailModal";
 import { createPortal } from "react-dom";
 
@@ -78,9 +77,6 @@ export default function DiaryList({
           onDeleteDiary={handleDeleteDiary}
           isDeleting={deleteDiaryMutation.isPending}
         />
-
-        {/* 空状态 */}
-        {!isLoading && diaries.length === 0 && <DiaryEmptyState />}
       </div>
 
       {/* 日记详情模态框 - 使用 Portal */}

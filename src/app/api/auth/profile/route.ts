@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
 
     // 获取用户配置文件
     const { data: profile, error: profileError } = await supabaseAdmin
-      .from("profiles")
+      .from("user_profiles")
       .select("*")
       .eq("id", user.id)
       .single();
@@ -68,7 +68,7 @@ export async function PUT(request: NextRequest) {
 
     // 更新用户配置文件
     const { data: profile, error: updateError } = await supabaseAdmin
-      .from("profiles")
+      .from("user_profiles")
       .update({
         ...sanitizedUpdates,
         updated_at: new Date().toISOString(),

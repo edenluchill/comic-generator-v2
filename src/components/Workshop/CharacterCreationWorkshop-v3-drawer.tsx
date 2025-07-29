@@ -1,16 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  ArrowLeft,
-  CheckCircle,
-  Upload,
-  User,
-  Palette,
-  Lock,
-  Users,
-  Trash2,
-} from "lucide-react";
+import { Upload, User, Palette, Users } from "lucide-react";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useSearchParams } from "next/navigation";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
@@ -23,300 +14,9 @@ import {
 } from "@/hooks/useCharacters";
 import { useAuth } from "@/hooks/useAuth";
 import { useCharacterGeneration } from "@/hooks/useCharacterGeneration";
-import { Character } from "@/types/characters";
-import Image from "next/image";
-import { MobileDrawer } from "@/components/ui/mobile-drawer";
-
-// 步骤卡片组件
-function StepCard({
-  step,
-  title,
-  description,
-  icon: Icon,
-  isActive,
-  isCompleted,
-  isLocked,
-  children,
-  actionButton,
-}: {
-  step: number;
-  title: string;
-  description: string;
-  icon: React.ElementType;
-  isActive: boolean;
-  isCompleted: boolean;
-  isLocked?: boolean;
-  children?: React.ReactNode;
-  actionButton?: { text: string; onClick: () => void; disabled?: boolean };
-}) {
-  return (
-    <div
-      className={`bg-white rounded-2xl p-6 shadow-lg border-2 transition-all duration-300 ${
-        isActive
-          ? "border-blue-500 shadow-blue-100"
-          : isCompleted
-          ? "border-green-500 shadow-green-100"
-          : isLocked
-          ? "border-gray-200 opacity-60"
-          : "border-gray-200"
-      }`}
-    >
-      <div className="flex items-center gap-4 mb-4">
-        <div
-          className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
-            isCompleted
-              ? "bg-green-500 text-white"
-              : isActive
-              ? "bg-blue-500 text-white"
-              : isLocked
-              ? "bg-gray-300 text-gray-500"
-              : "bg-gray-100 text-gray-600"
-          }`}
-        >
-          {isCompleted ? (
-            <CheckCircle className="w-6 h-6" />
-          ) : isLocked ? (
-            <Lock className="w-6 h-6" />
-          ) : (
-            <Icon className="w-6 h-6" />
-          )}
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-gray-500">
-              步骤 {step}
-            </span>
-            {isCompleted && <CheckCircle className="w-4 h-4 text-green-500" />}
-          </div>
-          <h3
-            className={`text-lg font-semibold ${
-              isLocked ? "text-gray-400" : "text-gray-800"
-            }`}
-          >
-            {title}
-          </h3>
-          <p
-            className={`text-sm ${
-              isLocked ? "text-gray-400" : "text-gray-600"
-            }`}
-          >
-            {description}
-          </p>
-        </div>
-      </div>
-
-      {!isLocked && children && <div className="mb-4">{children}</div>}
-
-      {!isLocked && actionButton && (
-        <div className="flex justify-center">
-          <button
-            onClick={actionButton.onClick}
-            disabled={actionButton.disabled}
-            className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-              actionButton.disabled
-                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                : isActive
-                ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
-                : "bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white shadow-lg hover:shadow-xl transform hover:scale-105"
-            }`}
-          >
-            {actionButton.text}
-          </button>
-        </div>
-      )}
-
-      {isLocked && (
-        <div className="text-center py-4">
-          <div className="text-gray-400 text-sm">完成上一步后解锁</div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// 顶部导航栏组件
-function NavigationBar({
-  onBack,
-  characters,
-  onOpenCharacterDrawer,
-  loading,
-  mounted,
-}: {
-  onBack: () => void;
-  characters: Character[];
-  onOpenCharacterDrawer: () => void;
-  loading: boolean;
-  mounted: boolean;
-}) {
-  return (
-    <div
-      className={`
-        flex items-center justify-between mb-6 p-4 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-amber-200/50
-        transition-all duration-1000 
-        ${mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}
-      `}
-    >
-      {/* 左侧：返回按钮 */}
-      <button
-        onClick={onBack}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 text-amber-600 hover:text-amber-700 hover:bg-white/50 active:scale-95"
-      >
-        <ArrowLeft className="w-4 h-4 flex-shrink-0" />
-        <span className="hidden sm:inline">返回控制台</span>
-      </button>
-
-      {/* 右侧：角色库信息 */}
-      <div className="flex items-center gap-3">
-        {loading ? (
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-full bg-gray-200 animate-pulse" />
-            <div className="text-sm font-medium text-gray-500">加载中...</div>
-          </div>
-        ) : (
-          <>
-            {/* 角色预览 */}
-            {characters.length > 0 && (
-              <div className="flex -space-x-1">
-                {characters.slice(0, 3).map((character) => (
-                  <div
-                    key={character.id}
-                    className="w-8 h-8 rounded-full border-2 border-white overflow-hidden shadow-sm"
-                  >
-                    <Image
-                      src={character.avatar_url}
-                      alt={character.name}
-                      className="w-full h-full object-cover"
-                      width={32}
-                      height={32}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* 角色库按钮 */}
-            <button
-              onClick={onOpenCharacterDrawer}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 text-amber-600 hover:text-amber-700 hover:bg-white/50 active:scale-95"
-            >
-              <Users className="w-4 h-4" />
-              <span className="text-sm font-medium">
-                {characters.length > 0
-                  ? `角色库 (${characters.length})`
-                  : "角色库"}
-              </span>
-            </button>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// 替换原有的CharacterDrawer组件
-function CharacterDrawer({
-  isOpen,
-  onClose,
-  characters,
-  onDelete,
-  onStartComic,
-  loading,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  characters: Character[];
-  onDelete: (id: string) => void;
-  onStartComic: () => void;
-  loading: boolean;
-}) {
-  if (loading) {
-    return null;
-  }
-
-  const footer =
-    characters.length > 0 ? (
-      <button
-        onClick={() => {
-          onStartComic();
-          onClose();
-        }}
-        className="w-full py-3 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-medium flex items-center justify-center gap-2"
-      >
-        <Palette className="w-4 h-4" />
-        开始制作漫画
-      </button>
-    ) : (
-      <div className="text-center py-2">
-        <p className="text-amber-600/60 text-sm">创建角色后即可开始制作漫画</p>
-      </div>
-    );
-
-  return (
-    <MobileDrawer
-      isOpen={isOpen}
-      onClose={onClose}
-      title="角色列表"
-      subtitle={
-        characters.length === 0 ? "暂无角色" : `共 ${characters.length} 个角色`
-      }
-      icon={<Users className="w-5 h-5 text-amber-600" />}
-      footer={footer}
-    >
-      {/* 角色列表内容 */}
-      {characters.length === 0 ? (
-        <div className="text-center py-8">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl flex items-center justify-center border border-amber-100">
-            <Users className="w-8 h-8 text-amber-400" />
-          </div>
-          <h4 className="text-gray-800 font-medium mb-2">还没有创建角色</h4>
-          <p className="text-gray-500 text-sm">先创建一个角色开始制作漫画</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {characters.map((character) => (
-            <div
-              key={character.id}
-              className="bg-gradient-to-r from-amber-50/30 to-orange-50/30 rounded-lg p-3 group hover:from-amber-50 hover:to-orange-50 transition-all duration-200 border border-amber-100/50 hover:border-amber-200/50"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg overflow-hidden border-2 border-white shadow-sm flex-shrink-0">
-                  <Image
-                    src={character.avatar_url}
-                    alt={character.name}
-                    className="w-full h-full object-cover"
-                    width={40}
-                    height={40}
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-gray-900 truncate">
-                    {character.name}
-                  </h4>
-                  <p className="text-xs text-amber-600/60">
-                    创建于{" "}
-                    {new Date(character.created_at).toLocaleDateString(
-                      "zh-CN",
-                      {
-                        month: "short",
-                        day: "numeric",
-                      }
-                    )}
-                  </p>
-                </div>
-                <button
-                  onClick={() => onDelete(character.id)}
-                  className="w-8 h-8 flex items-center justify-center text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 rounded-lg hover:bg-red-50"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </MobileDrawer>
-  );
-}
+import { StepCard } from "./StepCard";
+import { CharacterWorkshopNavigationBar } from "./CharacterWorkshopNavigationBar";
+import { CharacterLibraryDrawer } from "./CharacterLibraryDrawer";
 
 export default function CharacterCreationWorkshop() {
   const t = useTranslations("WorkshopPage");
@@ -445,8 +145,8 @@ export default function CharacterCreationWorkshop() {
       </div>
 
       <div className="container mx-auto px-3 py-3 relative z-10 max-w-4xl">
-        {/* 新的导航栏 */}
-        <NavigationBar
+        {/* 导航栏组件 */}
+        <CharacterWorkshopNavigationBar
           onBack={handleBackToDashboard}
           characters={characters}
           onOpenCharacterDrawer={() => setIsDrawerOpen(true)}
@@ -568,8 +268,8 @@ export default function CharacterCreationWorkshop() {
           </div>
         )}
 
-        {/* 角色抽屉 */}
-        <CharacterDrawer
+        {/* 角色库抽屉 */}
+        <CharacterLibraryDrawer
           isOpen={isDrawerOpen}
           onClose={() => setIsDrawerOpen(false)}
           characters={characters}

@@ -340,3 +340,67 @@
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15),
     0 0 0 1px rgba(255, 255, 255, 0.2);
 }
+
+/* ========== 移动端底部安全区域 ========== */
+:root {
+  --mobile-nav-height: 4rem; /* 64px */
+}
+
+/* 移动端底部安全区域工具类 */
+.pb-mobile-safe {
+  padding-bottom: calc(
+    var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px)
+  );
+}
+
+@media (min-width: 768px) {
+  .pb-mobile-safe {
+    padding-bottom: 1rem; /* 桌面端恢复正常 */
+  }
+}
+
+/* 容器底部安全区域 */
+.mb-mobile-safe {
+  margin-bottom: calc(
+    var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px)
+  );
+}
+
+@media (min-width: 768px) {
+  .mb-mobile-safe {
+    margin-bottom: 0;
+  }
+}
+
+/* ========== 移动端安全区域工具类 ========== */
+@layer utilities {
+  /* 移动端底部安全区域 - padding版本 */
+  .pb-mobile-safe {
+    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* 移动端底部安全区域 - margin版本 */
+  .mb-mobile-safe {
+    margin-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Drawer专用 - 高度计算 */
+  .h-mobile-drawer {
+    height: calc(
+      100vh - 5.5rem - env(safe-area-inset-bottom, 0px)
+    ); /* 70px header */
+  }
+
+  /* 桌面端恢复正常 */
+  @media (min-width: 768px) {
+    .pb-mobile-safe {
+      padding-bottom: 1rem;
+    }
+    .mb-mobile-safe {
+      margin-bottom: 0;
+    }
+    .h-mobile-drawer {
+      height: calc(100vh - 4.375rem);
+    }
+  }
+}

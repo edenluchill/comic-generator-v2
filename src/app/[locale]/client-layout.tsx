@@ -41,7 +41,10 @@ export default function ClientLayout({
       <Suspense fallback={<HeaderFallback />}>
         <Header />
       </Suspense>
-      {children}
+
+      {/* 主内容区域 - 添加底部安全区域 */}
+      <main className="pb-mobile-safe">{children}</main>
+
       <Suspense fallback={<div className="h-16" />}>
         <MobileNavigationBar />
       </Suspense>

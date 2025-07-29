@@ -9,7 +9,6 @@ import {
   Palette,
   Lock,
   Users,
-  X,
   Trash2,
 } from "lucide-react";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -24,9 +23,9 @@ import {
 } from "@/hooks/useCharacters";
 import { useAuth } from "@/hooks/useAuth";
 import { useCharacterGeneration } from "@/hooks/useCharacterGeneration";
-import WorkshopHeader, { createBackAction } from "./WorkshopHeader";
 import { Character } from "@/types/characters";
 import Image from "next/image";
+import { MobileDrawer } from "@/components/ui/mobile-drawer";
 
 // 步骤卡片组件
 function StepCard({
@@ -135,173 +134,190 @@ function StepCard({
   );
 }
 
-// 右侧角色抽屉组件
+// 顶部导航栏组件
+function NavigationBar({
+  onBack,
+  characters,
+  onOpenCharacterDrawer,
+  loading,
+  mounted,
+}: {
+  onBack: () => void;
+  characters: Character[];
+  onOpenCharacterDrawer: () => void;
+  loading: boolean;
+  mounted: boolean;
+}) {
+  return (
+    <div
+      className={`
+        flex items-center justify-between mb-6 p-4 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-amber-200/50
+        transition-all duration-1000 
+        ${mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}
+      `}
+    >
+      {/* 左侧：返回按钮 */}
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 text-amber-600 hover:text-amber-700 hover:bg-white/50 active:scale-95"
+      >
+        <ArrowLeft className="w-4 h-4 flex-shrink-0" />
+        <span className="hidden sm:inline">返回控制台</span>
+      </button>
+
+      {/* 右侧：角色库信息 */}
+      <div className="flex items-center gap-3">
+        {loading ? (
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-full bg-gray-200 animate-pulse" />
+            <div className="text-sm font-medium text-gray-500">加载中...</div>
+          </div>
+        ) : (
+          <>
+            {/* 角色预览 */}
+            {characters.length > 0 && (
+              <div className="flex -space-x-1">
+                {characters.slice(0, 3).map((character) => (
+                  <div
+                    key={character.id}
+                    className="w-8 h-8 rounded-full border-2 border-white overflow-hidden shadow-sm"
+                  >
+                    <Image
+                      src={character.avatar_url}
+                      alt={character.name}
+                      className="w-full h-full object-cover"
+                      width={32}
+                      height={32}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* 角色库按钮 */}
+            <button
+              onClick={onOpenCharacterDrawer}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 text-amber-600 hover:text-amber-700 hover:bg-white/50 active:scale-95"
+            >
+              <Users className="w-4 h-4" />
+              <span className="text-sm font-medium">
+                {characters.length > 0
+                  ? `角色库 (${characters.length})`
+                  : "角色库"}
+              </span>
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// 替换原有的CharacterDrawer组件
 function CharacterDrawer({
   isOpen,
   onClose,
   characters,
-  onAddNew,
   onDelete,
+  onStartComic,
   loading,
 }: {
   isOpen: boolean;
   onClose: () => void;
   characters: Character[];
-  onAddNew: () => void;
   onDelete: (id: string) => void;
+  onStartComic: () => void;
   loading: boolean;
 }) {
   if (loading) {
-    return (
-      <div className="fixed top-20 right-6 z-9999 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-lg border border-amber-200/50">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-gray-200 animate-pulse" />
-          <div className="text-sm font-medium text-gray-500">加载中...</div>
-        </div>
-      </div>
-    );
+    return null;
   }
 
-  return (
-    <>
-      {/* 遮罩层 */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 z-40 transition-opacity"
-          onClick={onClose}
-        />
-      )}
-
-      {/* 抽屉 */}
-      <div
-        className={`fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300 ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
+  const footer =
+    characters.length > 0 ? (
+      <button
+        onClick={() => {
+          onStartComic();
+          onClose();
+        }}
+        className="w-full py-3 bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-medium flex items-center justify-center gap-2"
       >
-        <div className="p-6 h-full flex flex-col">
-          {/* 头部 */}
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-              <Users className="w-5 h-5 text-amber-600" />
-              我的角色库 ({characters.length})
-            </h3>
-            <button
-              onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          {/* 角色列表 */}
-          <div className="flex-1 overflow-y-auto">
-            <div className="space-y-4">
-              {characters.map((character) => (
-                <div
-                  key={character.id}
-                  className="bg-gray-50 rounded-xl p-4 group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg overflow-hidden border border-gray-200">
-                      <Image
-                        src={character.avatar_url}
-                        alt={character.name}
-                        className="w-full h-full object-cover"
-                        width={32}
-                        height={32}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-800">
-                        {character.name}
-                      </h4>
-                      <p className="text-sm text-gray-500">
-                        {new Date(character.created_at).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => onDelete(character.id)}
-                      className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* 底部操作 */}
-          <div className="pt-4 border-t border-gray-200">
-            <button
-              onClick={() => {
-                onAddNew();
-                onClose();
-              }}
-              className="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:shadow-lg transition-all font-medium"
-            >
-              + 创建新角色
-            </button>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-}
-
-// 浮动角色预览按钮
-function FloatingCharacterButton({
-  characters,
-  onClick,
-  loading,
-}: {
-  characters: Character[];
-  onClick: () => void;
-  loading: boolean;
-}) {
-  if (loading) {
-    return (
-      <div className="fixed top-20 right-6 z-9999 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-lg border border-amber-200/50">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-full bg-gray-200 animate-pulse" />
-          <div className="text-sm font-medium text-gray-500">加载中...</div>
-        </div>
+        <Palette className="w-4 h-4" />
+        开始制作漫画
+      </button>
+    ) : (
+      <div className="text-center py-2">
+        <p className="text-amber-600/60 text-sm">创建角色后即可开始制作漫画</p>
       </div>
     );
-  }
-
-  if (characters.length === 0) return null;
 
   return (
-    <button
-      onClick={onClick}
-      className="fixed top-20 right-6 z-9999 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-lg border border-amber-200/50 hover:shadow-xl transition-all group"
+    <MobileDrawer
+      isOpen={isOpen}
+      onClose={onClose}
+      title="角色列表"
+      subtitle={
+        characters.length === 0 ? "暂无角色" : `共 ${characters.length} 个角色`
+      }
+      icon={<Users className="w-5 h-5 text-amber-600" />}
+      footer={footer}
     >
-      <div className="flex items-center gap-2">
-        <div className="flex -space-x-1">
-          {characters.slice(0, 2).map((character) => (
+      {/* 角色列表内容 */}
+      {characters.length === 0 ? (
+        <div className="text-center py-8">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl flex items-center justify-center border border-amber-100">
+            <Users className="w-8 h-8 text-amber-400" />
+          </div>
+          <h4 className="text-gray-800 font-medium mb-2">还没有创建角色</h4>
+          <p className="text-gray-500 text-sm">先创建一个角色开始制作漫画</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {characters.map((character) => (
             <div
               key={character.id}
-              className="w-6 h-6 rounded-full border border-white overflow-hidden shadow-sm"
+              className="bg-gradient-to-r from-amber-50/30 to-orange-50/30 rounded-lg p-3 group hover:from-amber-50 hover:to-orange-50 transition-all duration-200 border border-amber-100/50 hover:border-amber-200/50"
             >
-              <Image
-                src={character.avatar_url}
-                alt={character.name}
-                className="w-full h-full object-cover"
-                width={32}
-                height={32}
-              />
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg overflow-hidden border-2 border-white shadow-sm flex-shrink-0">
+                  <Image
+                    src={character.avatar_url}
+                    alt={character.name}
+                    className="w-full h-full object-cover"
+                    width={40}
+                    height={40}
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-medium text-gray-900 truncate">
+                    {character.name}
+                  </h4>
+                  <p className="text-xs text-amber-600/60">
+                    创建于{" "}
+                    {new Date(character.created_at).toLocaleDateString(
+                      "zh-CN",
+                      {
+                        month: "short",
+                        day: "numeric",
+                      }
+                    )}
+                  </p>
+                </div>
+                <button
+                  onClick={() => onDelete(character.id)}
+                  className="w-8 h-8 flex items-center justify-center text-gray-300 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 rounded-lg hover:bg-red-50"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           ))}
         </div>
-        <div className="text-sm font-medium text-gray-700">
-          已有{characters.length} 个角色
-        </div>
-        <Users className="w-4 h-4 text-amber-600 group-hover:scale-110 transition-transform" />
-      </div>
-    </button>
+      )}
+    </MobileDrawer>
   );
 }
+
 export default function CharacterCreationWorkshop() {
   const t = useTranslations("WorkshopPage");
   const { navigate } = useLocalizedNavigation();
@@ -417,13 +433,6 @@ export default function CharacterCreationWorkshop() {
   const canGenerate = uploadedFile && !isProcessing;
   const isCreatingCharacter = createCharacterMutation.isPending;
 
-  const backAction = createBackAction(
-    ArrowLeft,
-    "返回控制台",
-    "控制台",
-    handleBackToDashboard
-  );
-
   // 步骤状态计算 - 合并第二步和第三步
   const step1Complete = !!uploadedFile;
   const step2Complete = characterSaved; // 现在第二步包括生成和保存
@@ -436,13 +445,13 @@ export default function CharacterCreationWorkshop() {
       </div>
 
       <div className="container mx-auto px-3 py-3 relative z-10 max-w-4xl">
-        <WorkshopHeader leftAction={backAction} mounted={mounted} />
-
-        {/* 浮动角色按钮 */}
-        <FloatingCharacterButton
+        {/* 新的导航栏 */}
+        <NavigationBar
+          onBack={handleBackToDashboard}
           characters={characters}
-          onClick={() => setIsDrawerOpen(true)}
+          onOpenCharacterDrawer={() => setIsDrawerOpen(true)}
           loading={isLoading}
+          mounted={mounted}
         />
 
         {/* 分步流程卡片 */}
@@ -521,8 +530,29 @@ export default function CharacterCreationWorkshop() {
                 <div className="text-lg font-semibold text-gray-800 mb-2">
                   恭喜！角色创建完成
                 </div>
-                <div className="text-gray-600 text-sm">
+                <div className="text-gray-600 text-sm mb-6">
                   现在可以使用 {characters.length} 个角色来创作你的专属漫画了
+                </div>
+
+                {/* 添加更多角色按钮 */}
+                <div className="flex items-center justify-center gap-4">
+                  <button
+                    onClick={handleAddNewCharacter}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-amber-200 text-amber-600 rounded-xl hover:bg-amber-50 hover:border-amber-300 transition-all duration-200 text-sm font-medium"
+                  >
+                    <User className="w-4 h-4" />
+                    添加更多角色
+                  </button>
+
+                  <div className="text-gray-300">|</div>
+
+                  <button
+                    onClick={() => setIsDrawerOpen(true)}
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm font-medium"
+                  >
+                    <Users className="w-4 h-4" />
+                    查看角色库
+                  </button>
                 </div>
               </div>
             )}
@@ -543,8 +573,8 @@ export default function CharacterCreationWorkshop() {
           isOpen={isDrawerOpen}
           onClose={() => setIsDrawerOpen(false)}
           characters={characters}
-          onAddNew={handleAddNewCharacter}
           onDelete={handleDeleteCharacter}
+          onStartComic={handleSwitchToComic}
           loading={isLoading}
         />
       </div>

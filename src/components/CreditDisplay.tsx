@@ -85,7 +85,6 @@ export function CreditDisplay({
                 }`}
               />
               <h3 className="font-semibold text-gray-900">积分余额</h3>
-              {isPremium && <Crown className="w-4 h-4 text-amber-500" />}
             </div>
             {isPremium && (
               <span className="bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded-full">
@@ -118,10 +117,6 @@ export function CreditDisplay({
                 >
                   {isLowCredit ? "积分不足，建议充值" : "积分充足"}
                 </span>
-              </div>
-
-              <div className="text-sm text-gray-500">
-                可生成约 {Math.floor(profile.current_credits / 40)} 个漫画
               </div>
             </div>
 

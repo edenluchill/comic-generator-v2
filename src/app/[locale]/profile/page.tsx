@@ -9,12 +9,7 @@ import { CreditDisplay } from "@/components/CreditDisplay";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import { AlertCircle } from "lucide-react";
 import { useEffect } from "react";
-import {
-  ProfileHeader,
-  UserInfoCard,
-  TransactionHistory,
-} from "@/components/Profile";
-// 🎉 导入统一的loading组件
+import { UserInfoCard, TransactionHistory } from "@/components/Profile";
 import { FullScreenLoader } from "@/components/ui/loading";
 
 // 工具函数
@@ -27,9 +22,7 @@ const formatDate = (dateString: string) => {
 };
 
 // ✅ 使用统一的FullScreenLoader替代自定义LoadingState
-const LoadingState = () => (
-  <FullScreenLoader message="加载中..." background="light" />
-);
+const LoadingState = () => <FullScreenLoader background="light" />;
 
 // 错误状态组件保持不变
 const ErrorState = ({
@@ -61,6 +54,7 @@ export default function ProfilePage() {
     data: profile,
     isLoading: profileLoading,
     error: profileError,
+    refetch: refetchProfile,
   } = useProfile();
   const { data: transactions = [], isLoading: transactionsLoading } =
     useTransactions(10);
@@ -104,18 +98,22 @@ export default function ProfilePage() {
     }
   };
 
+  const handleProfileUpdate = () => {
+    // 刷新profile数据
+    refetchProfile();
+  };
+
   const isPremium = profile.subscription_tier === "premium";
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto space-y-8">
-        <ProfileHeader />
-
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1 space-y-6">
             <UserInfoCard
               profile={profile}
               onSignOut={handleSignOut}
+              onProfileUpdate={handleProfileUpdate}
               formatDate={formatDate}
             />
           </div>

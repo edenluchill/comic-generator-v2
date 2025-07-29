@@ -7,6 +7,7 @@ export interface UserProfile {
   email: string;
   full_name?: string;
   avatar_url?: string;
+  override_avatar_url?: string; // 新增自定义头像字段
 
   // 订阅信息
   subscription_status: "free" | "premium";
@@ -128,6 +129,12 @@ export interface SubscriptionCheckoutResult {
   checkoutUrl?: string;
   sessionId?: string;
   message?: string;
+}
+
+// 新增更新用户资料的接口
+export interface UpdateUserProfileRequest {
+  full_name?: string;
+  override_avatar_url?: string;
 }
 
 // ===========================================

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateRequest } from "@/lib/auth-helpers";
 import { creditService } from "@/lib/services/credit.service";
+import { UpdateUserProfileRequest } from "@/types/credits";
 
 export async function GET(request: NextRequest) {
   try {
@@ -48,6 +49,52 @@ export async function GET(request: NextRequest) {
     console.error("Get user profile error:", error);
     return NextResponse.json(
       { error: "Failed to get user profile" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  try {
+    // 验证用户身份
+    const { user, error: authError } = await authenticateRequest(request);
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // 解析请求体
+    const body: UpdateUserProfileRequest = await request.json();
+
+    // 验证请求数据
+    if (!body.full_name && !body.override_avatar_url) {
+      return NextResponse.json(
+        {
+          error:
+            "At least one field (full_name or override_avatar_url) is required",
+        },
+        { status: 400 }
+      );
+    }
+
+    // 更新用户档案
+    const result = await creditService.updateUserProfile(user.id, body);
+
+    if (!result.success) {
+      return NextResponse.json(
+        { error: result.message || "Failed to update profile" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      profile: result.profile,
+      message: result.message,
+    });
+  } catch (error) {
+    console.error("Update user profile error:", error);
+    return NextResponse.json(
+      { error: "Failed to update user profile" },
       { status: 500 }
     );
   }

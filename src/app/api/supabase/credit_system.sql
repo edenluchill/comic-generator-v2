@@ -8,6 +8,7 @@ CREATE TABLE user_profiles (
   email TEXT NOT NULL,
   full_name TEXT,
   avatar_url TEXT,
+  override_avatar_url TEXT,
   
   -- 订阅信息
   subscription_status TEXT DEFAULT 'free' CHECK (subscription_status IN ('free', 'premium')),

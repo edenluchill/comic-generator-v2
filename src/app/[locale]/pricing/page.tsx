@@ -31,7 +31,6 @@ export default function PricingPage() {
 
   // 处理订阅逻辑
   const handleSubscribe = async () => {
-    // ✅ 先检查是否还在加载中
     if (loading) {
       console.log("Still loading auth state, please wait...");
       return;

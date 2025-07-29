@@ -428,6 +428,59 @@ export class CreditService {
       return false;
     }
   }
+
+  /**
+   * 更新用户档案信息
+   */
+  async updateUserProfile(
+    userId: string,
+    updates: {
+      full_name?: string;
+      override_avatar_url?: string;
+    }
+  ): Promise<{ success: boolean; profile?: UserProfile; message?: string }> {
+    try {
+      // 构建更新对象，只包含有值的字段
+      const updateData: Partial<UserProfile> = {
+        updated_at: new Date().toISOString(),
+      };
+
+      if (updates.full_name !== undefined) {
+        updateData.full_name = updates.full_name;
+      }
+
+      if (updates.override_avatar_url !== undefined) {
+        updateData.override_avatar_url = updates.override_avatar_url;
+      }
+
+      const { data, error } = await supabaseAdmin
+        .from("user_profiles")
+        .update(updateData)
+        .eq("id", userId)
+        .select("*")
+        .single();
+
+      if (error) {
+        console.error("更新用户档案失败:", error);
+        return {
+          success: false,
+          message: "更新用户档案失败",
+        };
+      }
+
+      return {
+        success: true,
+        profile: data,
+        message: "用户档案更新成功",
+      };
+    } catch (error) {
+      console.error("updateUserProfile error:", error);
+      return {
+        success: false,
+        message: "更新用户档案时出错",
+      };
+    }
+  }
 }
 
 // 导出单例

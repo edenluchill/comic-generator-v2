@@ -2,6 +2,7 @@ import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "@/hooks/useTranslations";
 
 // 1. 简单的Spinner组件 - 适用于按钮、小区域loading
 const spinnerVariants = cva("animate-spin rounded-full border-2", {
@@ -15,7 +16,6 @@ const spinnerVariants = cva("animate-spin rounded-full border-2", {
     color: {
       primary: "border-amber-200 border-t-amber-500",
       secondary: "border-blue-200 border-t-blue-500",
-      purple: "border-purple-200 border-t-purple-500",
       white: "border-gray-300 border-t-white",
     },
   },
@@ -63,7 +63,7 @@ export interface LoaderProps
     VariantProps<typeof loaderVariants> {
   message?: string;
   iconSize?: number;
-  color?: "primary" | "secondary" | "purple";
+  color?: "primary" | "secondary";
 }
 
 export const Loader = React.forwardRef<HTMLDivElement, LoaderProps>(
@@ -74,7 +74,6 @@ export const Loader = React.forwardRef<HTMLDivElement, LoaderProps>(
     const colorClasses = {
       primary: "text-amber-600",
       secondary: "text-blue-600",
-      purple: "text-purple-600",
     };
 
     return (
@@ -85,11 +84,7 @@ export const Loader = React.forwardRef<HTMLDivElement, LoaderProps>(
       >
         <div
           className={`border-2 border-${
-            color === "primary"
-              ? "amber"
-              : color === "secondary"
-              ? "blue"
-              : "purple"
+            color === "primary" ? "amber" : "blue"
           }-200 rounded-xl p-3 flex items-center justify-center`}
         >
           <Loader2
@@ -114,7 +109,7 @@ export interface ProgressSpinnerProps
   progress?: number;
   message?: string;
   size?: "md" | "lg";
-  color?: "primary" | "secondary" | "purple";
+  color?: "primary" | "secondary";
   showProgressBar?: boolean;
   showPercentage?: boolean;
 }
@@ -150,13 +145,6 @@ export const ProgressSpinner = React.forwardRef<
         gradient: "from-blue-500 to-cyan-500",
         conicColor: "#3b82f6",
         text: "text-blue-600",
-      },
-      purple: {
-        border: "border-purple-200",
-        spinBorder: "border-t-purple-500",
-        gradient: "from-purple-500 to-pink-500",
-        conicColor: "#a855f7",
-        text: "text-purple-600",
       },
     };
 
@@ -233,44 +221,36 @@ export interface FullScreenLoaderProps
 export const FullScreenLoader = React.forwardRef<
   HTMLDivElement,
   FullScreenLoaderProps
->(
-  (
-    {
-      className,
-      message = "Loading...",
-      subMessage,
-      background = "light",
-      ...props
-    },
-    ref
-  ) => {
-    const backgroundClasses = {
-      light: "bg-gray-50/80",
-      dark: "bg-black/60",
-      blur: "bg-white/80 backdrop-blur-sm",
-    };
+>(({ className, message, subMessage, background = "light", ...props }, ref) => {
+  const tCommon = useTranslations("Common");
+  const backgroundClasses = {
+    light: "bg-gray-50/80",
+    dark: "bg-black/60",
+    blur: "bg-white/80 backdrop-blur-sm",
+  };
 
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          "min-h-screen flex items-center justify-center",
-          backgroundClasses[background],
-          className
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "min-h-screen flex items-center justify-center",
+        backgroundClasses[background],
+        className
+      )}
+      {...props}
+    >
+      <div className="text-center">
+        <SimpleSpinner size="xl" className="mx-auto mb-4" />
+        <p className="text-amber-700 font-medium">
+          {message ?? tCommon("loading")}
+        </p>
+        {subMessage && (
+          <p className="text-gray-600 text-sm mt-2">{subMessage}</p>
         )}
-        {...props}
-      >
-        <div className="text-center">
-          <SimpleSpinner size="xl" className="mx-auto mb-4" />
-          <p className="text-amber-700 font-medium">{message}</p>
-          {subMessage && (
-            <p className="text-gray-600 text-sm mt-2">{subMessage}</p>
-          )}
-        </div>
       </div>
-    );
-  }
-);
+    </div>
+  );
+});
 FullScreenLoader.displayName = "FullScreenLoader";
 
 // 导出所有组件和类型

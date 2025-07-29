@@ -4,6 +4,7 @@ import Image from "next/image";
 import { MobileDrawer } from "@/components/ui/mobile-drawer";
 import { useState } from "react";
 import CharacterDetailModal from "./CharacterDetailModal";
+import { Loader } from "../ui/loading";
 
 export interface CharacterLibraryDrawerProps {
   isOpen: boolean;
@@ -27,7 +28,11 @@ export function CharacterLibraryDrawer({
   );
 
   if (loading) {
-    return null;
+    return (
+      <div className="p-4">
+        <Loader message="加载角色库..." color="primary" size="md" />
+      </div>
+    );
   }
 
   const handleDeleteCharacter = async (id: string) => {

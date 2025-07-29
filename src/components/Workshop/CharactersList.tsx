@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { Character } from "@/types/characters";
 import CharacterCard from "./CharacterCard";
 import CharacterDetailModal from "./CharacterDetailModal";
+import { SimpleSpinner } from "../ui/loading";
 
 interface CharactersListProps {
   onAddNewCharacter: () => void;
@@ -38,11 +39,7 @@ export default function CharactersList({
             <span className="text-base font-normal bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
               {characters.length}
             </span>
-            {loading && (
-              <span className="text-sm font-normal text-amber-600 animate-pulse">
-                (同步中...)
-              </span>
-            )}
+            {loading && <SimpleSpinner />}
           </h3>
         </div>
 

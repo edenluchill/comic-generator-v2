@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Zap, Star, CheckCircle, Loader2 } from "lucide-react";
 import { makeAuthenticatedJsonRequest } from "@/lib/auth-request";
+import { Loader } from "./ui/loading";
 
 interface CreditPackage {
   id: string;
@@ -99,14 +100,7 @@ export function CreditPurchase() {
   };
 
   if (loading) {
-    return (
-      <div className="space-y-4">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">加载充值包...</p>
-        </div>
-      </div>
-    );
+    return <Loader message="加载充值包..." color="primary" size="lg" />;
   }
 
   if (error) {

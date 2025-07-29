@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
-import { useTranslations } from "@/hooks/useTranslations";
+import { FullScreenLoader } from "./ui/loading";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -15,7 +15,6 @@ export default function AuthGuard({ children, fallback }: AuthGuardProps) {
   const { user, loading } = useAuth();
   const { navigate } = useLocalizedNavigation();
   const pathname = usePathname();
-  const t = useTranslations("Common");
 
   useEffect(() => {
     if (!loading && !user) {
@@ -28,18 +27,7 @@ export default function AuthGuard({ children, fallback }: AuthGuardProps) {
 
   // 显示加载状态
   if (loading) {
-    return (
-      fallback || (
-        <div className="min-h-screen bg-amber-50/30 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto"></div>
-            <p className="mt-4 text-amber-700">
-              {t("loading") || "Loading..."}
-            </p>
-          </div>
-        </div>
-      )
-    );
+    return fallback || <FullScreenLoader />;
   }
 
   // 如果用户未登录，显示重定向状态

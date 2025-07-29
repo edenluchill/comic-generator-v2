@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Eye, Sparkles } from "lucide-react";
 import { Character } from "@/types/characters";
+import { SimpleSpinner } from "../ui/loading";
 
 interface CharacterCardProps {
   character: Character;
@@ -40,9 +41,7 @@ export default function CharacterCard({
 
         {/* 角色图片 */}
         <div className="relative w-full h-full">
-          {imageLoading && (
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-100 to-orange-100 animate-pulse rounded-2xl"></div>
-          )}
+          {imageLoading && <SimpleSpinner />}
           <Image
             src={character.avatar_url}
             alt={character.name}

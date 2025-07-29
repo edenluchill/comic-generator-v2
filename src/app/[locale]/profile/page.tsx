@@ -12,9 +12,10 @@ import { useEffect } from "react";
 import {
   ProfileHeader,
   UserInfoCard,
-  UserStatsCard,
   TransactionHistory,
 } from "@/components/Profile";
+// 🎉 导入统一的loading组件
+import { FullScreenLoader } from "@/components/ui/loading";
 
 // 工具函数
 const formatDate = (dateString: string) => {
@@ -25,17 +26,12 @@ const formatDate = (dateString: string) => {
   });
 };
 
-// 加载状态组件
+// ✅ 使用统一的FullScreenLoader替代自定义LoadingState
 const LoadingState = () => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500 mx-auto mb-4"></div>
-      <p className="text-gray-600">加载中...</p>
-    </div>
-  </div>
+  <FullScreenLoader message="加载中..." background="light" />
 );
 
-// 错误状态组件
+// 错误状态组件保持不变
 const ErrorState = ({
   error,
   onGoHome,
@@ -122,7 +118,6 @@ export default function ProfilePage() {
               onSignOut={handleSignOut}
               formatDate={formatDate}
             />
-            <UserStatsCard profile={profile} />
           </div>
 
           <div className="lg:col-span-2 space-y-6">

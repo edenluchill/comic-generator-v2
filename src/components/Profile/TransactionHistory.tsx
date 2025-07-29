@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, Zap, Calendar, Crown, Clock } from "lucide-react";
 import { CreditTransaction } from "@/types/credits";
+import { SimpleSpinner } from "@/components/ui/loading";
 
 interface TransactionHistoryProps {
   transactions: CreditTransaction[];
@@ -36,7 +37,8 @@ const TransactionHistory: FC<TransactionHistoryProps> = ({
       <CardContent>
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-500"></div>
+            {/* ✅ 使用统一的SimpleSpinner替代自定义spinner */}
+            <SimpleSpinner size="md" color="primary" />
           </div>
         ) : transactions.length === 0 ? (
           <div className="text-center py-8 text-gray-500">暂无交易记录</div>

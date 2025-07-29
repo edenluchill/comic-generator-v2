@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { ImageIcon, Download, RefreshCw, Edit, Check, X } from "lucide-react";
 import { ComicScene } from "@/types/diary";
+import { ProgressSpinner } from "../ui/loading";
 
 interface ComicDisplayProps {
   isGenerating: boolean;
@@ -107,20 +108,19 @@ export default function ComicDisplay({
 
   const renderLoadingState = () => (
     <div className="text-center">
-      <div className="w-16 h-16 mx-auto mb-4 border-4 border-purple-200 border-t-purple-600 rounded-full animate-spin"></div>
-      <p className="text-gray-600">{progressMessage || "正在生成漫画..."}</p>
+      <ProgressSpinner
+        progress={progress}
+        message={progressMessage || "正在生成漫画..."}
+        color="purple"
+        size="lg"
+        showProgressBar={true}
+        showPercentage={true}
+      />
       {currentScene && totalScenes && (
         <p className="text-sm text-gray-500 mt-2">
           正在生成第 {currentScene} 个场景，共 {totalScenes} 个场景
         </p>
       )}
-      <div className="w-64 bg-gray-200 rounded-full h-2 mt-4 mx-auto">
-        <div
-          className="bg-purple-600 h-2 rounded-full transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-      <p className="text-xs text-gray-500 mt-2">{Math.round(progress)}%</p>
     </div>
   );
 

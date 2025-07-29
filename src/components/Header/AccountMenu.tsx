@@ -7,15 +7,8 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
-import {
-  User,
-  LogIn,
-  Settings,
-  Heart,
-  LogOut,
-  Crown,
-  Loader2,
-} from "lucide-react";
+import { User, LogIn, Settings, Heart, LogOut, Crown } from "lucide-react";
+import { Loader } from "../ui/loading";
 
 export default function AccountMenu() {
   const { getLocalizedHref } = useLocalizedNavigation();
@@ -52,15 +45,12 @@ export default function AccountMenu() {
 
   if (loading) {
     return (
-      <Button
-        variant="ghost"
-        size="sm"
-        disabled
-        className="h-10 px-4 transition-all duration-300 flex items-center gap-2 text-sm font-medium text-amber-700/60 bg-amber-500/5 rounded-full border border-amber-200/30"
-      >
-        <Loader2 className="w-4 h-4 animate-spin" />
-        <span className="hidden sm:inline">加载中...</span>
-      </Button>
+      <Loader
+        message={tAccount("loading")}
+        color="primary"
+        size="md"
+        iconSize={20}
+      />
     );
   }
 

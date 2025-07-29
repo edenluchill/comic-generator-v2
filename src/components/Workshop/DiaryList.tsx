@@ -10,6 +10,7 @@ import DiaryCard from "./DiaryCard";
 import CreateDiaryCard from "./CreateDiaryCard";
 import DiaryDetailModal from "./DiaryDetailModal";
 import { createPortal } from "react-dom";
+import { Loader } from "../ui/loading";
 
 interface DiaryListProps {
   onCreateNewDiary: () => void;
@@ -101,7 +102,9 @@ function DiaryListHeader({
   return (
     <div className="mb-4">
       <h3 className="text-lg font-semibold text-amber-800 mb-3">
-        我的日记本 ({count}) {isLoading && "(加载中...)"}
+        <div className="flex items-center gap-2">
+          我的日记本 ({count}){isLoading && <Loader size="sm" />}
+        </div>
       </h3>
     </div>
   );

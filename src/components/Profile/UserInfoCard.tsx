@@ -1,4 +1,5 @@
 import { FC } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
@@ -44,10 +45,12 @@ const UserInfoCard: FC<UserInfoCardProps> = ({
         <div className="relative mx-auto mb-4">
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-2xl font-bold shadow-lg">
             {profile.avatar_url ? (
-              <img
+              <Image
                 src={profile.avatar_url}
                 alt="Avatar"
                 className="w-24 h-24 rounded-full object-cover"
+                width={96}
+                height={96}
               />
             ) : (
               <User className="w-12 h-12" />

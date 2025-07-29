@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
+import { Loader } from "@/components/ui/loading";
 
 export default function AuthCallbackPage() {
   const { navigate } = useLocalizedNavigation();
@@ -94,10 +95,12 @@ export default function AuthCallbackPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
       <div className="max-w-md w-full space-y-8 text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div>
-        <h2 className="mt-6 text-2xl font-bold text-amber-900">
-          {tLogin("loggingIn")}
-        </h2>
+        <Loader
+          message={tLogin("loggingIn")}
+          color="primary"
+          size="md"
+          iconSize={20}
+        />
         <p className="text-amber-700">{tLogin("verifyingIdentity")}</p>
       </div>
     </div>

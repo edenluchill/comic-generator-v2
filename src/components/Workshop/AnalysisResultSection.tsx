@@ -1,7 +1,8 @@
 "use client";
 
-import { Eye, Loader2, Tag } from "lucide-react";
+import { Eye, Tag } from "lucide-react";
 import { useTranslations } from "@/hooks/useTranslations";
+import { Loader } from "../ui/loading";
 
 interface AnalysisResultSectionProps {
   tags: string[] | null;
@@ -33,12 +34,12 @@ export default function AnalysisResultSection({
 
       {processingStep === "analyzing" && (
         <div className="flex flex-col items-center justify-center h-32 lg:h-40">
-          <div className="w-10 h-10 lg:w-12 lg:h-12 border-2 border-amber-400/50 rounded-xl flex items-center justify-center mb-3 lg:mb-4">
-            <Loader2 className="w-5 h-5 lg:w-6 lg:h-6 text-amber-600 animate-spin" />
-          </div>
-          <p className="text-sm lg:text-base text-amber-700 font-medium">
-            {t("analyzingFeatures")}
-          </p>
+          <Loader
+            message={t("analyzingFeatures")}
+            color="primary"
+            size="md"
+            iconSize={20}
+          />
         </div>
       )}
 

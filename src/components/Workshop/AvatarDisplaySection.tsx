@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Eye, X, Edit3, Save, Check } from "lucide-react";
 import { FluxGenerationResult } from "@/types/flux";
 import Image from "next/image";
+import { ProgressSpinner } from "../ui/loading";
 
 interface AvatarDisplaySectionProps {
   currentStep: number;
@@ -30,54 +31,6 @@ export default function AvatarDisplaySection({
   const [isEditingName, setIsEditingName] = useState(false);
   const [characterName, setCharacterName] = useState("");
 
-  const renderLoadingSpinner = (step: number, color: string) => {
-    const colorMap = {
-      blue: {
-        border: "border-blue-200",
-        spinBorder: "border-t-blue-500",
-        gradient: "from-blue-500 to-cyan-500",
-        conicColor: "#3b82f6",
-      },
-      purple: {
-        border: "border-purple-200",
-        spinBorder: "border-t-purple-500",
-        gradient: "from-purple-500 to-pink-500",
-        conicColor: "#a855f7",
-      },
-    };
-
-    const colors = colorMap[color as keyof typeof colorMap];
-
-    return (
-      <div className="h-full flex flex-col items-center justify-center">
-        <div className="w-16 h-16 mb-4 relative">
-          <div
-            className={`absolute inset-0 rounded-full border-4 ${colors.border}`}
-          ></div>
-          <div
-            className={`absolute inset-0 rounded-full border-4 border-transparent ${colors.spinBorder} animate-spin`}
-            style={{
-              background: `conic-gradient(from 0deg, transparent ${
-                100 - progress
-              }%, ${colors.conicColor} ${100 - progress}%)`,
-              WebkitMask:
-                "radial-gradient(circle at center, transparent 70%, black 70%)",
-              mask: "radial-gradient(circle at center, transparent 70%, black 70%)",
-            }}
-          ></div>
-        </div>
-        <p className="text-sm text-gray-600 text-center">{status}</p>
-        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-          <div
-            className={`bg-gradient-to-r ${colors.gradient} h-2 rounded-full transition-all duration-300`}
-            style={{ width: `${progress}%` }}
-          ></div>
-        </div>
-        <p className="text-xs text-gray-500 mt-1">{progress}%</p>
-      </div>
-    );
-  };
-
   const handleSaveCharacter = () => {
     if (characterName.trim() && onSaveCharacter) {
       onSaveCharacter(characterName.trim());
@@ -96,11 +49,29 @@ export default function AvatarDisplaySection({
 
   const renderContent = () => {
     if (currentStep < 2 && isProcessing) {
-      return renderLoadingSpinner(1, "blue");
+      return (
+        <ProgressSpinner
+          progress={progress}
+          message={status}
+          color="secondary"
+          size="lg"
+          showProgressBar={true}
+          showPercentage={true}
+        />
+      );
     }
 
     if (currentStep === 2 && isProcessing) {
-      return renderLoadingSpinner(2, "purple");
+      return (
+        <ProgressSpinner
+          progress={progress}
+          message={status}
+          color="purple"
+          size="lg"
+          showProgressBar={true}
+          showPercentage={true}
+        />
+      );
     }
 
     if (avatarResult) {

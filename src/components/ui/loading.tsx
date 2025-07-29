@@ -253,5 +253,89 @@ export const FullScreenLoader = React.forwardRef<
 });
 FullScreenLoader.displayName = "FullScreenLoader";
 
+// 5. 水平Loader组件 - 适用于header、导航等横向区域
+export interface HorizontalLoaderProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  message?: string;
+  size?: "sm" | "md";
+  color?: "primary" | "secondary";
+  showIcon?: boolean;
+}
+
+export const HorizontalLoader = React.forwardRef<
+  HTMLDivElement,
+  HorizontalLoaderProps
+>(
+  (
+    {
+      className,
+      message,
+      size = "sm",
+      color = "primary",
+      showIcon = true,
+      ...props
+    },
+    ref
+  ) => {
+    const tCommon = useTranslations("Common");
+
+    const colorClasses = {
+      primary: {
+        spinner: "border-amber-200 border-t-amber-500",
+        text: "text-amber-700",
+        bg: "bg-amber-50/60",
+      },
+      secondary: {
+        spinner: "border-blue-200 border-t-blue-500",
+        text: "text-blue-700",
+        bg: "bg-blue-50/60",
+      },
+    };
+
+    const sizeClasses = {
+      sm: {
+        container: "h-10 px-4 gap-2",
+        spinner: "w-4 h-4",
+        text: "text-sm",
+      },
+      md: {
+        container: "h-12 px-6 gap-3",
+        spinner: "w-5 h-5",
+        text: "text-base",
+      },
+    };
+
+    const colors = colorClasses[color];
+    const sizes = sizeClasses[size];
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "inline-flex items-center justify-center rounded-full border border-transparent transition-all duration-300",
+          colors.bg,
+          sizes.container,
+          className
+        )}
+        {...props}
+      >
+        {showIcon && (
+          <div
+            className={cn(
+              "animate-spin rounded-full border-2",
+              colors.spinner,
+              sizes.spinner
+            )}
+          />
+        )}
+        <span className={cn("font-medium", colors.text, sizes.text)}>
+          {message || tCommon("loading")}
+        </span>
+      </div>
+    );
+  }
+);
+HorizontalLoader.displayName = "HorizontalLoader";
+
 // 导出所有组件和类型
 export { spinnerVariants, loaderVariants };

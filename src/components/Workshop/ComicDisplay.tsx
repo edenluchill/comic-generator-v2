@@ -111,7 +111,7 @@ export default function ComicDisplay({
       <ProgressSpinner
         progress={progress}
         message={progressMessage || "正在生成漫画..."}
-        color="purple"
+        color="primary"
         size="lg"
         showProgressBar={true}
         showPercentage={true}

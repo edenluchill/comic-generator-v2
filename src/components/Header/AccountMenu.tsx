@@ -8,7 +8,7 @@ import { useTranslations } from "@/hooks/useTranslations";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import { User, LogIn, Settings, Heart, LogOut, Crown } from "lucide-react";
-import { Loader } from "../ui/loading";
+import { HorizontalLoader } from "../ui/loading";
 
 export default function AccountMenu() {
   const { getLocalizedHref } = useLocalizedNavigation();
@@ -46,11 +46,10 @@ export default function AccountMenu() {
 
   if (loading) {
     return (
-      <Loader
+      <HorizontalLoader
         message={tCommon("loading")}
         color="primary"
-        size="md"
-        iconSize={20}
+        size="sm"
       />
     );
   }

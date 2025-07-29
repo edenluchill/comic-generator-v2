@@ -66,7 +66,6 @@ export default function AvatarDisplaySection({
         <ProgressSpinner
           progress={progress}
           message={status}
-          color="purple"
           size="lg"
           showProgressBar={true}
           showPercentage={true}

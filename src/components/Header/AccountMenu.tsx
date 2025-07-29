@@ -16,6 +16,7 @@ export default function AccountMenu() {
   const menuRef = useRef<HTMLDivElement>(null);
   const { user, profile, loading, signOut } = useAuth();
   const tAccount = useTranslations("Account");
+  const tCommon = useTranslations("Common");
 
   // 点击外部关闭菜单
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function AccountMenu() {
   if (loading) {
     return (
       <Loader
-        message={tAccount("loading")}
+        message={tCommon("loading")}
         color="primary"
         size="md"
         iconSize={20}

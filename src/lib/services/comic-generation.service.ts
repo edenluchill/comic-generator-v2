@@ -1,4 +1,9 @@
-import { ComicScene, SceneDescription, SceneCharacter } from "@/types/diary";
+import {
+  ComicScene,
+  SceneDescription,
+  SceneCharacter,
+  ComicFormat,
+} from "@/types/diary";
 import { Character } from "@/types/characters";
 import { sceneAnalysisService } from "./scene-analysis.service";
 import { comicDatabaseService } from "./comic-database.service";
@@ -12,6 +17,7 @@ export interface ComicGenerationOptions {
   diaryContent: string;
   characters: SceneCharacter[];
   style: string;
+  format: ComicFormat; // 新增
   controller: ReadableStreamDefaultController;
   encoder: TextEncoder;
 }
@@ -29,8 +35,15 @@ export class ComicGenerationService {
   async generateComic(
     options: ComicGenerationOptions
   ): Promise<ComicGenerationResult> {
-    const { userId, diaryContent, characters, style, controller, encoder } =
-      options;
+    const {
+      userId,
+      diaryContent,
+      characters,
+      style,
+      format,
+      controller,
+      encoder,
+    } = options;
 
     try {
       // 步骤0：检查用户credits
@@ -77,29 +90,31 @@ export class ComicGenerationService {
         throw new Error("角色验证失败，请确保角色属于当前用户");
       }
 
-      // 步骤2：创建日记记录
+      // 步骤2：场景分析 - 根据格式决定场景数量
+      StreamUtils.encodeProgress(encoder, controller, {
+        step: "analyzing",
+        message: "正在分析故事内容...",
+        progress: 10,
+      });
+
+      const { scenes: sceneDescriptions, title } =
+        await sceneAnalysisService.analyzeScenes({
+          diaryContent,
+          characters: characterData,
+        });
+
+      // 步骤3：创建日记记录
       StreamUtils.encodeProgress(encoder, controller, {
         step: "analyzing",
         message: "正在保存日记...",
-        progress: 10,
+        progress: 20,
       });
 
       const diary = await comicDatabaseService.createDiary(
         userId,
-        diaryContent
-      );
-
-      // 步骤3：场景分析
-      StreamUtils.encodeProgress(encoder, controller, {
-        step: "analyzing",
-        message: "正在分析日记内容...",
-        progress: 20,
-      });
-
-      const sceneDescriptions = await sceneAnalysisService.analyzeScenes({
         diaryContent,
-        characters: characterData,
-      });
+        title
+      );
 
       // 步骤4：创建漫画记录
       StreamUtils.encodeProgress(encoder, controller, {
@@ -111,7 +126,10 @@ export class ComicGenerationService {
       const comic = await comicDatabaseService.createComic(
         diary.id,
         userId,
-        style
+        style,
+        format, // 新增参数
+        undefined, // 新增参数
+        title // title参数保持可选
       );
 
       // 步骤5：创建场景记录
@@ -142,13 +160,14 @@ export class ComicGenerationService {
       const deductionResult = await creditService.deductCredits({
         userId,
         amount: CREDIT_COSTS.COMIC_GENERATION,
-        description: `生成漫画 - ${diary.title || "无标题"}`,
+        description: `生成漫画 - ${title || "无标题"}`,
         relatedEntityType: "comic",
         relatedEntityId: comic.id,
         metadata: {
           comic_id: comic.id,
           scenes_count: completedScenes.length,
           style: style,
+          format: format, // 新增元数据
         },
       });
 

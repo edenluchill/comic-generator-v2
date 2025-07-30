@@ -7,6 +7,8 @@ export interface FluxGenerationOptions {
   prompt?: string;
   input_image?: string | null; // Base64 encoded image or URL to use with Kontext
   aspectRatio?: string;
+  width?: number;
+  height?: number;
   seed?: number;
   outputFormat?: "png" | "jpeg";
   promptUpsampling?: boolean;

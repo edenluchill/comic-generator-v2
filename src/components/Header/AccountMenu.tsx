@@ -7,11 +7,11 @@ import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/hooks/useTranslations";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
-import { User, LogIn, Settings, Heart, LogOut, Crown } from "lucide-react";
+import { User, LogIn, Settings, LogOut, Crown } from "lucide-react";
 import { HorizontalLoader } from "../ui/loading";
 
 export default function AccountMenu() {
-  const { getLocalizedHref } = useLocalizedNavigation();
+  const { getLocalizedHref, navigate } = useLocalizedNavigation();
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { user, profile, loading, signOut } = useAuth();
@@ -39,6 +39,7 @@ export default function AccountMenu() {
     try {
       await signOut();
       setShowMenu(false);
+      navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -111,7 +112,7 @@ export default function AccountMenu() {
       {showMenu && (
         <div className="absolute right-0 top-full mt-2 w-56 bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-amber-200/30 py-2 animate-fadeIn z-50">
           {/* 用户信息 */}
-          <div className="px-4 py-3 border-b border-amber-100/50">
+          <div className="px-4 py-3 ">
             <div className="flex items-center space-x-3">
               {/* 头像 - 清晰不被遮挡 */}
               {profile.avatar_url ? (
@@ -121,7 +122,6 @@ export default function AccountMenu() {
                   width={32}
                   height={32}
                   className="rounded-full"
-                  unoptimized
                 />
               ) : (
                 <div className="w-8 h-8 bg-gradient-to-r from-amber-400 to-orange-400 rounded-full flex items-center justify-center">
@@ -135,12 +135,7 @@ export default function AccountMenu() {
                   <p className="font-medium text-amber-900 truncate">
                     {profile.full_name || tAccount("username")}
                   </p>
-                  {isPremium && (
-                    <div className="flex items-center gap-1 text-xs text-amber-800 px-2 py-0.5 rounded-full border border-yellow-200/50 font-medium shadow-sm">
-                      <Crown className="w-3 h-3 text-yellow-600" />
-                      <span>Premium</span>
-                    </div>
-                  )}
+                  {isPremium && <Crown className="w-3 h-3 text-yellow-600" />}
                 </div>
                 <p className="text-xs text-amber-600 truncate">
                   {profile.email}
@@ -166,19 +161,6 @@ export default function AccountMenu() {
               <Settings className="w-4 h-4" />
               <span className="text-sm">
                 {tAccount("profile") || "个人资料"}
-              </span>
-            </Link>
-            <Link
-              href={getLocalizedHref("/profile")}
-              onClick={() => setShowMenu(false)}
-              className="w-full px-4 py-2 text-left text-amber-700 hover:bg-amber-50/60 transition-colors duration-200 flex items-center space-x-3"
-            >
-              <Heart className="w-4 h-4" />
-              <span className="text-sm">
-                {tAccount("myWorks") || "我的作品"}
-              </span>
-              <span className="ml-auto text-xs text-amber-500">
-                {profile.total_comics_generated || 0}
               </span>
             </Link>
             <div className="border-t border-amber-100/50 mt-2 pt-2">

@@ -1,5 +1,4 @@
 import OpenAI from "openai";
-import { SceneDescription } from "@/types/diary";
 import { Character } from "@/types/characters";
 
 const openai = new OpenAI({
@@ -14,13 +13,26 @@ export interface SceneAnalysisOptions {
   temperature?: number;
 }
 
+export interface SceneDescription {
+  scene_number: number;
+  description: string;
+  character_ids: string[]; // 场景中需要的角色ID
+  mood?: string; // 场景情绪
+}
+
+// 新增：场景分析结果类型
+export interface StoryAnalysisResult {
+  title: string; // 故事标题
+  scenes: SceneDescription[]; // 场景数组
+}
+
 export class SceneAnalysisService {
   /**
-   * 分析日记内容并切割成4个场景
+   * 分析日记内容并切割成4个场景，同时生成故事标题
    */
   async analyzeScenes(
     options: SceneAnalysisOptions
-  ): Promise<SceneDescription[]> {
+  ): Promise<StoryAnalysisResult> {
     const {
       diaryContent,
       characters,
@@ -31,24 +43,26 @@ export class SceneAnalysisService {
     const characterList = characters.map((c) => `${c.name}`).join(", ");
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
+      model: "gpt-4o-mini",
       messages: [
         {
           role: "user",
-          content: `Analyze the following diary content and split it into 4 comic scenes. 
+          content: `Analyze the following diary content and split it into 4 comic scenes, and create an engaging title for the story.
 
 Available characters: ${characterList}
 
 Diary content: ${diaryContent}
 
-Please create 4 scenes that:
-1. Have clear visual elements suitable for comic panels
-2. Are appropriate for single-frame representation
-3. Are arranged in chronological order
-4. Include emotions and actions
-5. Identify the overall mood of each scene
-6. When mentioning character names in scene descriptions, wrap them with angle brackets like <character_name>
-7. IMPORTANT: Use the exact character names from the available characters list: ${characterList}
+Please create:
+1. A catchy, engaging title for the story based on the diary content
+2. 4 scenes that:
+   - Have clear visual elements suitable for comic panels
+   - Are appropriate for single-frame representation
+   - Are arranged in chronological order
+   - Include emotions and actions
+   - Identify the overall mood of each scene
+   - When mentioning character names in scene descriptions, wrap them with angle brackets like <character_name>
+   - IMPORTANT: Use the exact character names from the available characters list: ${characterList}
 
 Example: If a scene involves a character named "菠萝塞东", describe it as: "The scene shows <菠萝塞东> walking in the park..."`,
         },
@@ -59,10 +73,15 @@ Example: If a scene involves a character named "菠萝塞东", describe it as: "
           function: {
             name: "analyze_diary_scenes",
             description:
-              "Split diary content into 4 comic scenes with character names marked in angle brackets and mood analysis",
+              "Split diary content into 4 comic scenes with character names marked in angle brackets, mood analysis, and generate a story title",
             parameters: {
               type: "object",
               properties: {
+                title: {
+                  type: "string",
+                  description:
+                    "Engaging title for the story based on the diary content",
+                },
                 scenes: {
                   type: "array",
                   items: {
@@ -89,7 +108,7 @@ Example: If a scene involves a character named "菠萝塞东", describe it as: "
                   maxItems: 4,
                 },
               },
-              required: ["scenes"],
+              required: ["title", "scenes"],
             },
           },
         },
@@ -119,9 +138,13 @@ Example: If a scene involves a character named "菠萝塞东", describe it as: "
   private parseFunctionCallResult(
     argumentsString: string,
     characters: Character[]
-  ): SceneDescription[] {
+  ): StoryAnalysisResult {
     try {
       const result = JSON.parse(argumentsString);
+
+      if (!result.title || typeof result.title !== "string") {
+        throw new Error("场景分析结果格式错误：缺少故事标题");
+      }
 
       if (!result.scenes || !Array.isArray(result.scenes)) {
         throw new Error("场景分析结果格式错误：缺少scenes数组");
@@ -149,7 +172,10 @@ Example: If a scene involves a character named "菠萝塞东", describe it as: "
         }
       );
 
-      return parsedScenes;
+      return {
+        title: result.title,
+        scenes: parsedScenes,
+      };
     } catch (parseError) {
       console.error("函数调用结果解析错误:", parseError);
       throw new Error("场景分析结果格式错误");

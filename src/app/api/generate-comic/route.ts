@@ -13,6 +13,7 @@ import {
   validateRequiredFields,
   validateArrayField,
 } from "@/lib/helpers/request-validation.helpers";
+import { posterGenerationService } from "@/lib/services/poster-generation.service";
 
 const COMIC_GENERATION_STEPS = [
   { name: "checking", message: "正在检查用户余额...", weight: 10 },
@@ -56,22 +57,51 @@ export async function POST(request: NextRequest) {
       return createValidationErrorResponse(charactersErrors.join(", "));
     }
 
-    const { diary_content, characters, style = "cute" } = body!;
+    // 提取参数，移除layout_mode传递给后端
+    const {
+      diary_content,
+      characters,
+      style = "cute",
+      format = "four", // 只需要format参数
+    } = body!;
+
+    // 验证format参数
+    if (format && !["single", "four"].includes(format)) {
+      return createValidationErrorResponse("无效的漫画格式");
+    }
 
     // 创建流式响应
     return StreamGenerationHelper.createStreamResponse(
       COMIC_GENERATION_STEPS,
       async (helper) => {
-        const result = await comicGenerationService.generateComic({
-          userId: user.id,
-          diaryContent: diary_content,
-          characters,
-          style,
-          controller: helper["controller"], // 访问私有属性，需要改进
-          encoder: helper["encoder"],
-        });
+        let result;
 
-        helper.sendComplete(result, "漫画生成完成！");
+        if (format === "single") {
+          // 使用海报生成服务
+          result = await posterGenerationService.generateSingleScene({
+            userId: user.id,
+            diaryContent: diary_content,
+            characters,
+            style,
+            controller: helper["controller"],
+            encoder: helper["encoder"],
+          });
+
+          helper.sendComplete(result, "海报生成完成！");
+        } else {
+          // 使用原来的漫画生成服务，不传layout_mode
+          result = await comicGenerationService.generateComic({
+            userId: user.id,
+            diaryContent: diary_content,
+            characters,
+            style,
+            format,
+            controller: helper["controller"],
+            encoder: helper["encoder"],
+          });
+
+          helper.sendComplete(result, "漫画生成完成！");
+        }
       }
     );
   } catch (error) {

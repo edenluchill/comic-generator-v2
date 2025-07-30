@@ -7,12 +7,14 @@ import {
   Edit3,
   Check,
   X as XIcon,
+  Trash2, // 添加删除图标
 } from "lucide-react";
 import {
   DiaryComic,
   DiaryWithComics,
   SimpleComicScene,
   useUpdateDiary,
+  useDeleteDiary, // 添加删除hook
 } from "@/hooks/useDiaries";
 import { formatDate, getStatusColor, getStatusText } from "@/lib/diary-utils";
 import Image from "next/image";
@@ -21,11 +23,13 @@ import { useState, useEffect } from "react";
 interface DiaryDetailModalProps {
   diary: DiaryWithComics;
   onClose: () => void;
+  onDelete?: (diaryId: string) => void; // 添加删除回调
 }
 
 export default function DiaryDetailModal({
   diary,
   onClose,
+  onDelete, // 添加删除参数
 }: DiaryDetailModalProps) {
   const firstComic =
     diary.comics && diary.comics.length > 0 ? diary.comics[0] : null;
@@ -72,7 +76,7 @@ export default function DiaryDetailModal({
         <div className="absolute -inset-2 bg-gradient-to-r from-amber-400/20 via-orange-400/10 to-yellow-400/20 rounded-3xl opacity-50 blur-xl -z-20 animate-pulse"></div>
 
         {/* 头部 */}
-        <ModalHeader diary={diary} onClose={onClose} />
+        <ModalHeader diary={diary} onClose={onClose} onDelete={onDelete} />
 
         {/* 内容区域 - 响应式网格 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
@@ -91,14 +95,18 @@ export default function DiaryDetailModal({
 function ModalHeader({
   diary,
   onClose,
+  onDelete, // 添加删除参数
 }: {
   diary: DiaryWithComics;
   onClose: () => void;
+  onDelete?: (diaryId: string) => void; // 添加删除类型
 }) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editedTitle, setEditedTitle] = useState(diary.title || "");
   const [displayTitle, setDisplayTitle] = useState(diary.title || "");
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false); // 添加删除确认状态
   const updateDiary = useUpdateDiary();
+  const deleteDiary = useDeleteDiary(); // 添加删除hook
 
   // 当 diary.title 变化时，更新本地状态
   useEffect(() => {
@@ -133,6 +141,27 @@ function ModalHeader({
   const handleCancelEdit = () => {
     setEditedTitle(displayTitle);
     setIsEditingTitle(false);
+  };
+
+  // 添加删除相关处理函数
+  const handleDeleteClick = () => {
+    setShowDeleteConfirm(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteDiary.mutateAsync(diary.id);
+      onDelete?.(diary.id);
+      onClose(); // 删除后关闭模态框
+    } catch (error) {
+      console.error("删除日记失败:", error);
+      alert("删除失败，请重试");
+    }
+    setShowDeleteConfirm(false);
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirm(false);
   };
 
   return (
@@ -195,12 +224,51 @@ function ModalHeader({
         </div>
       </div>
 
-      <button
-        onClick={onClose}
-        className="p-2 hover:bg-white/50 rounded-full transition-all duration-300 backdrop-blur-sm border border-amber-200/50 shrink-0"
-      >
-        <X className="w-6 h-6 text-gray-600" />
-      </button>
+      {/* 右侧按钮区域 */}
+      <div className="flex items-center gap-2">
+        {/* 删除按钮 */}
+        {onDelete && (
+          <div className="flex items-center gap-1">
+            {!showDeleteConfirm ? (
+              <button
+                onClick={handleDeleteClick}
+                disabled={deleteDiary.isPending}
+                className="p-2 hover:bg-red-100/70 rounded-full transition-all duration-300 text-red-600 hover:scale-110 group backdrop-blur-sm border border-red-200/50 disabled:opacity-50"
+                title="删除日记"
+              >
+                <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              </button>
+            ) : (
+              <div className="flex gap-1">
+                <button
+                  onClick={handleConfirmDelete}
+                  disabled={deleteDiary.isPending}
+                  className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs font-medium transition-all duration-300 disabled:opacity-50"
+                  title="确认删除"
+                >
+                  {deleteDiary.isPending ? "删除中..." : "确认删除"}
+                </button>
+                <button
+                  onClick={handleCancelDelete}
+                  disabled={deleteDiary.isPending}
+                  className="px-3 py-1.5 bg-gray-500 hover:bg-gray-600 text-white rounded-full text-xs font-medium transition-all duration-300 disabled:opacity-50"
+                  title="取消"
+                >
+                  取消
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 关闭按钮 */}
+        <button
+          onClick={onClose}
+          className="p-2 hover:bg-white/50 rounded-full transition-all duration-300 backdrop-blur-sm border border-amber-200/50 shrink-0"
+        >
+          <X className="w-6 h-6 text-gray-600" />
+        </button>
+      </div>
     </div>
   );
 }
@@ -215,7 +283,7 @@ function DiaryContent({ diary }: { diary: DiaryWithComics }) {
       </h4> */}
 
       {/* 日记本样式的内容区域 */}
-      <div className="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 rounded-2xl p-8 shadow-lg border-2 border-amber-200/50 relative overflow-hidden">
+      <div className="h-full bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 rounded-2xl p-8 shadow-lg border-2 border-amber-200/50 relative overflow-hidden">
         {/* 纸质背景纹理 */}
         <div className="absolute inset-0 opacity-20">
           <div className="w-full h-full bg-gradient-to-br from-amber-100 to-yellow-100"></div>
@@ -287,6 +355,11 @@ function ComicSection({ comic }: { comic: DiaryComic | null }) {
 
 // 重写 PhotoStyleComicGrid 以支持响应式
 function PhotoStyleComicGrid({ scenes }: { scenes: SimpleComicScene[] }) {
+  // 按 scene_order 排序场景
+  const sortedScenes = [...scenes].sort(
+    (a, b) => a.scene_order - b.scene_order
+  );
+
   return (
     <div className="bg-gradient-to-br from-amber-100/50 via-yellow-100/30 to-orange-100/50 rounded-2xl p-4 sm:p-8 min-h-[300px] sm:min-h-[500px] relative shadow-lg border border-amber-200/50">
       {/* 背景装饰 */}
@@ -297,7 +370,7 @@ function PhotoStyleComicGrid({ scenes }: { scenes: SimpleComicScene[] }) {
         {/* 移动端：简单的网格布局 */}
         <div className="block">
           <div className="grid grid-cols-2 gap-4">
-            {scenes.map((scene, index) => (
+            {sortedScenes.map((scene, index) => (
               <MobilePhotoCard key={scene.id} scene={scene} index={index} />
             ))}
           </div>

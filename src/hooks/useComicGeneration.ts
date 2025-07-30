@@ -3,7 +3,11 @@
 import { useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase/client";
-import { ComicGenerationProgress, ComicGenerationResult } from "@/types/diary";
+import {
+  ComicGenerationProgress,
+  ComicGenerationResult,
+  ComicFormat,
+} from "@/types/diary";
 
 export interface ComicGenerationState {
   isGenerating: boolean;
@@ -20,6 +24,7 @@ export interface ComicGenerationOptions {
   diary_content: string;
   characters: Array<{ id: string; name: string; avatar_url: string }>;
   style?: "cute" | "realistic" | "minimal" | "kawaii";
+  format?: ComicFormat; // 只保留format，不传layout_mode到后端
 }
 
 export function useComicGeneration() {
@@ -35,6 +40,9 @@ export function useComicGeneration() {
 
   const generateComic = useCallback(
     async (options: ComicGenerationOptions) => {
+      // 根据格式设置场景数量
+      const scenesCount = options.format === "single" ? 1 : 4;
+
       setState((prev) => ({
         ...prev,
         isGenerating: true,
@@ -43,6 +51,7 @@ export function useComicGeneration() {
         message: "开始生成漫画...",
         result: undefined,
         error: undefined,
+        totalScenes: scenesCount, // 动态设置总场景数
       }));
 
       try {

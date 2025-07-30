@@ -10,6 +10,7 @@ import WorkshopHeader, { createBackAction } from "./WorkshopHeader";
 import { useCharacters, useDeleteCharacter } from "@/hooks/useCharacters";
 import { useComicGeneration } from "@/hooks/useComicGeneration";
 import { Character } from "@/types/characters";
+import { ComicFormat, LayoutMode } from "@/types/diary";
 
 export default function ComicGeneration() {
   const router = useRouter();
@@ -33,6 +34,9 @@ export default function ComicGeneration() {
   const [selectedStyle] = useState<"cute" | "realistic" | "minimal" | "kawaii">(
     "cute"
   );
+  // 新增状态
+  const [comicFormat, setComicFormat] = useState<ComicFormat>("four");
+  const [layoutMode, setLayoutMode] = useState<LayoutMode>("grid-2x2");
 
   useEffect(() => {
     setMounted(true);
@@ -74,6 +78,7 @@ export default function ComicGeneration() {
         diary_content: storyText,
         characters: characterData,
         style: selectedStyle,
+        format: comicFormat, // 只传format，不传layout_mode
       });
     } catch (error) {
       console.error("生成漫画失败:", error);
@@ -168,6 +173,10 @@ export default function ComicGeneration() {
               scenes={result?.scenes}
               error={error}
               onRetryScene={handleRetryScene}
+              format={comicFormat}
+              onFormatChange={setComicFormat}
+              layoutMode={layoutMode}
+              onLayoutModeChange={setLayoutMode} // 保留，只用于前端显示控制
             />
           </div>
         </div>

@@ -6,6 +6,8 @@ import {
   ComicScene,
   SceneDescription,
   SceneCharacter,
+  ComicFormat,
+  LayoutMode,
 } from "@/types/diary";
 
 export class ComicDatabaseService {
@@ -33,13 +35,18 @@ export class ComicDatabaseService {
   /**
    * 创建日记记录
    */
-  async createDiary(userId: string, content: string): Promise<Diary> {
+  async createDiary(
+    userId: string,
+    content: string,
+    title?: string
+  ): Promise<Diary> {
     const { data: diary, error } = await supabaseAdmin
       .from("diary")
       .insert([
         {
           user_id: userId,
           content: content,
+          title: title,
           status: "processing",
         },
       ])
@@ -61,6 +68,8 @@ export class ComicDatabaseService {
     diaryId: string,
     userId: string,
     style: string,
+    format: ComicFormat = "four", // 新增参数
+    layoutMode?: LayoutMode, // 新增参数
     title?: string
   ): Promise<Comic> {
     const { data: comic, error } = await supabaseAdmin
@@ -71,6 +80,8 @@ export class ComicDatabaseService {
           user_id: userId,
           title: title || `漫画 - ${new Date().toLocaleDateString()}`,
           style: style,
+          format: format, // 新增字段
+          layout_mode: layoutMode, // 新增字段
           status: "processing",
         },
       ])

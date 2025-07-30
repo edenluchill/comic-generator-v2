@@ -1,38 +1,15 @@
-import { Eye, Trash2 } from "lucide-react";
+import { Eye } from "lucide-react";
 import { DiaryWithComics } from "@/hooks/useDiaries";
 import { formatDate, getStatusColor, getStatusText } from "@/lib/diary-utils";
 import Image from "next/image";
-import { useState } from "react";
 
 interface DiaryCardProps {
   diary: DiaryWithComics;
   onClick: () => void;
-  onDelete?: (diaryId: string) => void;
 }
 
-export default function DiaryCard({
-  diary,
-  onClick,
-  onDelete,
-}: DiaryCardProps) {
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+export default function DiaryCard({ diary, onClick }: DiaryCardProps) {
   const firstComic = diary.comics?.[0];
-
-  const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // 防止触发卡片点击事件
-    setShowDeleteConfirm(true);
-  };
-
-  const handleConfirmDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDelete?.(diary.id);
-    setShowDeleteConfirm(false);
-  };
-
-  const handleCancelDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowDeleteConfirm(false);
-  };
 
   return (
     <div
@@ -70,38 +47,6 @@ export default function DiaryCard({
           marginRight: "16px",
         }}
       />
-
-      {/* 删除按钮 */}
-      {onDelete && (
-        <div className="absolute top-2 left-2 z-10">
-          {!showDeleteConfirm ? (
-            <button
-              onClick={handleDeleteClick}
-              className="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-              title="删除日记"
-            >
-              <Trash2 className="w-3 h-3" />
-            </button>
-          ) : (
-            <div className="flex gap-1">
-              <button
-                onClick={handleConfirmDelete}
-                className="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs font-bold"
-                title="确认删除"
-              >
-                ✓
-              </button>
-              <button
-                onClick={handleCancelDelete}
-                className="w-6 h-6 bg-gray-500 hover:bg-gray-600 text-white rounded-full flex items-center justify-center text-xs font-bold"
-                title="取消删除"
-              >
-                ✕
-              </button>
-            </div>
-          )}
-        </div>
-      )}
 
       <div
         className="p-4 h-full flex flex-col relative"

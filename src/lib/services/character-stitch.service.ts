@@ -3,9 +3,9 @@ import { Sharp } from "sharp";
 
 export interface StitchOptions {
   characters: SceneCharacter[];
-  spacing: number;
-  backgroundColor: string;
-  direction: "horizontal" | "vertical";
+  spacing?: number;
+  backgroundColor?: string;
+  direction?: "horizontal" | "vertical";
 }
 
 export interface StitchResult {

@@ -153,6 +153,8 @@ export class FluxCharacterGenerator {
         safety_tolerance: options?.safetyTolerance || 2,
         webhook_url: options?.webhookUrl,
         webhook_secret: options?.webhookSecret,
+        width: options?.width,
+        height: options?.height,
       };
 
       const response: AxiosResponse<FluxAPIResponse> = await axios.post(

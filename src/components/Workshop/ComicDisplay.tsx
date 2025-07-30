@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import { ImageIcon, Download, RefreshCw, Edit, Check, X } from "lucide-react";
-import { ComicScene } from "@/types/diary";
+import { ImageIcon, Download, RefreshCw } from "lucide-react";
+import { ComicScene, ComicFormat, LayoutMode } from "@/types/diary";
 import { ProgressSpinner } from "../ui/loading";
+import { COMIC_DISPLAY_STYLES } from "@/lib/styles/comic-display.styles";
+import FormatPicker from "./ComicDisplay/FormatPicker";
+import ComicSceneComponent from "./ComicDisplay/ComicScene";
+// import LayoutPicker from "./ComicDisplay/LayoutPicker";
 
 interface ComicDisplayProps {
   isGenerating: boolean;
@@ -17,41 +19,11 @@ interface ComicDisplayProps {
   scenes?: ComicScene[];
   error?: string;
   onRetryScene?: (sceneId: string, newDescription: string) => Promise<void>;
+  format: ComicFormat;
+  onFormatChange: (format: ComicFormat) => void;
+  layoutMode: LayoutMode;
+  onLayoutModeChange: (mode: LayoutMode) => void;
 }
-
-// 样式常量
-const STYLES = {
-  container: "bg-white rounded-2xl shadow-lg p-6 h-full flex flex-col",
-  header: "flex items-center gap-3 mb-6",
-  title: "text-xl font-bold text-gray-800",
-  centerContent: "flex-1 flex items-center justify-center",
-
-  // 漫画相关样式
-  comicContainer: "w-full max-w-2xl mx-auto",
-  comicBook:
-    "bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 p-8 rounded-lg shadow-2xl border border-amber-200 relative overflow-hidden",
-  comicGrid: "grid grid-cols-2 gap-6 mb-6 relative z-10",
-
-  // 场景相关样式
-  sceneContainer: "relative group",
-  scenePanel:
-    "aspect-square bg-white border-4 border-amber-200 rounded-sm overflow-hidden relative shadow-lg flex items-center justify-center",
-  sceneImage: "max-w-full max-h-full object-contain",
-  sceneNumber:
-    "absolute top-2 left-2 bg-amber-100 border-2 border-amber-300 rounded-full w-8 h-8 flex items-center justify-center",
-
-  // 按钮样式
-  generateButton:
-    "w-full py-3 px-4 rounded-xl font-medium transition-all duration-300 flex items-center justify-center gap-2",
-  downloadButton:
-    "flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all duration-200 shadow-lg border-2 border-blue-700 transform hover:scale-105",
-
-  // 编辑相关样式
-  editOverlay:
-    "absolute inset-0 bg-white border-4 border-amber-200 rounded-sm p-4 shadow-lg z-20",
-  editButton:
-    "absolute top-2 right-2 bg-blue-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-blue-600 disabled:opacity-50 shadow-lg border-2 border-white",
-} as const;
 
 export default function ComicDisplay({
   isGenerating,
@@ -64,37 +36,10 @@ export default function ComicDisplay({
   scenes,
   error,
   onRetryScene,
+  format,
+  onFormatChange,
+  layoutMode,
 }: ComicDisplayProps) {
-  const [editingSceneId, setEditingSceneId] = useState<string | null>(null);
-  const [editedDescription, setEditedDescription] = useState("");
-  const [retryingSceneId, setRetryingSceneId] = useState<string | null>(null);
-
-  // 事件处理函数
-  const handleEditScene = (scene: ComicScene) => {
-    setEditingSceneId(scene.id);
-    setEditedDescription(scene.scenario_description || "");
-  };
-
-  const handleCancelEdit = () => {
-    setEditingSceneId(null);
-    setEditedDescription("");
-  };
-
-  const handleConfirmRetry = async (sceneId: string) => {
-    if (!onRetryScene) return;
-
-    try {
-      setRetryingSceneId(sceneId);
-      await onRetryScene(sceneId, editedDescription);
-      setEditingSceneId(null);
-      setEditedDescription("");
-    } catch (error) {
-      console.error("重试场景失败:", error);
-    } finally {
-      setRetryingSceneId(null);
-    }
-  };
-
   // 渲染函数
   const renderErrorState = () => (
     <div className="text-center text-red-600">
@@ -134,123 +79,83 @@ export default function ComicDisplay({
     </div>
   );
 
-  const renderSceneTooltip = (scene: ComicScene) => (
-    <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 -translate-y-full bg-gray-800 text-white px-3 py-2 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-30 whitespace-nowrap max-w-xs">
-      <div className="text-center">
-        <p className="font-medium mb-1">{scene.scenario_description}</p>
-        {scene.mood && (
-          <p className="text-xs text-yellow-300">心情: {scene.mood}</p>
-        )}
-      </div>
-      {/* 小三角箭头 */}
-      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
-    </div>
-  );
+  // 获取场景面板样式
+  const getScenePanelStyle = () => {
+    if (format === "single") return COMIC_DISPLAY_STYLES.scenePanels.single;
+    if (layoutMode === "horizontal-strip")
+      return COMIC_DISPLAY_STYLES.scenePanels.horizontal;
+    if (layoutMode === "comic-book")
+      return COMIC_DISPLAY_STYLES.scenePanels["comic-book"];
+    return COMIC_DISPLAY_STYLES.scenePanels.default;
+  };
 
-  const renderEditOverlay = (scene: ComicScene, index: number) => (
-    <div className={STYLES.editOverlay}>
-      <div className="h-full flex flex-col">
-        <div className="text-center mb-3">
-          <span className="text-sm font-bold text-gray-800">
-            编辑场景 {index + 1}
-          </span>
-        </div>
-        <textarea
-          value={editedDescription}
-          onChange={(e) => setEditedDescription(e.target.value)}
-          className="flex-1 p-2 border-2 border-gray-300 rounded text-sm resize-none focus:border-blue-500 focus:outline-none"
-          placeholder="编辑场景描述..."
-        />
-        <div className="flex gap-2 mt-3">
-          <button
-            onClick={() => handleConfirmRetry(scene.id)}
-            disabled={retryingSceneId === scene.id}
-            className="flex items-center gap-1 px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 disabled:opacity-50 border-2 border-green-600"
-          >
-            <Check className="w-3 h-3" />
-            重试
-          </button>
-          <button
-            onClick={handleCancelEdit}
-            className="flex items-center gap-1 px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600 border-2 border-gray-600"
-          >
-            <X className="w-3 h-3" />
-            取消
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  // 根据格式和布局渲染漫画
+  const renderComicGrid = () => {
+    if (!scenes || scenes.length === 0) return null;
 
-  const renderScene = (scene: ComicScene, index: number) => (
-    <div key={scene.id} className={STYLES.sceneContainer}>
-      {/* 漫画格子 */}
-      <div className={STYLES.scenePanel}>
-        {/* 场景内容 */}
-        {scene.image_url ? (
-          <Image
-            src={scene.image_url}
-            alt={`场景 ${index + 1}`}
-            className={STYLES.sceneImage}
-            width={300}
-            height={300}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-50">
-            <ImageIcon className="w-12 h-12 text-gray-400" />
+    // 单格漫画 (海报模式) - 优化尺寸和下载按钮
+    if (format === "single") {
+      return (
+        <div className={COMIC_DISPLAY_STYLES.posterContainer}>
+          <div className={COMIC_DISPLAY_STYLES.comicBook}>
+            {/* 纸质纹理效果 */}
+            <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-transparent via-amber-100 to-transparent"></div>
+
+            {/* 浮动下载按钮 */}
+            <button className={COMIC_DISPLAY_STYLES.downloadButton}>
+              <Download className="w-4 h-4" />
+              <span className="text-sm font-medium">下载</span>
+            </button>
+
+            {/* 海报内容 */}
+            <div className="flex justify-center items-center min-h-[400px] relative z-10">
+              <ComicSceneComponent
+                scene={scenes[0]}
+                index={0}
+                panelStyle={getScenePanelStyle()}
+                onRetryScene={onRetryScene}
+              />
+            </div>
           </div>
-        )}
-
-        {/* 场景序号 */}
-        {/* <div className={STYLES.sceneNumber}>
-          <span className="text-sm font-bold text-brown-700">{index + 1}</span>
-        </div> */}
-
-        {/* 改进的Tooltip显示描述 */}
-        {scene.scenario_description && renderSceneTooltip(scene)}
-
-        {/* 重试按钮 */}
-        {onRetryScene && (
-          <button
-            onClick={() => handleEditScene(scene)}
-            disabled={retryingSceneId === scene.id}
-            className={STYLES.editButton}
-          >
-            {retryingSceneId === scene.id ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <Edit className="w-4 h-4" />
-            )}
-          </button>
-        )}
-      </div>
-
-      {/* 编辑模式 */}
-      {editingSceneId === scene.id && renderEditOverlay(scene, index)}
-    </div>
-  );
-
-  const renderComicGrid = () => (
-    <div className={STYLES.comicContainer}>
-      <div className={STYLES.comicBook}>
-        {/* 纸质纹理效果 */}
-        <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-transparent via-amber-100 to-transparent"></div>
-
-        {/* 四格漫画网格 */}
-        <div className={STYLES.comicGrid}>
-          {scenes?.map((scene, index) => renderScene(scene, index))}
         </div>
+      );
+    }
 
-        {/* 下载按钮 */}
-        <div className="flex justify-center relative z-10">
-          <button className={STYLES.downloadButton}>
-            <Download className="w-5 h-5" />
-            下载漫画
+    // 四格漫画
+    const gridClass =
+      COMIC_DISPLAY_STYLES.comicGrids[layoutMode] ||
+      COMIC_DISPLAY_STYLES.comicGrids["grid-2x2"];
+
+    return (
+      <div className={COMIC_DISPLAY_STYLES.comicContainer}>
+        <div className={COMIC_DISPLAY_STYLES.comicBook}>
+          {/* 纸质纹理效果 */}
+          <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-transparent via-amber-100 to-transparent"></div>
+
+          {/* 浮动下载按钮 */}
+          <button className={COMIC_DISPLAY_STYLES.downloadButton}>
+            <Download className="w-4 h-4" />
+            <span className="text-sm font-medium">下载</span>
           </button>
+
+          {/* 漫画网格 */}
+          <div className={gridClass}>
+            {scenes?.map((scene, index) => (
+              <ComicSceneComponent
+                key={scene.id}
+                scene={scene}
+                index={index}
+                panelStyle={getScenePanelStyle()}
+                onRetryScene={onRetryScene}
+              />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
+
+  // ... existing code ...
 
   const renderMainContent = () => {
     if (error) return renderErrorState();
@@ -260,7 +165,7 @@ export default function ComicDisplay({
   };
 
   const getGenerateButtonStyles = () => {
-    const baseStyles = STYLES.generateButton;
+    const baseStyles = COMIC_DISPLAY_STYLES.generateButton;
     const disabledStyles = "bg-gray-200 text-gray-500 cursor-not-allowed";
     const activeStyles =
       "bg-gradient-to-r from-purple-500 via-pink-500 to-indigo-500 text-white hover:from-purple-600 hover:via-pink-600 hover:to-indigo-600 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5";
@@ -270,30 +175,76 @@ export default function ComicDisplay({
     }`;
   };
 
+  // 获取动态标题
+  const getTitle = () => {
+    if (format === "single") return "海报";
+    return "四格漫画";
+  };
+
+  // 获取动态按钮文本
+  const getButtonText = () => {
+    if (isGenerating) return "生成中...";
+    if (format === "single") return "生成海报";
+    return "生成四格漫画";
+  };
+
+  // 点击外部关闭dropdown
+  const handleClickOutside = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    // The dropdowns are now self-contained, so no need to close here
+  };
+
   return (
-    <div className={STYLES.container}>
-      {/* 标题 */}
-      <div className={STYLES.header}>
-        <ImageIcon className="w-6 h-6 text-purple-600" />
-        <h3 className={STYLES.title}>四格漫画</h3>
-      </div>
+    <>
+      {/* 点击外部关闭dropdown的遮罩 */}
+      {
+        /* showFormatDropdown || showLayoutDropdown */ false && (
+          <div className="fixed inset-0 z-40" onClick={handleClickOutside} />
+        )
+      }
 
-      {/* 主要内容区域 */}
-      <div className={STYLES.centerContent}>{renderMainContent()}</div>
+      <div className={COMIC_DISPLAY_STYLES.container}>
+        {/* 标题和控制器 */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <ImageIcon className="w-6 h-6 text-purple-600" />
+            <h3 className={COMIC_DISPLAY_STYLES.title}>{getTitle()}</h3>
+          </div>
+          <div className="flex items-center gap-3">
+            <FormatPicker
+              format={format}
+              onFormatChange={onFormatChange}
+              disabled={isGenerating}
+            />
+            {/* {format === "four" && (
+              <LayoutPicker
+                layoutMode={layoutMode}
+                onLayoutModeChange={onLayoutModeChange}
+                disabled={isGenerating}
+              />
+            )} */}
+          </div>
+        </div>
 
-      {/* 生成按钮 */}
-      <div className="mt-6">
-        <button
-          onClick={onGenerate}
-          disabled={!canGenerate || isGenerating}
-          className={getGenerateButtonStyles()}
-        >
-          <RefreshCw
-            className={`w-5 h-5 ${isGenerating ? "animate-spin" : ""}`}
-          />
-          {isGenerating ? "生成中..." : "生成四格漫画"}
-        </button>
+        {/* 主要内容区域 */}
+        <div className={COMIC_DISPLAY_STYLES.centerContent}>
+          {renderMainContent()}
+        </div>
+
+        {/* 生成按钮 */}
+        <div className="mt-6">
+          <button
+            onClick={onGenerate}
+            disabled={!canGenerate || isGenerating}
+            className={getGenerateButtonStyles()}
+          >
+            <RefreshCw
+              className={`w-5 h-5 ${isGenerating ? "animate-spin" : ""}`}
+            />
+            {getButtonText()}
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

@@ -17,12 +17,24 @@ export interface CreateDiaryData {
   date?: string;
 }
 
+// 漫画格式类型
+export type ComicFormat = "single" | "four";
+
+// 排版模式类型
+export type LayoutMode =
+  | "grid-2x2"
+  | "vertical-strip"
+  | "horizontal-strip"
+  | "comic-book";
+
 export interface Comic {
   id: string;
   diary_id: string;
   user_id: string;
   title?: string;
   style: "cute" | "realistic" | "minimal" | "kawaii";
+  format: ComicFormat; // 新增
+  layout_mode?: LayoutMode; // 新增，仅四格漫画需要
   status: "pending" | "processing" | "completed" | "failed";
   created_at: string;
   updated_at: string;
@@ -54,6 +66,7 @@ export interface CreateComicData {
   diary_id: string;
   title?: string;
   style?: "cute" | "realistic" | "minimal" | "kawaii";
+  format?: ComicFormat; // 只保留format
   characters: SceneCharacter[]; // 完整的角色信息数组
 }
 
@@ -68,6 +81,7 @@ export interface ComicGenerationRequest extends Record<string, unknown> {
   diary_content: string;
   characters: SceneCharacter[]; // 完整的角色信息数组
   style?: "cute" | "realistic" | "minimal" | "kawaii";
+  format?: ComicFormat; // 只保留format
 }
 
 export interface ComicGenerationProgress {

@@ -20,7 +20,7 @@ export function CharacterWorkshopNavigationBar({
   return (
     <div
       className={`
-        flex items-center justify-between mb-6 p-4 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-amber-200/50
+        flex items-center justify-between mb-6 p-1 bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-amber-200/50
         transition-all duration-1000 
         ${mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}
       `}
@@ -35,7 +35,7 @@ export function CharacterWorkshopNavigationBar({
       </button>
 
       {/* 右侧：角色库信息 */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-0">
         {loading ? (
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-gray-200 animate-pulse" />

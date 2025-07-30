@@ -75,8 +75,6 @@ export default function DiaryList({
           diaries={diaries}
           onViewDiary={handleViewDiary}
           onCreateNewDiary={onCreateNewDiary}
-          onDeleteDiary={handleDeleteDiary}
-          isDeleting={deleteDiaryMutation.isPending}
         />
       </div>
 
@@ -84,7 +82,11 @@ export default function DiaryList({
       {selectedDiary &&
         typeof document !== "undefined" &&
         createPortal(
-          <DiaryDetailModal diary={selectedDiary} onClose={handleCloseModal} />,
+          <DiaryDetailModal
+            diary={selectedDiary}
+            onClose={handleCloseModal}
+            onDelete={handleDeleteDiary} // 添加删除回调
+          />,
           document.body
         )}
     </>
@@ -126,14 +128,10 @@ function DiaryGrid({
   diaries,
   onViewDiary,
   onCreateNewDiary,
-  onDeleteDiary,
-  isDeleting,
 }: {
   diaries: DiaryWithComics[];
   onViewDiary: (diary: DiaryWithComics) => void;
   onCreateNewDiary: () => void;
-  onDeleteDiary: (diaryId: string) => void;
-  isDeleting: boolean;
 }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -143,7 +141,7 @@ function DiaryGrid({
           key={diary.id}
           diary={diary}
           onClick={() => onViewDiary(diary)}
-          onDelete={!isDeleting ? onDeleteDiary : undefined}
+          // 移除 onDelete prop
         />
       ))}
 

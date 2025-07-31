@@ -12,6 +12,42 @@ import { useComicGeneration } from "@/hooks/useComicGeneration";
 import { Character } from "@/types/characters";
 import { ComicFormat, LayoutMode } from "@/types/diary";
 
+// localStorage 键名常量
+const COMIC_FORMAT_STORAGE_KEY = "comic-generator-format-preference";
+
+// 从 localStorage 读取格式偏好
+const getStoredFormat = (): ComicFormat => {
+  if (typeof window === "undefined") return "four"; // SSR 安全
+
+  try {
+    const stored = localStorage.getItem(COMIC_FORMAT_STORAGE_KEY);
+    if (stored && (stored === "single" || stored === "four")) {
+      return stored as ComicFormat;
+    }
+  } catch (error) {
+    console.warn(
+      "Failed to read comic format preference from localStorage:",
+      error
+    );
+  }
+
+  return "four"; // 默认值
+};
+
+// 保存格式偏好到 localStorage
+const saveFormatPreference = (format: ComicFormat) => {
+  if (typeof window === "undefined") return;
+
+  try {
+    localStorage.setItem(COMIC_FORMAT_STORAGE_KEY, format);
+  } catch (error) {
+    console.warn(
+      "Failed to save comic format preference to localStorage:",
+      error
+    );
+  }
+};
+
 export default function ComicGeneration() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -34,13 +70,24 @@ export default function ComicGeneration() {
   const [selectedStyle] = useState<"cute" | "realistic" | "minimal" | "kawaii">(
     "cute"
   );
-  // 新增状态
-  const [comicFormat, setComicFormat] = useState<ComicFormat>("four");
+
+  // 修改状态初始化 - 从 localStorage 读取上次选择
+  const [comicFormat, setComicFormat] = useState<ComicFormat>(() => {
+    return getStoredFormat();
+  });
   const [layoutMode, setLayoutMode] = useState<LayoutMode>("grid-2x2");
 
   useEffect(() => {
     setMounted(true);
+    // 组件挂载后，确保状态与 localStorage 同步
+    setComicFormat(getStoredFormat());
   }, []);
+
+  // 处理格式变更的函数
+  const handleFormatChange = (newFormat: ComicFormat) => {
+    setComicFormat(newFormat);
+    saveFormatPreference(newFormat);
+  };
 
   const handleBackToWorkshop = () => {
     const newSearchParams = new URLSearchParams(searchParams);
@@ -174,9 +221,9 @@ export default function ComicGeneration() {
               error={error}
               onRetryScene={handleRetryScene}
               format={comicFormat}
-              onFormatChange={setComicFormat}
+              onFormatChange={handleFormatChange} // 使用新的处理函数
               layoutMode={layoutMode}
-              onLayoutModeChange={setLayoutMode} // 保留，只用于前端显示控制
+              onLayoutModeChange={setLayoutMode}
             />
           </div>
         </div>

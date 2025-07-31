@@ -353,13 +353,32 @@ function ComicSection({ comic }: { comic: DiaryComic | null }) {
   );
 }
 
-// 重写 PhotoStyleComicGrid 以支持响应式
+// 重写 PhotoStyleComicGrid 以支持响应式和海报模式
 function PhotoStyleComicGrid({ scenes }: { scenes: SimpleComicScene[] }) {
   // 按 scene_order 排序场景
   const sortedScenes = [...scenes].sort(
     (a, b) => a.scene_order - b.scene_order
   );
 
+  // 判断是否为海报模式（只有一个场景）
+  const isPosterMode = sortedScenes.length === 1;
+
+  if (isPosterMode) {
+    // 海报模式：单个大图居中显示
+    return (
+      <div className="bg-gradient-to-br from-amber-100/50 via-yellow-100/30 to-orange-100/50 rounded-2xl p-4 sm:p-8 relative shadow-lg border border-amber-200/50">
+        {/* 背景装饰 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-amber-50/30 to-transparent rounded-2xl"></div>
+
+        {/* 海报居中显示 - 移除固定高度，让内容决定高度 */}
+        <div className="relative w-full flex items-center justify-center">
+          <PosterCard scene={sortedScenes[0]} />
+        </div>
+      </div>
+    );
+  }
+
+  // 多场景模式：网格布局
   return (
     <div className="bg-gradient-to-br from-amber-100/50 via-yellow-100/30 to-orange-100/50 rounded-2xl p-4 sm:p-8 min-h-[300px] sm:min-h-[500px] relative shadow-lg border border-amber-200/50">
       {/* 背景装饰 */}
@@ -367,7 +386,6 @@ function PhotoStyleComicGrid({ scenes }: { scenes: SimpleComicScene[] }) {
 
       {/* 响应式照片网格 */}
       <div className="relative w-full h-full">
-        {/* 移动端：简单的网格布局 */}
         <div className="block">
           <div className="grid grid-cols-2 gap-4">
             {sortedScenes.map((scene, index) => (
@@ -376,6 +394,46 @@ function PhotoStyleComicGrid({ scenes }: { scenes: SimpleComicScene[] }) {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// 新增：海报卡片组件
+function PosterCard({ scene }: { scene: SimpleComicScene }) {
+  return (
+    <div className="transform transition-all duration-300 hover:scale-105 relative max-w-md w-full">
+      <div className="relative bg-white rounded-xl shadow-2xl border-4 border-white overflow-hidden">
+        {/* 胶带效果 - 顶部 */}
+        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 w-12 h-6 bg-yellow-200/80 rounded-sm shadow-lg border border-yellow-300/60 z-10 rotate-1"></div>
+
+        {scene.image_url ? (
+          <div className="relative">
+            <Image
+              src={scene.image_url}
+              alt="海报回忆"
+              className="w-full h-auto object-cover"
+              width={512}
+              height={384}
+              style={{ aspectRatio: "4/3" }} // 海报比例
+            />
+
+            {/* 图片上的光泽效果 */}
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-transparent pointer-events-none"></div>
+          </div>
+        ) : (
+          <div className="w-full aspect-[4/3] flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+            <div className="text-center text-gray-400">
+              <div className="w-16 h-16 bg-gray-300 rounded-lg mx-auto mb-3 flex items-center justify-center">
+                <Sparkles className="w-8 h-8 text-gray-400" />
+              </div>
+              <p className="text-lg font-medium">海报生成中...</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* 底部阴影 */}
+      <div className="absolute -bottom-2 left-2 right-2 h-4 bg-black/20 blur-md rounded-full"></div>
     </div>
   );
 }

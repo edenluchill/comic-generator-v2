@@ -49,7 +49,7 @@ export default function WorkshopOverview() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 relative">
+    <div className="min-h-screen pb-8 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 relative">
       {/* 背景装饰 */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-10 left-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-amber-400/10 to-orange-400/10 rounded-full blur-3xl animate-pulse" />

@@ -8,13 +8,13 @@ export default function CreateDiaryCard({ onClick }: CreateDiaryCardProps) {
   return (
     <div
       onClick={onClick}
-      className="aspect-[4/5] border-2 border-dashed border-amber-300 rounded-lg cursor-pointer transition-all duration-300 hover:border-amber-400 hover:bg-amber-50 group flex flex-col items-center justify-center p-6 bg-gradient-to-br from-amber-25 to-yellow-25"
+      className="aspect-[5/4] border-2 border-dashed border-amber-300 rounded-lg cursor-pointer transition-all duration-300 hover:border-amber-400 hover:bg-amber-50 group flex flex-col items-center justify-center p-6 bg-gradient-to-br from-amber-25 to-yellow-25"
     >
       {/* 主要图标 */}
-      <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center group-hover:bg-amber-200 transition-colors mb-4 relative">
-        <BookOpen className="w-8 h-8 text-amber-600" />
-        <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-amber-300 rounded-full flex items-center justify-center group-hover:bg-amber-400 transition-colors">
-          <Plus className="w-4 h-4 text-white" />
+      <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center group-hover:bg-amber-200 transition-colors mb-3 relative">
+        <BookOpen className="w-6 h-6 text-amber-600" />
+        <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-amber-300 rounded-full flex items-center justify-center group-hover:bg-amber-400 transition-colors">
+          <Plus className="w-3 h-3 text-white" />
         </div>
       </div>
 

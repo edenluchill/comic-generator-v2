@@ -134,17 +134,15 @@ function DiaryGrid({
   onCreateNewDiary: () => void;
 }) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
       {/* 日记卡片 */}
       {diaries.map((diary) => (
         <DiaryCard
           key={diary.id}
           diary={diary}
           onClick={() => onViewDiary(diary)}
-          // 移除 onDelete prop
         />
       ))}
-
       {/* 创建新日记按钮 */}
       <CreateDiaryCard onClick={onCreateNewDiary} />
     </div>

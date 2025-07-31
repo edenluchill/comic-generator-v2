@@ -127,7 +127,7 @@ export default function CharacterCreationWorkshop() {
   }, [searchParams, navigate]);
 
   const handleBackToDashboard = useCallback(() => {
-    navigate("/");
+    navigate("/workshop");
   }, [navigate]);
 
   const canGenerate = uploadedFile && !isProcessing;

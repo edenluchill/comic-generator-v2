@@ -40,7 +40,7 @@ export default function MobileNavigationBar() {
 
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
-      <div className="bg-white/90 backdrop-blur-md border-t border-gray-100">
+      <div className="bg-white/150 backdrop-blur-md border-t border-gray-100">
         <div className="flex items-center justify-around px-4 py-2 safe-area-inset-bottom">
           {/* 首页 */}
           <Link href={getLocalizedHref("/")} className="flex-1">

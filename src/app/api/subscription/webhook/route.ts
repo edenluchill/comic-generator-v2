@@ -27,24 +27,24 @@ export async function POST(request: NextRequest) {
     const signature = request.headers.get("stripe-signature")!;
 
     // 🔧 添加调试信息
-    console.log("=== Webhook Debug Info ===");
-    console.log("Webhook secret configured:", !!webhookSecret);
-    console.log("Webhook secret length:", webhookSecret?.length || 0);
-    console.log(
+    console.warn("=== Webhook Debug Info ===");
+    console.warn("Webhook secret configured:", !!webhookSecret);
+    console.warn("Webhook secret length:", webhookSecret?.length || 0);
+    console.warn(
       "Webhook secret prefix:",
       webhookSecret?.substring(0, 10) + "..."
     );
-    console.log("Signature header:", signature);
-    console.log("Body length:", body.length);
-    console.log("Body preview:", body.substring(0, 100) + "...");
+    console.warn("Signature header:", signature);
+    console.warn("Body length:", body.length);
+    console.warn("Body preview:", body.substring(0, 100) + "...");
 
     let event: Stripe.Event;
 
     try {
       event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-      console.log("✅ Webhook signature verification SUCCESS");
-      console.log("Event type:", event.type);
-      console.log("Event ID:", event.id);
+      console.warn("✅ Webhook signature verification SUCCESS");
+      console.warn("Event type:", event.type);
+      console.warn("Event ID:", event.id);
     } catch (err) {
       console.error("❌ Webhook signature verification FAILED:");
       console.error("Error message:", (err as Error).message);
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case "checkout.session.completed": {
         const session = event.data.object as Stripe.Checkout.Session;
-        console.log(
+        console.warn(
           "Processing checkout.session.completed for session:",
           session.id
         );
@@ -90,18 +90,18 @@ export async function POST(request: NextRequest) {
 
       case "customer.subscription.created": {
         const subscription = event.data.object as ExtendedSubscription;
-        console.log(
+        console.warn(
           "Processing customer.subscription.created for subscription:",
           subscription.id
         );
-        console.log("Subscription metadata:", subscription.metadata);
+        console.warn("Subscription metadata:", subscription.metadata);
         await handleSubscriptionCreated(subscription);
         break;
       }
 
       case "customer.subscription.updated": {
         const subscription = event.data.object as ExtendedSubscription;
-        console.log(
+        console.warn(
           "Processing customer.subscription.updated for subscription:",
           subscription.id
         );
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
 
       case "customer.subscription.deleted": {
         const subscription = event.data.object as ExtendedSubscription;
-        console.log(
+        console.warn(
           "Processing customer.subscription.deleted for subscription:",
           subscription.id
         );
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
 
       case "invoice.payment_succeeded": {
         const invoice = event.data.object as ExtendedInvoice;
-        console.log(
+        console.warn(
           "Processing invoice.payment_succeeded for invoice:",
           invoice.id
         );
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
 
       case "invoice.payment_failed": {
         const invoice = event.data.object as ExtendedInvoice;
-        console.log(
+        console.warn(
           "Processing invoice.payment_failed for invoice:",
           invoice.id
         );
@@ -140,10 +140,10 @@ export async function POST(request: NextRequest) {
       }
 
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        console.warn(`Unhandled event type: ${event.type}`);
     }
 
-    console.log("✅ Webhook processed successfully");
+    console.warn("✅ Webhook processed successfully");
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error("❌ Webhook processing error:", error);
@@ -167,7 +167,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
     // 如果是订阅模式，订阅创建事件会处理升级
     if (session.mode === "subscription") {
-      console.log(`Subscription checkout completed for user ${userId}`);
+      console.warn(`Subscription checkout completed for user ${userId}`);
       return;
     }
 
@@ -193,7 +193,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           );
 
           if (result.success) {
-            console.log(
+            console.warn(
               `User ${userId} purchased ${creditsAmount} credits successfully`
             );
           } else {
@@ -236,7 +236,7 @@ async function handleSubscriptionCreated(subscription: ExtendedSubscription) {
     );
 
     if (success) {
-      console.log(`User ${userId} upgraded to premium subscription`);
+      console.warn(`User ${userId} upgraded to premium subscription`);
     } else {
       console.error(`Failed to upgrade user ${userId} to premium`);
     }
@@ -271,7 +271,7 @@ async function handleSubscriptionUpdated(subscription: ExtendedSubscription) {
       expiresAt
     );
 
-    console.log(`User ${userId} subscription updated: ${subscription.status}`);
+    console.warn(`User ${userId} subscription updated: ${subscription.status}`);
   } catch (error) {
     console.error("Handle subscription updated error:", error);
   }
@@ -297,7 +297,7 @@ async function handleSubscriptionDeleted(subscription: ExtendedSubscription) {
       subscription.customer as string
     );
 
-    console.log(`User ${userId} subscription canceled`);
+    console.warn(`User ${userId} subscription canceled`);
   } catch (error) {
     console.error("Handle subscription deleted error:", error);
   }
@@ -340,7 +340,7 @@ async function handlePaymentSucceeded(invoice: ExtendedInvoice) {
       expiresAt
     );
 
-    console.log(`User ${userId} subscription renewed successfully`);
+    console.warn(`User ${userId} subscription renewed successfully`);
   } catch (error) {
     console.error("Handle payment succeeded error:", error);
   }
@@ -370,7 +370,7 @@ async function handlePaymentFailed(invoice: ExtendedInvoice) {
       return;
     }
 
-    console.log(
+    console.warn(
       `Payment failed for user ${userId}, subscription ${subscription.id}`
     );
 

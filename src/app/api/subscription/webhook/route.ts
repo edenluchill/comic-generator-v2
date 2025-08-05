@@ -23,11 +23,13 @@ const webhookSecret =
 
 export async function POST(request: NextRequest) {
   try {
+    // 🔧 添加调试信息
+    console.log("=== Webhook Debug Info ===");
+    console.log("Webhook secret configured:", !!webhookSecret);
+
     const body = await request.text();
     const signature = request.headers.get("stripe-signature")!;
 
-    // 🔧 添加调试信息
-    console.warn("=== Webhook Debug Info ===");
     console.warn("Webhook secret configured:", !!webhookSecret);
     console.warn("Webhook secret length:", webhookSecret?.length || 0);
     console.warn(

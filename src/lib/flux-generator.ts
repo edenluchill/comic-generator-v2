@@ -121,6 +121,18 @@ export class FluxCharacterGenerator {
   }
 
   /**
+   * 第一步：将原图转换成卡通角色正面头像
+   */
+  async generateCartoonAvatar(
+    inputImage: string,
+    tags?: string[],
+    options?: Partial<FluxGenerationOptions>
+  ): Promise<FluxGenerationResult> {
+    const prompt = this.generateCartoonAvatarPrompt(tags);
+    return this.imageEdit(inputImage, prompt, options);
+  }
+
+  /**
    * 生成3视图角色的提示词
    */
   private generateThreeViewPrompt(originalPrompt?: string): string {
@@ -199,19 +211,6 @@ export class FluxCharacterGenerator {
       );
     }
   }
-
-  /**
-   * 第一步：将原图转换成卡通角色正面头像
-   */
-  async generateCartoonAvatar(
-    inputImage: string,
-    tags?: string[],
-    options?: Partial<FluxGenerationOptions>
-  ): Promise<FluxGenerationResult> {
-    const prompt = this.generateCartoonAvatarPrompt(tags);
-    return this.imageEdit(inputImage, prompt, options);
-  }
-
   /**
    * 第二步：将卡通头像转换成3视图全身图
    */

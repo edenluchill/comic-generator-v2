@@ -234,23 +234,23 @@ export default function CharacterCreationWorkshop() {
                   现在可以使用 {characters.length} 个角色来创作你的专属漫画了
                 </div>
 
-                {/* 添加更多角色按钮 */}
-                <div className="flex items-center justify-center gap-4">
+                {/* 调整次要按钮样式，降低视觉权重 */}
+                <div className="flex items-center justify-center gap-3 mt-8">
                   <button
                     onClick={handleAddNewCharacter}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-amber-200 text-amber-600 rounded-xl hover:bg-amber-50 hover:border-amber-300 transition-all duration-200 text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-transparent border border-gray-300 text-gray-500 rounded-lg hover:bg-gray-50 hover:text-gray-600 transition-all duration-200 text-xs font-normal"
                   >
-                    <User className="w-4 h-4" />
+                    <User className="w-3 h-3" />
                     添加更多角色
                   </button>
 
-                  <div className="text-gray-300">|</div>
+                  <div className="text-gray-300 text-xs">|</div>
 
                   <button
                     onClick={() => setIsDrawerOpen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-transparent border border-gray-300 text-gray-500 rounded-lg hover:bg-gray-50 hover:text-gray-600 transition-all duration-200 text-xs font-normal"
                   >
-                    <Users className="w-4 h-4" />
+                    <Users className="w-3 h-3" />
                     查看角色库
                   </button>
                 </div>

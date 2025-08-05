@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, X, Edit3, Save, Check } from "lucide-react";
+import { Eye, X, Save, Check } from "lucide-react";
 import { FluxGenerationResult } from "@/types/flux";
 import Image from "next/image";
 import { ProgressSpinner } from "../ui/loading";
@@ -28,13 +28,11 @@ export default function AvatarDisplaySection({
   isSaved = false,
 }: AvatarDisplaySectionProps) {
   const [showThreeViewModal, setShowThreeViewModal] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
   const [characterName, setCharacterName] = useState("");
 
   const handleSaveCharacter = () => {
     if (characterName.trim() && onSaveCharacter) {
       onSaveCharacter(characterName.trim());
-      setIsEditingName(false);
     }
   };
 
@@ -42,7 +40,6 @@ export default function AvatarDisplaySection({
     if (e.key === "Enter") {
       handleSaveCharacter();
     } else if (e.key === "Escape") {
-      setIsEditingName(false);
       setCharacterName("");
     }
   };
@@ -101,45 +98,23 @@ export default function AvatarDisplaySection({
               <div className="text-center">
                 <p className="text-sm text-gray-600 mb-2">给角色起个名字</p>
                 <div className="flex items-center gap-2">
-                  {isEditingName ? (
-                    <div className="flex-1 flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={characterName}
-                        onChange={(e) => setCharacterName(e.target.value)}
-                        onKeyDown={handleKeyPress}
-                        placeholder="输入角色名字"
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                        autoFocus
-                      />
-                      <button
-                        onClick={handleSaveCharacter}
-                        disabled={!characterName.trim()}
-                        className="p-2 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 text-white rounded-lg transition-colors"
-                        title="保存角色"
-                      >
-                        <Save className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsEditingName(false);
-                          setCharacterName("");
-                        }}
-                        className="p-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg transition-colors"
-                        title="取消"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setIsEditingName(true)}
-                      className="w-full py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all duration-300 flex items-center justify-center gap-2 text-sm font-medium"
-                    >
-                      <Edit3 className="w-4 h-4" />
-                      添加角色名字并保存
-                    </button>
-                  )}
+                  <input
+                    type="text"
+                    value={characterName}
+                    onChange={(e) => setCharacterName(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    placeholder="输入角色名字"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                  <button
+                    onClick={handleSaveCharacter}
+                    disabled={!characterName.trim()}
+                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white rounded-lg transition-colors text-sm font-medium flex items-center gap-1"
+                    title="保存角色"
+                  >
+                    <Save className="w-4 h-4" />
+                    保存
+                  </button>
                 </div>
               </div>
             </div>

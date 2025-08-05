@@ -52,6 +52,9 @@ const Header = memo(function Header() {
 
           {/* 右侧功能区 */}
           <div className="flex items-center gap-1">
+            {/* Premium 升级按钮 */}
+            <PremiumButton />
+
             {/* 桌面端导航链接 - 独立分组 */}
             <nav className="hidden md:flex items-center gap-1 backdrop-blur-sm rounded-lg p-1 border border-amber-200/40 shadow-sm">
               <Link href={getLocalizedHref("/")}>
@@ -99,9 +102,6 @@ const Header = memo(function Header() {
             <div className="flex items-center gap-1.5">
               {/* 语言选择器 */}
               <LanguagePicker />
-
-              {/* Premium 升级按钮 */}
-              <PremiumButton />
 
               {/* 账户菜单 */}
               <div className="hidden md:block">

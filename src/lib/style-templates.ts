@@ -11,84 +11,89 @@ export interface StyleTemplate {
 export const styleTemplates: Record<CharacterStyle, StyleTemplate> = {
   chibi: {
     avatar:
-      "anime style, cute chibi {type} portrait, facing forward, dot eyes, simple smile, soft pastel colors, preserve original hairstyle and clothing, minimal shading, clean background, kawaii, adorable expression, round face, blush cheeks",
+      "cute chibi {type} portrait, facing forward, dot eyes, simple smile, soft pastel colors, preserve original hairstyle and clothing, minimal shading, clean background, kawaii, adorable expression, round face, blush cheeks, Q version style",
     "three-view":
-      "anime style, 3-view character sheet of cute chibi {type}, front side back views, consistent design, dot eyes, simple colors, kawaii style",
+      "cute chibi {type} 3-view character sheet, front side back views, consistent design, dot eyes, simple colors, kawaii style, Q version proportions",
     "full-body":
-      "anime style, cute chibi {type} full body, standing pose, dot eyes, simple smile, kawaii proportions, soft colors",
-    custom: "anime style, cute chibi {type}, kawaii, dot eyes, adorable",
+      "cute chibi {type} full body, standing pose, dot eyes, simple smile, kawaii proportions, soft colors, Q version style",
+    custom: "cute chibi {type}, kawaii, dot eyes, adorable, Q version",
   },
 
   chinese: {
     avatar:
-      "anime style, cute {type} portrait with traditional Chinese elements, facing forward, big kawaii eyes, soft smile, preserve original hairstyle and clothing, pastel colors with gold accents, adorable expression, traditional hair ornaments, gentle features",
+      "traditional Chinese painting style, cute {type} portrait with Chinese elements, facing forward, big kawaii eyes, soft smile, preserve original hairstyle and clothing, ink wash colors with gold accents, adorable expression, traditional hair ornaments, gentle features, Chinese art style",
     "three-view":
-      "anime style, 3-view cute Chinese style {type}, front side back views, kawaii features, traditional elements, soft colors",
+      "traditional Chinese art style, 3-view cute Chinese {type}, front side back views, kawaii features, traditional elements, ink wash colors",
     "full-body":
-      "anime style, cute Chinese style {type} full body, traditional pose, kawaii features, soft colors, adorable expression",
+      "traditional Chinese painting style, cute Chinese {type} full body, traditional pose, kawaii features, soft ink colors, adorable expression",
     custom:
-      "anime style, cute Chinese {type}, kawaii, traditional elements, adorable",
+      "traditional Chinese art style, cute {type}, kawaii, traditional elements, adorable",
   },
 
   labubu: {
     avatar:
-      "anime style, cute Labubu style {type} portrait, facing forward, very round chubby face, huge kawaii eyes with sparkles, tiny mouth, preserve original hairstyle and clothing, soft pastel colors, vinyl toy aesthetic, extremely adorable expression, rounded features",
+      "Pop Mart Labubu toy style, ultra cute round chubby {type} portrait, facing forward, extremely round puffy face, huge sparkling kawaii eyes, tiny dot mouth, preserve original hairstyle and clothing, soft vinyl toy colors, 3D toy aesthetic, maximum adorable expression, balloon-like rounded features, Labubu character design",
     "three-view":
-      "anime style, 3-view Labubu style {type}, front side back views, round chubby design, kawaii features, pastel colors",
+      "Pop Mart Labubu toy style, 3-view ultra round chubby {type}, front side back views, balloon proportions, kawaii toy features, vinyl colors, Labubu design",
     "full-body":
-      "anime style, cute Labubu {type} full body, round proportions, kawaii pose, soft pastel colors, adorable",
-    custom: "anime style, cute Labubu {type}, round chubby, kawaii, adorable",
+      "Pop Mart Labubu toy style, ultra cute round {type} full body, balloon proportions, kawaii pose, soft vinyl colors, maximum adorable, toy character design",
+    custom:
+      "Pop Mart Labubu style, ultra round chubby {type}, kawaii toy, maximum adorable, balloon features",
   },
 
   anime: {
     avatar:
-      "anime style, kawaii {type} portrait, facing forward, large sparkling eyes, cute smile, preserve original hairstyle and clothing, vibrant but soft colors, adorable expression, anime girl/boy features, blush, innocent look",
+      "anime manga style, kawaii {type} portrait, facing forward, large sparkling eyes, cute smile, preserve original hairstyle and clothing, vibrant but soft colors, adorable expression, anime girl/boy features, blush, innocent look, Japanese animation style",
     "three-view":
-      "anime style, 3-view kawaii {type}, front side back views, large eyes, cute features, vibrant colors",
+      "anime manga style, 3-view kawaii {type}, front side back views, large eyes, cute features, vibrant colors, Japanese animation",
     "full-body":
-      "anime style, kawaii {type} full body, cute pose, large eyes, adorable expression, vibrant colors",
-    custom: "anime style, kawaii {type}, large eyes, cute, adorable",
+      "anime manga style, kawaii {type} full body, cute pose, large eyes, adorable expression, vibrant colors, Japanese animation",
+    custom:
+      "anime manga style, kawaii {type}, large eyes, cute, adorable, Japanese animation",
   },
 
   ghibli: {
     avatar:
-      "Studio Ghibli style, cute {type} portrait, facing forward, warm gentle expression, preserve original hairstyle and clothing, soft natural lighting, Miyazaki film character style, innocent kawaii features, warm colors, wholesome atmosphere",
+      "Studio Ghibli film style, cute {type} portrait, facing forward, warm gentle expression, preserve original hairstyle and clothing, soft natural lighting, Miyazaki character design, innocent kawaii features, warm earth tones, wholesome atmosphere, hand-drawn animation style",
     "three-view":
-      "Studio Ghibli style, 3-view cute {type}, front side back views, Miyazaki character design, warm colors",
+      "Studio Ghibli style, 3-view cute {type}, front side back views, Miyazaki character design, warm natural colors, hand-drawn animation",
     "full-body":
-      "Studio Ghibli style, cute {type} full body, Miyazaki film character, warm lighting, innocent expression",
+      "Studio Ghibli style, cute {type} full body, Miyazaki film character, warm natural lighting, innocent expression, hand-drawn animation",
     custom:
-      "Studio Ghibli style, cute {type}, Miyazaki character, warm, innocent",
+      "Studio Ghibli style, cute {type}, Miyazaki character, warm, innocent, hand-drawn animation",
   },
 
   pixel: {
     avatar:
-      "16-bit pixel art, cute {type} portrait, facing forward, kawaii pixel style, preserve original hairstyle and clothing, limited cute color palette, pixel perfect, retro game character, adorable 8-bit expression",
+      "16-bit pixel art style, cute {type} portrait, facing forward, kawaii pixel design, preserve original hairstyle and clothing, limited retro color palette, pixel perfect, 8-bit game character, adorable pixelated expression, retro gaming aesthetic",
     "three-view":
-      "16-bit pixel art, 3-view cute {type}, front side back views, kawaii pixel style, limited colors",
+      "16-bit pixel art style, 3-view cute {type}, front side back views, kawaii pixel design, limited retro colors, 8-bit gaming",
     "full-body":
-      "16-bit pixel art, cute {type} full body, kawaii pixel character, retro game style, adorable pose",
-    custom: "16-bit pixel art, cute {type}, kawaii pixel style, adorable",
+      "16-bit pixel art style, cute {type} full body, kawaii pixel character, retro game design, adorable pose, 8-bit aesthetic",
+    custom:
+      "16-bit pixel art style, cute {type}, kawaii pixel design, adorable, 8-bit gaming",
   },
 
   watercolor: {
     avatar:
-      "watercolor painting, cute {type} portrait, facing forward, soft kawaii features, preserve original hairstyle and clothing, gentle pastel watercolors, adorable expression, soft brush strokes, dreamy atmosphere",
+      "soft watercolor painting style, cute {type} portrait, facing forward, gentle kawaii features, preserve original hairstyle and clothing, flowing pastel watercolors, adorable expression, soft brush strokes, dreamy atmosphere, traditional watercolor technique",
     "three-view":
-      "watercolor painting, 3-view cute {type}, front side back views, soft kawaii style, pastel colors",
+      "soft watercolor painting style, 3-view cute {type}, front side back views, gentle kawaii design, flowing pastel colors, traditional watercolor",
     "full-body":
-      "watercolor painting, cute {type} full body, soft kawaii style, gentle colors, adorable pose",
-    custom: "watercolor painting, cute {type}, kawaii, soft colors, adorable",
+      "soft watercolor painting style, cute {type} full body, gentle kawaii design, flowing colors, adorable pose, traditional watercolor technique",
+    custom:
+      "soft watercolor painting style, cute {type}, kawaii, flowing colors, adorable, traditional watercolor",
   },
 
   sketch: {
     avatar:
-      "pencil sketch, cute {type} portrait, facing forward, kawaii features, preserve original hairstyle and clothing, soft pencil lines, adorable expression, gentle shading, warm sketch style, innocent look",
+      "hand-drawn pencil sketch style, cute {type} portrait, facing forward, kawaii features, preserve original hairstyle and clothing, soft pencil lines, adorable expression, gentle shading, warm sketch technique, innocent look, traditional drawing",
     "three-view":
-      "pencil sketch, 3-view cute {type}, front side back views, kawaii sketch style, soft lines",
+      "hand-drawn pencil sketch style, 3-view cute {type}, front side back views, kawaii sketch design, soft pencil lines, traditional drawing",
     "full-body":
-      "pencil sketch, cute {type} full body, kawaii sketch style, soft shading, adorable pose",
-    custom: "pencil sketch, cute {type}, kawaii style, soft lines, adorable",
+      "hand-drawn pencil sketch style, cute {type} full body, kawaii sketch design, soft shading, adorable pose, traditional drawing technique",
+    custom:
+      "hand-drawn pencil sketch style, cute {type}, kawaii design, soft lines, adorable, traditional drawing",
   },
 };
 

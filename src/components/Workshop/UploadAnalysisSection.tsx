@@ -6,12 +6,6 @@ import ImageUploadSection from "./ImageUploadSection";
 interface UploadAnalysisSectionProps {
   uploadedImage: string | null;
   uploadedFile: File | null;
-  // tags: string[] | null;
-  // processingStep:
-  //   | "analyzing"
-  //   | "generating-avatar"
-  //   | "generating-three-view"
-  //   | null;
   mounted: boolean;
   onImageUpload: (file: File) => void;
   onClearImage: () => void;
@@ -20,8 +14,6 @@ interface UploadAnalysisSectionProps {
 export default function UploadAnalysisSection({
   uploadedImage,
   uploadedFile,
-  // tags,
-  // processingStep,
   mounted,
   onImageUpload,
   onClearImage,

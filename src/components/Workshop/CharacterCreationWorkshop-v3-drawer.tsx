@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import UploadAnalysisSection from "./UploadAnalysisSection";
 import AvatarDisplaySection from "./AvatarDisplaySection";
+import GenerationSection from "./GenerationSection";
 import {
   useCharacters,
   useCreateCharacter,
@@ -17,6 +18,7 @@ import { useCharacterGeneration } from "@/hooks/useCharacterGeneration";
 import { StepCard } from "./StepCard";
 import { CharacterWorkshopNavigationBar } from "./CharacterWorkshopNavigationBar";
 import { CharacterLibraryDrawer } from "./CharacterLibraryDrawer";
+import { CharacterStyle } from "@/types/flux";
 
 export default function CharacterCreationWorkshop() {
   const t = useTranslations("WorkshopPage");
@@ -33,6 +35,9 @@ export default function CharacterCreationWorkshop() {
   const [mounted, setMounted] = useState(false);
   const [characterSaved, setCharacterSaved] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+
+  // 风格选择状态
+  const [selectedStyle, setSelectedStyle] = useState<CharacterStyle>("chibi");
 
   const {
     isProcessing,
@@ -73,11 +78,14 @@ export default function CharacterCreationWorkshop() {
   const handleCharacterGeneration = useCallback(async () => {
     if (!uploadedFile) return;
     try {
-      await generateCharacter({ uploadedFile });
+      await generateCharacter({
+        uploadedFile,
+        style: selectedStyle,
+      });
     } catch (error) {
       console.error("生成失败:", error);
     }
-  }, [uploadedFile, generateCharacter]);
+  }, [uploadedFile, selectedStyle, generateCharacter]);
 
   const handleSaveCharacter = useCallback(
     async (characterName: string) => {
@@ -130,7 +138,6 @@ export default function CharacterCreationWorkshop() {
     navigate("/workshop");
   }, [navigate]);
 
-  const canGenerate = uploadedFile && !isProcessing;
   const isCreatingCharacter = createCharacterMutation.isPending;
 
   // 步骤状态计算 - 合并第二步和第三步
@@ -181,18 +188,22 @@ export default function CharacterCreationWorkshop() {
             isActive={step1Complete && !step2Complete}
             isCompleted={step2Complete}
             isLocked={!step1Complete}
-            actionButton={
-              step1Complete && !step2Complete && !avatarResult
-                ? {
-                    text: isProcessing ? "生成中..." : "开始生成",
-                    onClick: handleCharacterGeneration,
-                    disabled: !canGenerate,
-                  }
-                : undefined
-            }
+            actionButton={undefined}
           >
             {step1Complete && (
-              <div className="mt-4">
+              <div className="mt-4 space-y-4">
+                {/* 风格选择和生成按钮 */}
+                <GenerationSection
+                  selectedStyle={selectedStyle}
+                  onStyleChange={setSelectedStyle}
+                  onGenerate={handleCharacterGeneration}
+                  canGenerate={!!uploadedFile && !isProcessing}
+                  isProcessing={isProcessing}
+                  hasResults={!!avatarResult}
+                  mounted={mounted}
+                />
+
+                {/* 结果显示 */}
                 <AvatarDisplaySection
                   currentStep={currentStep}
                   isProcessing={isProcessing || isCreatingCharacter}

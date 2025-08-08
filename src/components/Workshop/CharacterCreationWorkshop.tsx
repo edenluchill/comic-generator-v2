@@ -13,6 +13,7 @@ import { useSearchParams } from "next/navigation";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import UploadAnalysisSection from "./UploadAnalysisSection";
 import AvatarDisplaySection from "./AvatarDisplaySection";
+import GenerationSection from "./GenerationSection";
 import CharactersList from "./CharactersList";
 // 替换 Redux imports
 import {
@@ -22,6 +23,7 @@ import {
 } from "@/hooks/useCharacters";
 import { useAuth } from "@/hooks/useAuth";
 import { useCharacterGeneration } from "@/hooks/useCharacterGeneration";
+import { CharacterStyle } from "@/types/flux";
 import WorkshopHeader, {
   createBackAction,
   createForwardAction,
@@ -43,6 +45,9 @@ export default function CharacterCreationWorkshop() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [mounted, setMounted] = useState(false);
   const [characterSaved, setCharacterSaved] = useState(false);
+
+  // 风格选择状态
+  const [selectedStyle, setSelectedStyle] = useState<CharacterStyle>("chibi");
 
   // 使用角色生成hook
   const {
@@ -89,6 +94,8 @@ export default function CharacterCreationWorkshop() {
     setUploadedImage(null);
     setUploadedFile(null);
     resetCharacterGeneration();
+    // 重置风格选择
+    setSelectedStyle("chibi");
   }, [resetCharacterGeneration]);
 
   const handleCharacterGeneration = useCallback(async () => {
@@ -97,11 +104,12 @@ export default function CharacterCreationWorkshop() {
     try {
       await generateCharacter({
         uploadedFile,
+        style: selectedStyle,
       });
     } catch (error) {
       console.error("生成失败:", error);
     }
-  }, [uploadedFile, generateCharacter]);
+  }, [uploadedFile, selectedStyle, generateCharacter]);
 
   const handleSaveCharacter = useCallback(
     async (characterName: string) => {
@@ -222,8 +230,22 @@ export default function CharacterCreationWorkshop() {
             />
           </div>
 
-          {/* 右列：头像显示和3视图 */}
-          <div className="order-2 xl:order-2">
+          {/* 右列：风格选择和结果显示 */}
+          <div className="order-2 xl:order-2 space-y-6">
+            {/* 风格选择和生成按钮 - 只在上传图片后显示 */}
+            {uploadedFile && (
+              <GenerationSection
+                selectedStyle={selectedStyle}
+                onStyleChange={setSelectedStyle}
+                onGenerate={handleCharacterGeneration}
+                canGenerate={!!uploadedFile && !isProcessing}
+                isProcessing={isProcessing}
+                hasResults={!!avatarResult}
+                mounted={mounted}
+              />
+            )}
+
+            {/* 结果显示区域 */}
             <AvatarDisplaySection
               currentStep={currentStep}
               isProcessing={isProcessing || isCreatingCharacter}

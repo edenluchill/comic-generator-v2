@@ -12,6 +12,7 @@ import {
   createValidationErrorResponse,
 } from "@/lib/helpers/api-response.helpers";
 import { handleOptionsRequest } from "@/lib/helpers/cors.helpers";
+import { CharacterStyle, ViewType } from "@/types/flux";
 
 interface FluxGenerationRequest extends Record<string, unknown> {
   aspectRatio?: string;
@@ -20,6 +21,9 @@ interface FluxGenerationRequest extends Record<string, unknown> {
   safetyTolerance?: number;
   input_image?: string; // 可选，用于向后兼容
   tags?: string[]; // 可选，用于向后兼容
+  // 新的风格系统参数
+  style?: string; // 风格选择
+  additionalPrompt?: string; // 额外提示词
 }
 
 const FLUX_GENERATION_STEPS = [
@@ -42,6 +46,8 @@ async function processFluxGeneration(
     outputFormat = "png",
     promptUpsampling = false,
     safetyTolerance = 2,
+    style = "chibi", // 默认使用chibi风格
+    additionalPrompt,
   } = request;
 
   let input_image: string;
@@ -80,11 +86,17 @@ async function processFluxGeneration(
     tags = request.tags;
   }
 
-  // 步骤2: 生成卡通头像
+  // 步骤2: 生成头像
   helper.startStep("avatar");
-  const avatarResult = await generator.generateCartoonAvatar(
-    input_image,
-    tags,
+
+  const avatarResult = await generator.generateCharacter(
+    {
+      image: input_image,
+      style: style as CharacterStyle,
+      viewType: "avatar" as ViewType,
+      tags,
+      additionalPrompt,
+    },
     {
       aspectRatio,
       outputFormat,
@@ -97,27 +109,41 @@ async function processFluxGeneration(
     avatarResult.id,
     avatarResult.pollingUrl,
     (progress) => {
-      helper.updateProgress(progress, `生成头像中... ${progress}%`);
+      helper.updateProgress(progress, `生成${style}风格头像中... ${progress}%`);
     }
   );
 
   helper.sendCustomEvent("avatar_complete", {
     data: completedAvatar,
-    message: "头像生成完成！开始生成3视图...",
+    message: `${style}风格头像生成完成！开始生成三视图...`,
   });
 
-  // 步骤3: 生成3视图
+  // 步骤3: 生成三视图
   helper.startStep("three_view");
-  const threeViewResult = await generator.generateThreeViewFromAvatar(
-    completedAvatar.imageUrl!,
-    { outputFormat, promptUpsampling, safetyTolerance }
+  const threeViewResult = await generator.generateCharacter(
+    {
+      image: completedAvatar.imageUrl!,
+      style: style as CharacterStyle,
+      viewType: "three-view",
+      tags,
+      additionalPrompt,
+    },
+    {
+      outputFormat,
+      promptUpsampling,
+      safetyTolerance,
+      aspectRatio: "4:3", // 三视图使用更宽的比例
+    }
   );
 
   const completedThreeView = await generator.waitForCompletion(
     threeViewResult.id,
     threeViewResult.pollingUrl,
     (progress) => {
-      helper.updateProgress(progress, `生成3视图中... ${progress}%`);
+      helper.updateProgress(
+        progress,
+        `生成${style}风格三视图中... ${progress}%`
+      );
     }
   );
 
@@ -134,6 +160,7 @@ async function processFluxGeneration(
     avatar: { ...completedAvatar, imageUrl: storedAvatarUrl },
     threeView: { ...completedThreeView, imageUrl: storedThreeViewUrl },
     analyzedTags: tags, // 包含分析得到的标签
+    style, // 包含使用的风格
   };
 
   // 步骤5: 处理积分（仅对登录用户）
@@ -199,12 +226,16 @@ export async function POST(request: NextRequest) {
       const promptUpsampling = formData.get("promptUpsampling") === "true";
       const safetyTolerance =
         parseInt(formData.get("safetyTolerance") as string) || 2;
+      const style = (formData.get("style") as string) || "chibi";
+      const additionalPrompt = formData.get("additionalPrompt") as string;
 
       requestData = {
         aspectRatio,
         outputFormat,
         promptUpsampling,
         safetyTolerance,
+        style,
+        additionalPrompt,
       };
     } else {
       // 处理JSON（向后兼容）

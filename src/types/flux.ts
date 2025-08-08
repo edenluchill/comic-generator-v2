@@ -39,8 +39,53 @@ export interface FluxAPIResponse {
   message?: string;
 }
 
+// 风格类型枚举 - 全部都是可爱风格
+export type CharacterStyle =
+  | "chibi" // 豆豆眼可爱风
+  | "chinese" // 可爱国风
+  | "labubu" // Labubu可爱风
+  | "anime" // 可爱动漫风
+  | "ghibli" // 吉卜力工作室风
+  | "pixel" // 像素可爱风
+  | "watercolor" // 水彩可爱风
+  | "sketch"; // 手绘可爱风
+
+// 视图类型
+export type ViewType = "avatar" | "three-view" | "full-body" | "custom";
+
+// 风格配置接口
+export interface StyleConfig {
+  name: string;
+  description: string;
+  basePrompt: string;
+  aspectRatio: string;
+  featureMapping: FeatureMapping[];
+  negativePrompt?: string;
+  additionalParams?: Partial<FluxGenerationOptions>;
+}
+
+// 特征映射配置
+export interface FeatureMapping {
+  keywords: string[];
+  getPrompt: (context?: FeatureContext) => string;
+  priority?: number; // 优先级，数字越大越优先
+}
+
+// 特征上下文
+export interface FeatureContext {
+  tags?: string[];
+  style: CharacterStyle;
+  viewType: ViewType;
+  gender?: "male" | "female" | "unknown";
+  animalType?: string;
+}
+
+// 更新的角色生成选项
 export interface FluxCharacterOptions {
   image: string; // base64 encoded image
-  style?: "kawaii" | "minimalist" | "detailed";
-  viewType?: "front" | "side" | "back" | "three-view";
+  style: CharacterStyle;
+  viewType: ViewType;
+  tags?: string[];
+  customStyleConfig?: Partial<StyleConfig>; // 用于自定义风格
+  additionalPrompt?: string; // 额外的提示词
 }

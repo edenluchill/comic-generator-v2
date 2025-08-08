@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { FluxGenerationResult } from "@/types/flux";
+import { FluxGenerationResult, CharacterStyle } from "@/types/flux";
 import { makeAuthenticatedRequest } from "@/lib/auth-request";
 import { makeAuthenticatedJsonRequest } from "@/lib/auth-request";
 import { CREDIT_COSTS, UserProfile } from "@/types/credits";
@@ -31,6 +31,9 @@ export interface CharacterGenerationOptions {
   outputFormat?: "png" | "jpeg";
   promptUpsampling?: boolean;
   safetyTolerance?: number;
+  // 新的风格系统选项
+  style?: CharacterStyle;
+  additionalPrompt?: string;
 }
 
 export function useCharacterGeneration() {
@@ -58,6 +61,8 @@ export function useCharacterGeneration() {
         outputFormat = "png",
         promptUpsampling = false,
         safetyTolerance = 2,
+        style = "chibi",
+        additionalPrompt,
       } = options;
 
       setState((prev) => ({
@@ -95,6 +100,10 @@ export function useCharacterGeneration() {
         formData.append("outputFormat", outputFormat);
         formData.append("promptUpsampling", promptUpsampling.toString());
         formData.append("safetyTolerance", safetyTolerance.toString());
+        formData.append("style", style);
+        if (additionalPrompt) {
+          formData.append("additionalPrompt", additionalPrompt);
+        }
 
         // 调用集成的API端点
         const response = await makeAuthenticatedRequest(

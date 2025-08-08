@@ -4,7 +4,10 @@ import {
   FluxGenerationOptions,
   FluxGenerationResult,
   FluxAPIResponse,
+  FluxCharacterOptions,
 } from "@/types/flux";
+import { promptGenerator } from "./prompt-generator";
+import { getAvailableStyles } from "./character-styles";
 
 export class FluxCharacterGenerator {
   private baseUrl: string = "https://api.bfl.ai/v1";
@@ -18,122 +21,59 @@ export class FluxCharacterGenerator {
   }
 
   /**
-   * 生成卡通头像的提示词
+   * 获取所有可用的风格
    */
-  private generateCartoonAvatarPrompt(tags?: string[]): string {
-    // 精简的基本prompt
-    const featureResult = this.generateFeaturePromptsFromTags(tags);
-    const finalPrompt =
-      `Convert the ${featureResult.type} into cute hand draw line art of simple chibi avatar with minimal color, minimal brown and white pen drawing,` +
-      `make the avatar faced and looked to the front, simple hairstyle with 5-7 curved lines, preserve same cloth in simple style,` +
-      ` 2 dot eyes, simple curved smile mouth, blush on cheeks, no shading no shadow no lighting,` +
-      `rice-white background,` +
-      `other features: ${featureResult.featurePrompts.join(", ")}`;
-
-    // 获取特色描述
-    return finalPrompt;
-  }
-
-  private generateFeaturePromptsFromTags(tags?: string[]) {
-    if (!tags || tags.length === 0) {
-      return {
-        type: "girl",
-        featurePrompts: [],
-      };
-    }
-
-    // 特征映射数组
-    const featureMap = [
-      {
-        keywords: ["glasses"],
-        getPrompt(): string {
-          return `Put on simple line art glasses as circles/ovals`;
-        },
-      },
-      {
-        keywords: ["short_hair"],
-        getPrompt(): string {
-          return `short hair with few strokes around head`;
-        },
-      },
-      {
-        keywords: ["hat", "cap"],
-        getPrompt(): string {
-          return `hat as simple geometric shape`;
-        },
-      },
-      {
-        keywords: ["earrings"],
-        getPrompt(): string {
-          return `earrings as small simple shapes`;
-        },
-      },
-    ];
-
-    const featurePrompts: string[] = [];
-
-    // 遍历特征映射，检查是否匹配
-    featureMap.forEach((feature) => {
-      const hasFeature = feature.keywords.some((keyword) =>
-        tags.some((tag) => tag.includes(keyword))
-      );
-
-      if (hasFeature) {
-        featurePrompts.push(feature.getPrompt());
-      }
-    });
-
-    const styles: string[] = [];
-    tags.forEach((tag) => {
-      ["tail", "hair"].forEach((keyword) => {
-        if (tag.includes(keyword)) {
-          styles.push(tag);
-        }
-      });
-    });
-
-    if (styles.length > 0) {
-      featurePrompts.push(
-        `preserve the ${styles.join(", ")} style from the input image.`
-      );
-    }
-
-    const type = tags.find(
-      (tag) =>
-        tag.includes("girl") || tag.includes("woman") || tag.includes("female")
-    )
-      ? "girl"
-      : tags.find(
-          (tag) =>
-            tag.includes("boy") || tag.includes("man") || tag.includes("male")
-        )
-      ? "boy"
-      : tags.find((tag) => tag.includes("dog"))
-      ? "dog"
-      : tags.find((tag) => tag.includes("cat"))
-      ? "cat"
-      : "cute animal";
-
-    return {
-      type: type,
-      featurePrompts,
-    };
+  getAvailableStyles() {
+    return getAvailableStyles();
   }
 
   /**
-   * 第一步：将原图转换成卡通角色正面头像
+   * 生成角色图像 - 新的统一接口
+   */
+  async generateCharacter(
+    options: FluxCharacterOptions,
+    fluxOptions?: Partial<FluxGenerationOptions>
+  ): Promise<FluxGenerationResult> {
+    // 使用提示词生成器创建提示词
+    const promptResult = promptGenerator.generatePrompt(options);
+    const recommendedParams = promptGenerator.getRecommendedParams(
+      options.style,
+      options.viewType
+    );
+
+    // 合并生成选项
+    const finalOptions: Partial<FluxGenerationOptions> = {
+      ...recommendedParams,
+      ...promptResult.additionalParams,
+      ...fluxOptions, // 用户提供的选项优先级最高
+    };
+
+    return this.imageEdit(options.image, promptResult.prompt, finalOptions);
+  }
+
+  /**
+   * 第一步：将原图转换成卡通角色正面头像 (保持向后兼容)
+   * @deprecated 建议使用 generateCharacter 方法
    */
   async generateCartoonAvatar(
     inputImage: string,
     tags?: string[],
     options?: Partial<FluxGenerationOptions>
   ): Promise<FluxGenerationResult> {
-    const prompt = this.generateCartoonAvatarPrompt(tags);
-    return this.imageEdit(inputImage, prompt, options);
+    return this.generateCharacter(
+      {
+        image: inputImage,
+        style: "chibi",
+        viewType: "avatar",
+        tags,
+      },
+      options
+    );
   }
 
   /**
-   * 生成3视图角色的提示词
+   * 生成3视图角色的提示词 (保持向后兼容)
+   * @deprecated 建议使用 generateCharacter 方法
    */
   private generateThreeViewPrompt(originalPrompt?: string): string {
     const basePrompt = `Create 3-view character sheet (front/side/back) of girl from 
@@ -212,17 +152,24 @@ export class FluxCharacterGenerator {
     }
   }
   /**
-   * 第二步：将卡通头像转换成3视图全身图
+   * 第二步：将卡通头像转换成3视图全身图 (保持向后兼容)
+   * @deprecated 建议使用 generateCharacter 方法
    */
   async generateThreeViewFromAvatar(
     cartoonAvatarImage: string,
     options?: Partial<FluxGenerationOptions>
   ): Promise<FluxGenerationResult> {
-    const prompt = this.generateThreeViewPrompt();
-    return this.imageEdit(cartoonAvatarImage, prompt, {
-      ...options,
-      aspectRatio: "4:3", // 3视图更适合宽一点的比例
-    });
+    return this.generateCharacter(
+      {
+        image: cartoonAvatarImage,
+        style: "chibi",
+        viewType: "three-view",
+      },
+      {
+        ...options,
+        aspectRatio: "4:3", // 3视图更适合宽一点的比例
+      }
+    );
   }
 
   /**

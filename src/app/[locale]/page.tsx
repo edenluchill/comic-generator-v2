@@ -488,7 +488,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-16 items-center mb-16">
+          <div className="grid lg:grid-cols-2 gap-16 items-center mb-12">
             {/* 左侧：主展示图 */}
             <div className="relative">
               <div className="bg-white rounded-3xl p-6 shadow-2xl border border-rose-100 group hover:scale-105 transition-transform duration-500">
@@ -625,7 +625,7 @@ export default function HomePage() {
           </div>
 
           {/* 用户评价 */}
-          <div className="grid md:grid-cols-3 gap-8 mb-20">
+          <div className="grid md:grid-cols-3 gap-8 mb-16">
             {/* 评价1 */}
             <div className={`bg-white rounded-2xl p-6 shadow-xl border border-rose-100 group hover:scale-105 transition-all duration-700 ${
               userReviewsVisible 
@@ -703,8 +703,8 @@ export default function HomePage() {
           </div>
 
           {/* 创作分享展示 */}
-          <div className="mb-16">
-            <div className="text-center mb-12">
+          <div className="mb-12">
+            <div className="text-center mb-8">
               <h3 className="text-3xl font-bold text-gray-900 mb-4">社区创作精选</h3>
               <p className="text-gray-600 max-w-2xl mx-auto">
                 来自用户的精彩创作，展示AI漫画生成的无限可能

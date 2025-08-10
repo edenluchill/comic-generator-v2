@@ -74,8 +74,8 @@ const commonFeatureMapping: FeatureMapping[] = [
  */
 export const styleConfigs: Record<CharacterStyle, StyleConfig> = {
   chibi: {
-    name: "豆豆眼可爱风",
-    description: "超可爱的豆豆眼Q版角色，简单线条",
+    name: "Q版可爱风",
+    description: "超可爱的Q版角色，大头小身体，简单线条",
     basePrompt: "",
     aspectRatio: "1:1",
     featureMapping: commonFeatureMapping,
@@ -118,13 +118,14 @@ export const styleConfigs: Record<CharacterStyle, StyleConfig> = {
             ?.replace(/simple|line art/, "rounded cute Labubu style") || "",
       })),
       {
-        keywords: ["round", "chubby", "cute"],
-        getPrompt: () => "extra round chubby adorable features in Labubu style",
+        keywords: ["round", "cute"],
+        getPrompt: () =>
+          "gentle round adorable features in Labubu style with soft curves",
         priority: 3,
       },
     ],
     negativePrompt:
-      "sharp edges, angular, realistic, dark colors, ugly, scary, changing original outfit, different clothing, side view, profile view, back view",
+      "sharp edges, angular, realistic, dark colors, ugly, scary, changing original outfit, different clothing, side view, profile view, back view, overly fat, obese, bloated, excessive puffiness, balloon body, inflated features",
   },
 
   anime: {

@@ -51,7 +51,7 @@ export type CharacterStyle =
   | "sketch"; // 手绘可爱风
 
 // 视图类型
-export type ViewType = "avatar" | "three-view" | "full-body" | "custom";
+export type ViewType = "avatar" | "three-view";
 
 // 风格配置接口
 export interface StyleConfig {

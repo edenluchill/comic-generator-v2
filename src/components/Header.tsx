@@ -27,7 +27,7 @@ const Header = memo(function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-gradient-to-r from-amber-50/95 via-orange-50/95 to-yellow-50/95 backdrop-blur-md border-b border-amber-200/30 shadow-sm">
+    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-rose-100/50 shadow-sm">
       <div className="max-w-6xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo区域 */}
@@ -36,15 +36,15 @@ const Header = memo(function Header() {
             className="flex items-center gap-3 group"
           >
             <div className="relative">
-              <div className="w-10 h-10 border-2 border-amber-400/50 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:border-amber-500 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-amber-400/20">
-                <Palette className="w-5 h-5 text-amber-600 group-hover:text-amber-700 transition-colors" />
+              <div className="w-10 h-10 border-2 border-rose-300/60 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:border-rose-400 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-rose-300/20">
+                <Palette className="w-5 h-5 text-rose-500 group-hover:text-rose-600 transition-colors" />
               </div>
             </div>
             <div className="">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
                 {headerT("title")}
               </h1>
-              <p className="text-xs text-amber-600/70 -mt-1">
+              <p className="text-xs text-rose-500/60 -mt-1">
                 {headerT("subtitle")}
               </p>
             </div>
@@ -56,7 +56,7 @@ const Header = memo(function Header() {
             <PremiumButton />
 
             {/* 桌面端导航链接 - 独立分组 */}
-            <nav className="hidden md:flex items-center gap-1 backdrop-blur-sm rounded-lg p-1 border border-amber-200/40 shadow-sm">
+            <nav className="hidden md:flex items-center gap-1 backdrop-blur-sm rounded-lg p-1 border border-rose-200/30 shadow-sm">
               <Link href={getLocalizedHref("/")}>
                 <Button
                   variant="ghost"
@@ -65,10 +65,10 @@ const Header = memo(function Header() {
                     "h-8 px-3 transition-all duration-200",
                     "flex items-center gap-0.5",
                     "text-sm font-medium",
-                    "hover:bg-yellow-500/15 hover:text-amber-800",
+                    "hover:bg-pink-400/10 hover:text-rose-600",
                     isActive("/")
-                      ? "bg-amber-500/20 text-amber-800 shadow-sm border-amber-300/50 hover:bg-amber-500/20 hover:text-amber-800"
-                      : "text-amber-700/90 ",
+                      ? "bg-rose-400/15 text-rose-600 shadow-sm border-rose-200/40 hover:bg-rose-400/15 hover:text-rose-600"
+                      : "text-rose-500/80 ",
                     "rounded-md border border-transparent"
                   )}
                 >
@@ -85,10 +85,10 @@ const Header = memo(function Header() {
                     "h-8 px-3 transition-all duration-200",
                     "flex items-center gap-0.5",
                     "text-sm font-medium",
-                    "hover:bg-yellow-500/15 hover:text-amber-800",
+                    "hover:bg-pink-400/10 hover:text-rose-600",
                     isActive("/workshop")
-                      ? "bg-amber-500/20 text-amber-800 shadow-sm border-amber-300/50 hover:bg-amber-500/20 hover:text-amber-800"
-                      : "text-amber-700/90 ",
+                      ? "bg-rose-400/15 text-rose-600 shadow-sm border-rose-200/40 hover:bg-rose-400/15 hover:text-rose-600"
+                      : "text-rose-500/80 ",
                     "rounded-md border border-transparent"
                   )}
                 >

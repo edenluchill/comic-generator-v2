@@ -198,7 +198,7 @@ export class ComicGenerationService {
   }
 
   /**
-   * 生成所有场景的图片
+   * 生成所有场景的图片 - 并行版本
    */
   private async generateSceneImages(
     scenes: ComicScene[],
@@ -209,19 +209,20 @@ export class ComicGenerationService {
     controller: ReadableStreamDefaultController,
     encoder: TextEncoder
   ): Promise<ComicScene[]> {
-    const completedScenes: ComicScene[] = [];
+    // 发送开始生成消息
+    StreamUtils.encodeProgress(encoder, controller, {
+      step: "generating_images",
+      total_scenes: scenes.length,
+      message: `正在并行生成${scenes.length}个场景...`,
+      progress: 40,
+    });
 
-    for (let i = 0; i < scenes.length; i++) {
-      const scene = scenes[i];
-      const sceneDesc = sceneDescriptions[i];
+    // 用于追踪已完成的场景数量
+    let completedCount = 0;
 
-      StreamUtils.encodeProgress(encoder, controller, {
-        step: "generating_images",
-        current_scene: i + 1,
-        total_scenes: scenes.length,
-        message: `正在生成第${i + 1}个场景...`,
-        progress: 40 + i * 15,
-      });
+    // 创建并行任务
+    const generateTasks = scenes.map(async (scene, index) => {
+      const sceneDesc = sceneDescriptions[index];
 
       try {
         // 更新场景状态
@@ -232,21 +233,14 @@ export class ComicGenerationService {
           sceneDesc.character_ids.includes(c.id)
         );
 
-        // 生成场景图片
+        // 生成场景图片（移除进度回调，因为我们将在完成时通知）
         const imageResult = await sceneImageService.generateSceneImage({
           sceneDescription: sceneDesc.description,
           sceneCharacters,
           style,
           userId,
           sceneId: scene.id,
-          onProgress: StreamUtils.createProgressCallback(
-            encoder,
-            controller,
-            40 + i * 15,
-            0.15,
-            i + 1,
-            scenes.length
-          ),
+          // 移除 onProgress 回调
         });
 
         // 更新场景记录
@@ -256,22 +250,78 @@ export class ComicGenerationService {
           imageResult.imagePrompt
         );
 
-        completedScenes.push(updatedScene);
+        // 增加完成计数并通知前端
+        completedCount++;
+        const progressPercentage = 40 + (completedCount / scenes.length) * 50; // 40-90% 的进度区间
+
+        StreamUtils.encodeProgress(encoder, controller, {
+          step: "generating_images",
+          total_scenes: scenes.length,
+          message: `已完成${completedCount}/${scenes.length}个场景`,
+          progress: progressPercentage,
+        });
+
+        return { success: true, scene: updatedScene, index };
       } catch (sceneError) {
-        console.error(`Scene ${i + 1} generation failed:`, sceneError);
+        console.error(`Scene ${index + 1} generation failed:`, sceneError);
 
         // 标记场景为失败状态
         await comicDatabaseService.markSceneFailed(scene.id, scene.retry_count);
 
-        throw new Error(
-          `第${i + 1}个场景生成失败: ${
-            sceneError instanceof Error ? sceneError.message : "未知错误"
-          }`
-        );
+        return {
+          success: false,
+          error: sceneError,
+          index,
+          sceneId: scene.id,
+        };
       }
+    });
+
+    // 等待所有任务完成
+    const results = await Promise.allSettled(generateTasks);
+
+    // 处理结果
+    const completedScenes: (ComicScene | undefined)[] = new Array(
+      scenes.length
+    );
+    const errors: string[] = [];
+
+    results.forEach((result, index) => {
+      if (result.status === "fulfilled") {
+        const taskResult = result.value;
+        if (taskResult.success) {
+          completedScenes[taskResult.index] = taskResult.scene;
+        } else {
+          errors.push(
+            `第${taskResult.index + 1}个场景生成失败: ${
+              taskResult.error instanceof Error
+                ? taskResult.error.message
+                : "未知错误"
+            }`
+          );
+        }
+      } else {
+        errors.push(`第${index + 1}个场景生成失败: ${result.reason}`);
+      }
+    });
+
+    // 如果有任何失败，抛出错误
+    if (errors.length > 0) {
+      throw new Error(`场景生成失败:\n${errors.join("\n")}`);
     }
 
-    return completedScenes;
+    // 确保返回的数组按照原始顺序排列
+    const orderedScenes = completedScenes.filter(
+      (scene) => scene !== undefined
+    );
+
+    if (orderedScenes.length !== scenes.length) {
+      throw new Error(
+        `场景生成不完整: 预期${scenes.length}个场景，实际完成${orderedScenes.length}个`
+      );
+    }
+
+    return orderedScenes;
   }
 }
 

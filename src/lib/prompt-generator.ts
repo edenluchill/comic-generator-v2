@@ -14,33 +14,90 @@ import { getStyleTemplate } from "./style-templates";
  */
 export class PromptGenerator {
   /**
-   * 从标签中识别角色类型和性别
+   * 从标签中识别角色类型、性别和年龄
    */
   private analyzeCharacterFromTags(tags?: string[]): {
     type: string;
     gender?: "male" | "female" | "unknown";
+    age?: "young" | "adult" | "elderly" | "unknown";
     animalType?: string;
   } {
     if (!tags || tags.length === 0) {
-      return { type: "character", gender: "unknown" };
+      return { type: "character", gender: "unknown", age: "unknown" };
     }
 
-    // 性别识别
-    let gender: "male" | "female" | "unknown" = "unknown";
+    // 年龄识别
+    let age: "young" | "adult" | "elderly" | "unknown" = "unknown";
+    const elderlyKeywords = [
+      "old",
+      "elderly",
+      "senior",
+      "aged",
+      "wrinkled",
+      "gray_hair",
+      "grey_hair",
+      "white_hair",
+      "grandma",
+      "grandpa",
+      "grandmother",
+      "grandfather",
+      "mature",
+    ];
+    const youngKeywords = [
+      "young",
+      "child",
+      "kid",
+      "baby",
+      "toddler",
+      "teen",
+      "teenager",
+    ];
+
     if (
-      tags.some(
-        (tag) =>
-          tag.includes("girl") ||
-          tag.includes("woman") ||
-          tag.includes("female")
+      tags.some((tag) =>
+        elderlyKeywords.some((keyword) => tag.includes(keyword))
+      )
+    ) {
+      age = "elderly";
+    } else if (
+      tags.some((tag) => youngKeywords.some((keyword) => tag.includes(keyword)))
+    ) {
+      age = "young";
+    } else {
+      age = "adult";
+    }
+
+    // 性别识别 - 扩展识别范围
+    let gender: "male" | "female" | "unknown" = "unknown";
+    const femaleKeywords = [
+      "girl",
+      "woman",
+      "female",
+      "lady",
+      "grandmother",
+      "grandma",
+      "old_woman",
+      "elderly_woman",
+    ];
+    const maleKeywords = [
+      "boy",
+      "man",
+      "male",
+      "gentleman",
+      "grandfather",
+      "grandpa",
+      "old_man",
+      "elderly_man",
+    ];
+
+    if (
+      tags.some((tag) =>
+        femaleKeywords.some((keyword) => tag.includes(keyword))
       )
     ) {
       gender = "female";
     } else if (
-      tags.some(
-        (tag) =>
-          tag.includes("boy") || tag.includes("man") || tag.includes("male")
-      )
+      tags.some((tag) => maleKeywords.some((keyword) => tag.includes(keyword)))
     ) {
       gender = "male";
     }
@@ -68,18 +125,37 @@ export class PromptGenerator {
       }
     }
 
-    // 如果不是动物，根据性别确定类型
+    // 如果不是动物，根据性别和年龄确定类型
     if (!animalType) {
-      if (gender === "female") {
-        type = "girl";
-      } else if (gender === "male") {
-        type = "boy";
+      if (age === "elderly") {
+        if (gender === "female") {
+          type = "elderly woman";
+        } else if (gender === "male") {
+          type = "elderly man";
+        } else {
+          type = "elderly person";
+        }
+      } else if (age === "young") {
+        if (gender === "female") {
+          type = "young girl";
+        } else if (gender === "male") {
+          type = "young boy";
+        } else {
+          type = "child";
+        }
       } else {
-        type = "person";
+        // 成年人
+        if (gender === "female") {
+          type = "woman";
+        } else if (gender === "male") {
+          type = "man";
+        } else {
+          type = "person";
+        }
       }
     }
 
-    return { type, gender, animalType };
+    return { type, gender, age, animalType };
   }
 
   /**
@@ -178,6 +254,7 @@ export class PromptGenerator {
       style,
       viewType,
       gender: characterAnalysis.gender,
+      age: characterAnalysis.age,
       animalType: characterAnalysis.animalType,
     };
 

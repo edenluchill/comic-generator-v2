@@ -6,25 +6,131 @@ import {
 } from "@/types/flux";
 
 /**
- * 通用特征映射 - 可被多个风格复用
+ * 年龄相关的特征映射
  */
-const commonFeatureMapping: FeatureMapping[] = [
+const ageRelatedFeatureMapping: FeatureMapping[] = [
   {
-    keywords: ["glasses"],
+    keywords: [
+      "old",
+      "elderly",
+      "aged",
+      "wrinkled",
+      "gray_hair",
+      "grey_hair",
+      "white_hair",
+    ],
     getPrompt: (context) => {
+      const ageFeatures = [];
+      if (context?.tags?.some((tag) => tag.includes("wrinkled"))) {
+        ageFeatures.push("gentle wrinkles showing wisdom and character");
+      }
+      if (
+        context?.tags?.some(
+          (tag) =>
+            tag.includes("gray") ||
+            tag.includes("grey") ||
+            tag.includes("white")
+        )
+      ) {
+        ageFeatures.push("beautiful silver or gray hair");
+      }
+
       switch (context?.style) {
         case "chinese":
-          return "traditional Chinese style glasses with thin frames";
+          return `elderly features with traditional Chinese wisdom, ${ageFeatures.join(
+            ", "
+          )}`;
         case "labubu":
-          return "round cute glasses in Labubu style";
+          return `cute elderly features in soft Labubu style, ${ageFeatures.join(
+            ", "
+          )}`;
+        case "ghibli":
+          return `warm elderly character with Ghibli charm, ${ageFeatures.join(
+            ", "
+          )}`;
+        default:
+          return `distinguished elderly features, ${ageFeatures.join(", ")}`;
+      }
+    },
+    priority: 3,
+  },
+  {
+    keywords: ["round_glasses", "glasses"],
+    getPrompt: (context) => {
+      const isElderly = context?.tags?.some((tag) =>
+        ["old", "elderly", "aged"].some((keyword) => tag.includes(keyword))
+      );
+
+      switch (context?.style) {
+        case "chinese":
+          return isElderly
+            ? "traditional Chinese style reading glasses"
+            : "traditional Chinese style glasses with thin frames";
+        case "labubu":
+          return "cute round glasses in soft Labubu style";
         case "pixel":
           return "pixelated glasses with simple geometric shapes";
         default:
-          return "simple line art glasses as circles/ovals";
+          return isElderly
+            ? "wise-looking reading glasses"
+            : "simple stylish glasses";
       }
     },
     priority: 2,
   },
+  {
+    keywords: ["curly_hair"],
+    getPrompt: (context) => {
+      switch (context?.style) {
+        case "chinese":
+          return "elegant curly hair with traditional Chinese styling";
+        case "labubu":
+          return "soft curly hair in cute Labubu style";
+        case "ghibli":
+          return "natural curly hair with Ghibli warmth";
+        default:
+          return "beautiful curly hair with natural flow";
+      }
+    },
+    priority: 2,
+  },
+  {
+    keywords: ["traditional_clothing"],
+    getPrompt: (context) => {
+      switch (context?.style) {
+        case "chinese":
+          return "authentic traditional Chinese clothing with cultural details";
+        case "labubu":
+          return "traditional clothing adapted to cute Labubu style";
+        case "ghibli":
+          return "traditional clothing with Ghibli film aesthetic";
+        default:
+          return "elegant traditional clothing with cultural authenticity";
+      }
+    },
+    priority: 2,
+  },
+  {
+    keywords: ["serious_face", "stern"],
+    getPrompt: (context) => {
+      switch (context?.style) {
+        case "labubu":
+          return "gently serious expression maintaining Labubu cuteness";
+        case "ghibli":
+          return "thoughtful serious expression with Ghibli warmth";
+        default:
+          return "dignified serious expression showing character";
+      }
+    },
+    priority: 1,
+  },
+];
+
+/**
+ * 通用特征映射 - 更新版本
+ */
+const commonFeatureMapping: FeatureMapping[] = [
+  ...ageRelatedFeatureMapping,
   {
     keywords: ["hat", "cap"],
     getPrompt: (context) => {

@@ -71,12 +71,13 @@ export interface FeatureMapping {
   priority?: number; // 优先级，数字越大越优先
 }
 
-// 特征上下文
+// 特征上下文 - 更新版本
 export interface FeatureContext {
   tags?: string[];
   style: CharacterStyle;
   viewType: ViewType;
   gender?: "male" | "female" | "unknown";
+  age?: "young" | "adult" | "elderly" | "unknown";
   animalType?: string;
 }
 

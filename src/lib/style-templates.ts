@@ -27,12 +27,11 @@ const STYLE_CONFIGS = {
       "dot eyes, simple colors, kawaii style, Q version proportions",
   },
   chinese: {
-    avatarPrefix:
-      "traditional Chinese painting style, cute {type} portrait with Chinese elements, facing forward",
+    avatarPrefix: "simple Chinese style, cute {type} portrait, facing forward",
     avatarFeatures:
-      "big kawaii eyes, soft smile, preserve original hairstyle and clothing, ink wash colors with gold accents, adorable expression, traditional hair ornaments, gentle features, Chinese art style",
-    threeViewPrefix: "traditional Chinese art style cute {type}",
-    threeViewFeatures: "kawaii features, traditional elements, ink wash colors",
+      "big kawaii eyes, soft smile, preserve original hairstyle and clothing, simple ink colors, adorable expression, minimal Chinese elements, clean style",
+    threeViewPrefix: "simple Chinese style cute {type}",
+    threeViewFeatures: "kawaii features, simple colors, minimal details",
   },
   labubu: {
     avatarPrefix:
@@ -71,12 +70,11 @@ const STYLE_CONFIGS = {
   },
   watercolor: {
     avatarPrefix:
-      "soft watercolor painting style, cute {type} portrait, facing forward",
+      "simple watercolor style, cute {type} portrait, facing forward",
     avatarFeatures:
-      "gentle kawaii features, preserve original hairstyle and clothing, flowing pastel watercolors, adorable expression, soft brush strokes, dreamy atmosphere, traditional watercolor technique",
-    threeViewPrefix: "soft watercolor painting style cute {type}",
-    threeViewFeatures:
-      "gentle kawaii design, flowing pastel colors, traditional watercolor",
+      "kawaii features, preserve original hairstyle and clothing, soft pastel colors, adorable expression, simple brush strokes, clean style",
+    threeViewPrefix: "simple watercolor style cute {type}",
+    threeViewFeatures: "kawaii design, soft pastel colors, simple watercolor",
   },
   sketch: {
     avatarPrefix:

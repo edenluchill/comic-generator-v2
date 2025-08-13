@@ -106,7 +106,7 @@ export default function ProfilePage() {
   const isPremium = profile.subscription_tier === "premium";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 py-4 px-4">
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1 space-y-6">

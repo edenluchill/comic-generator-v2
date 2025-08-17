@@ -2,6 +2,8 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant warm (&:is(.warm *));
+@custom-variant ai (&:is(.ai *));
 
 @theme inline {
   --color-background: var(--background);
@@ -101,35 +103,35 @@
 
 /* ========== 深色主题 - 优雅的深粉色调 ========== */
 .dark {
-  /* 基础背景和前景色 - 深色调 */
-  --background: oklch(0.08 0.01 340); /* 深粉灰色 */
-  --foreground: oklch(0.95 0.02 340); /* 浅粉白色 */
+  /* 基础背景和前景色 - 调整对比度 */
+  --background: oklch(0.12 0.015 340); /* 稍微亮一点的背景 */
+  --foreground: oklch(0.88 0.02 340); /* 稍微暗一点的字体 */
 
   /* 卡片和弹出层 - 稍亮的深色 */
-  --card: oklch(0.12 0.02 340);
-  --card-foreground: oklch(0.95 0.02 340);
-  --popover: oklch(0.12 0.02 340);
-  --popover-foreground: oklch(0.95 0.02 340);
+  --card: oklch(0.16 0.02 340); /* 稍微亮一点 */
+  --card-foreground: oklch(0.88 0.02 340);
+  --popover: oklch(0.16 0.02 340);
+  --popover-foreground: oklch(0.88 0.02 340);
 
   /* 主色调 - 亮粉色在深色背景上 */
   --primary: oklch(0.75 0.12 340); /* 亮粉色 */
-  --primary-foreground: oklch(0.08 0.01 340);
+  --primary-foreground: oklch(0.12 0.015 340);
 
   /* 次要色调 - 深粉灰色 */
-  --secondary: oklch(0.18 0.03 340);
-  --secondary-foreground: oklch(0.9 0.03 340);
+  --secondary: oklch(0.22 0.03 340); /* 稍微亮一点 */
+  --secondary-foreground: oklch(0.85 0.03 340); /* 稍微暗一点 */
 
   /* 静音色调 */
-  --muted: oklch(0.15 0.02 340);
-  --muted-foreground: oklch(0.7 0.04 340);
+  --muted: oklch(0.18 0.02 340); /* 稍微亮一点 */
+  --muted-foreground: oklch(0.68 0.04 340); /* 稍微暗一点 */
 
   /* 强调色 */
-  --accent: oklch(0.2 0.04 340);
-  --accent-foreground: oklch(0.85 0.05 340);
+  --accent: oklch(0.24 0.04 340); /* 稍微亮一点 */
+  --accent-foreground: oklch(0.82 0.05 340); /* 稍微暗一点 */
 
   /* 边框和输入 - 半透明 */
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 8%);
+  --border: oklch(1 0 0 / 15%); /* 稍微明显一点 */
+  --input: oklch(1 0 0 / 10%); /* 稍微明显一点 */
   --ring: oklch(0.75 0.12 340);
 
   /* 危险色 - 深色版本 */
@@ -143,14 +145,122 @@
   --chart-5: oklch(0.55 0.12 260); /* violet */
 
   /* 侧边栏 - 深色版本 */
-  --sidebar: oklch(0.1 0.01 340);
-  --sidebar-foreground: oklch(0.9 0.02 340);
+  --sidebar: oklch(0.14 0.015 340); /* 稍微亮一点 */
+  --sidebar-foreground: oklch(0.85 0.02 340); /* 稍微暗一点 */
   --sidebar-primary: oklch(0.7 0.12 340);
-  --sidebar-primary-foreground: oklch(0.1 0.01 340);
-  --sidebar-accent: oklch(0.16 0.03 340);
-  --sidebar-accent-foreground: oklch(0.85 0.04 340);
-  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-primary-foreground: oklch(0.14 0.015 340);
+  --sidebar-accent: oklch(0.2 0.03 340); /* 稍微亮一点 */
+  --sidebar-accent-foreground: oklch(0.82 0.04 340); /* 稍微暗一点 */
+  --sidebar-border: oklch(1 0 0 / 15%); /* 稍微明显一点 */
   --sidebar-ring: oklch(0.7 0.12 340);
+}
+
+/* ========== 温暖主题 - 橙黄色调 ========== */
+.warm {
+  /* 基础背景和前景色 - 温暖的橙黄色调 */
+  --background: oklch(0.98 0.02 45); /* 温暖的浅黄白色 */
+  --foreground: oklch(0.15 0.03 25); /* 深棕色文字 */
+
+  /* 卡片和弹出层 - 纯净白色 */
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.03 25);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.03 25);
+
+  /* 主色调 - 温暖的橙色 */
+  --primary: oklch(0.65 0.18 45); /* 温暖的橙色 */
+  --primary-foreground: oklch(0.98 0.01 45);
+
+  /* 次要色调 - 浅橙色 */
+  --secondary: oklch(0.95 0.04 45); /* 浅橙色 */
+  --secondary-foreground: oklch(0.5 0.1 45);
+
+  /* 静音色调 - 中性橙色 */
+  --muted: oklch(0.94 0.03 45);
+  --muted-foreground: oklch(0.55 0.06 45);
+
+  /* 强调色 - 亮橙色 */
+  --accent: oklch(0.92 0.06 45);
+  --accent-foreground: oklch(0.4 0.12 45);
+
+  /* 边框和输入 - 柔和橙色 */
+  --border: oklch(0.88 0.04 45);
+  --input: oklch(0.94 0.03 45);
+  --ring: oklch(0.65 0.18 45);
+
+  /* 危险色 - 保持红色 */
+  --destructive: oklch(0.65 0.2 25);
+
+  /* 图表色彩 - 温暖色系列 */
+  --chart-1: oklch(0.65 0.18 45); /* orange */
+  --chart-2: oklch(0.7 0.15 60); /* yellow */
+  --chart-3: oklch(0.6 0.2 30); /* red-orange */
+  --chart-4: oklch(0.55 0.15 15); /* brown */
+  --chart-5: oklch(0.5 0.12 75); /* amber */
+
+  /* 侧边栏 - 浅橙色背景 */
+  --sidebar: oklch(0.97 0.02 45);
+  --sidebar-foreground: oklch(0.3 0.06 45);
+  --sidebar-primary: oklch(0.65 0.18 45);
+  --sidebar-primary-foreground: oklch(0.97 0.02 45);
+  --sidebar-accent: oklch(0.93 0.05 45);
+  --sidebar-accent-foreground: oklch(0.4 0.1 45);
+  --sidebar-border: oklch(0.88 0.04 45);
+  --sidebar-ring: oklch(0.65 0.18 45);
+}
+
+/* ========== AI主题 - 科技蓝紫色调 ========== */
+.ai {
+  /* 基础背景和前景色 - 科技感的蓝紫色调 */
+  --background: oklch(0.97 0.02 240); /* 科技感的浅蓝白色 */
+  --foreground: oklch(0.12 0.04 240); /* 深蓝色文字 */
+
+  /* 卡片和弹出层 - 带蓝色调的白色 */
+  --card: oklch(0.99 0.01 240);
+  --card-foreground: oklch(0.12 0.04 240);
+  --popover: oklch(0.99 0.01 240);
+  --popover-foreground: oklch(0.12 0.04 240);
+
+  /* 主色调 - 科技蓝色 */
+  --primary: oklch(0.6 0.2 250); /* 科技蓝色 */
+  --primary-foreground: oklch(0.98 0.01 250);
+
+  /* 次要色调 - 浅科技蓝 */
+  --secondary: oklch(0.94 0.04 250); /* 浅科技蓝 */
+  --secondary-foreground: oklch(0.45 0.12 250);
+
+  /* 静音色调 - 中性蓝色 */
+  --muted: oklch(0.93 0.03 250);
+  --muted-foreground: oklch(0.5 0.08 250);
+
+  /* 强调色 - 亮蓝色 */
+  --accent: oklch(0.9 0.06 250);
+  --accent-foreground: oklch(0.35 0.15 250);
+
+  /* 边框和输入 - 柔和蓝色 */
+  --border: oklch(0.86 0.05 250);
+  --input: oklch(0.93 0.03 250);
+  --ring: oklch(0.6 0.2 250);
+
+  /* 危险色 - 保持红色 */
+  --destructive: oklch(0.65 0.2 25);
+
+  /* 图表色彩 - 科技色系列 */
+  --chart-1: oklch(0.6 0.2 250); /* tech blue */
+  --chart-2: oklch(0.65 0.18 270); /* purple */
+  --chart-3: oklch(0.55 0.22 230); /* electric blue */
+  --chart-4: oklch(0.5 0.15 290); /* deep purple */
+  --chart-5: oklch(0.7 0.12 200); /* cyan */
+
+  /* 侧边栏 - 浅蓝色背景 */
+  --sidebar: oklch(0.96 0.02 250);
+  --sidebar-foreground: oklch(0.25 0.08 250);
+  --sidebar-primary: oklch(0.6 0.2 250);
+  --sidebar-primary-foreground: oklch(0.96 0.02 250);
+  --sidebar-accent: oklch(0.91 0.05 250);
+  --sidebar-accent-foreground: oklch(0.35 0.12 250);
+  --sidebar-border: oklch(0.86 0.05 250);
+  --sidebar-ring: oklch(0.6 0.2 250);
 }
 
 @layer base {
@@ -398,4 +508,110 @@
     oklch(0.85 0.12 320) 100%
   );
   box-shadow: 0 4px 12px oklch(0.75 0.12 340 / 0.4);
+}
+
+/* ========== 温暖主题的特殊效果 ========== */
+.warm .glass-effect {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 200, 150, 0.1);
+  border: 1px solid rgba(255, 200, 150, 0.2);
+}
+
+.warm .bg-theme-gradient {
+  background: linear-gradient(
+    135deg,
+    oklch(0.98 0.02 45) 0%,
+    oklch(0.95 0.04 45) 50%,
+    oklch(0.92 0.06 60) 100%
+  );
+}
+
+.warm .btn-theme-primary {
+  background: linear-gradient(
+    135deg,
+    oklch(0.65 0.18 45) 0%,
+    oklch(0.7 0.15 60) 100%
+  );
+  color: oklch(0.98 0.01 45);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.warm .btn-theme-primary:hover {
+  background: linear-gradient(
+    135deg,
+    oklch(0.6 0.22 45) 0%,
+    oklch(0.65 0.18 60) 100%
+  );
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px oklch(0.65 0.18 45 / 0.3);
+}
+
+/* ========== AI主题的特殊效果 ========== */
+.ai .glass-effect {
+  backdrop-filter: blur(10px);
+  background: rgba(100, 150, 255, 0.1);
+  border: 1px solid rgba(100, 150, 255, 0.2);
+}
+
+.ai .bg-theme-gradient {
+  background: linear-gradient(
+    135deg,
+    oklch(0.97 0.02 240) 0%,
+    oklch(0.94 0.04 250) 50%,
+    oklch(0.9 0.06 270) 100%
+  );
+}
+
+.ai .btn-theme-primary {
+  background: linear-gradient(
+    135deg,
+    oklch(0.6 0.2 250) 0%,
+    oklch(0.65 0.18 270) 100%
+  );
+  color: oklch(0.98 0.01 250);
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.ai .btn-theme-primary:hover {
+  background: linear-gradient(
+    135deg,
+    oklch(0.55 0.25 250) 0%,
+    oklch(0.6 0.22 270) 100%
+  );
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px oklch(0.6 0.2 250 / 0.3);
+}
+
+/* ========== AI主题专用动画效果 ========== */
+@keyframes ai-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px oklch(0.6 0.2 250 / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px oklch(0.6 0.2 250 / 0.6),
+      0 0 30px oklch(0.65 0.18 270 / 0.4);
+  }
+}
+
+.ai .animate-ai-glow {
+  animation: ai-glow 2s ease-in-out infinite;
+}
+
+/* ========== 温暖主题专用动画效果 ========== */
+@keyframes warm-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 5px oklch(0.65 0.18 45 / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px oklch(0.65 0.18 45 / 0.5),
+      0 0 25px oklch(0.7 0.15 60 / 0.3);
+  }
+}
+
+.warm .animate-warm-glow {
+  animation: warm-glow 3s ease-in-out infinite;
 }

@@ -41,6 +41,7 @@ export default function ClientLayout({
     <ThemeProvider
       attribute="class"
       defaultTheme="light"
+      themes={["light", "dark", "warm", "ai"]}
       enableSystem={false}
       disableTransitionOnChange
     >

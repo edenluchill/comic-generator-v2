@@ -241,7 +241,9 @@
         "writeStoryFirst": "ストーリーを書いて生成ボタンをクリックしてください",
         "download": "ダウンロード",
         "poster": "ポスター",
-        "fourPanelComic": "4コマ漫画"
+        "fourPanelComic": "4コマ漫画",
+        "generateComic": "コミックを生成する",
+        "regenerate": "再生"
       }
     }
   },

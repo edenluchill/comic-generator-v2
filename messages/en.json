@@ -232,6 +232,8 @@
         "generatingScene": "Generating scene {current} of {total}",
         "noComicGenerated": "No comic generated yet",
         "writeStoryFirst": "Write a story and click generate button",
+        "generateComic": "Generate Comic",
+        "regenerate": "Regenerate",
         "download": "Download",
         "poster": "Poster",
         "fourPanelComic": "Four-Panel Comic"

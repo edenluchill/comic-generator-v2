@@ -241,7 +241,9 @@
         "writeStoryFirst": "스토리를 작성하고 생성 버튼을 클릭하세요",
         "download": "다운로드",
         "poster": "포스터",
-        "fourPanelComic": "4컷 만화"
+        "fourPanelComic": "4컷 만화",
+        "generateComic": "만화 생성",
+        "regenerate": "재생하다"
       }
     }
   },

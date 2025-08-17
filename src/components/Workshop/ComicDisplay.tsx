@@ -1,6 +1,6 @@
 "use client";
 
-import { ImageIcon, Download, RefreshCw } from "lucide-react";
+import { ImageIcon, Download, RefreshCw, Wand2 } from "lucide-react";
 import { ComicScene, ComicFormat, LayoutMode } from "@/types/diary";
 import { ProgressSpinner } from "../ui/loading";
 import { useTranslations } from "@/hooks/useTranslations";
@@ -27,6 +27,8 @@ interface ComicDisplayProps {
 
 export default function ComicDisplay({
   isGenerating,
+  onGenerate,
+  canGenerate,
   progress = 0,
   progressMessage = "",
   currentScene,
@@ -75,7 +77,21 @@ export default function ComicDisplay({
         <ImageIcon className="w-12 h-12 text-muted-foreground" />
       </div>
       <p className="text-lg mb-2 text-foreground/80">{t("noComicGenerated")}</p>
-      <p className="text-sm">{t("writeStoryFirst")}</p>
+      <p className="text-sm mb-6">{t("writeStoryFirst")}</p>
+
+      {/* 生成漫画按钮 */}
+      <button
+        onClick={onGenerate}
+        disabled={!canGenerate || isGenerating}
+        className={`inline-flex items-center justify-center gap-2 py-3 px-6 rounded-lg font-medium transition-all ${
+          canGenerate && !isGenerating
+            ? "bg-primary hover:to-accent/80 text-primary-foreground shadow-lg hover:shadow-xl transform hover:scale-105"
+            : "bg-muted text-muted-foreground cursor-not-allowed"
+        }`}
+      >
+        <Wand2 className={`w-5 h-5 ${isGenerating ? "animate-pulse" : ""}`} />
+        {isGenerating ? t("generating") : t("generateComic")}
+      </button>
     </div>
   );
 
@@ -97,16 +113,10 @@ export default function ComicDisplay({
     // 单格漫画 (海报模式) - 使用主题色彩
     if (format === "single") {
       return (
-        <div className="w-full max-w-3xl mx-auto">
+        <div className="w-full max-w-3xl mx-auto space-y-4">
           <div className="bg-card rounded-2xl shadow-2xl border border-border relative overflow-hidden">
             {/* 纸质纹理效果 - 使用主题色彩 */}
             <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-transparent via-secondary to-transparent"></div>
-
-            {/* 浮动下载按钮 - 使用主题色彩 */}
-            <button className="absolute top-4 right-4 bg-primary/90 hover:bg-primary text-primary-foreground rounded-lg px-3 py-2 flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg backdrop-blur-sm">
-              <Download className="w-4 h-4" />
-              <span className="text-sm font-medium">{t("download")}</span>
-            </button>
 
             {/* 海报内容 */}
             <div className="flex justify-center items-center min-h-[400px] relative z-10 p-6">
@@ -117,6 +127,29 @@ export default function ComicDisplay({
                 onRetryScene={onRetryScene}
               />
             </div>
+          </div>
+
+          {/* 底部按钮组 */}
+          <div className="flex justify-center gap-3">
+            {/* 重新生成按钮 */}
+            <button
+              onClick={onGenerate}
+              disabled={isGenerating}
+              className="bg-chart-3/90 hover:bg-chart-3 text-white rounded-lg px-4 py-3 flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
+            >
+              <RefreshCw
+                className={`w-4 h-4 ${isGenerating ? "animate-spin" : ""}`}
+              />
+              <span className="text-sm font-medium">
+                {isGenerating ? t("generating") : t("regenerate")}
+              </span>
+            </button>
+
+            {/* 下载按钮 */}
+            <button className="bg-primary/90 hover:bg-primary text-primary-foreground rounded-lg px-4 py-3 flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg">
+              <Download className="w-4 h-4" />
+              <span className="text-sm font-medium">{t("download")}</span>
+            </button>
           </div>
         </div>
       );
@@ -140,16 +173,10 @@ export default function ComicDisplay({
     const gridClass = getGridClass();
 
     return (
-      <div className="w-full max-w-2xl mx-auto">
+      <div className="w-full max-w-2xl mx-auto space-y-4">
         <div className="bg-card rounded-2xl shadow-2xl border border-border relative overflow-hidden">
           {/* 纸质纹理效果 - 使用主题色彩 */}
           <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-transparent via-secondary to-transparent"></div>
-
-          {/* 浮动下载按钮 - 使用主题色彩 */}
-          <button className="absolute top-4 right-4 bg-primary/90 hover:bg-primary text-primary-foreground rounded-lg px-3 py-2 flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg backdrop-blur-sm z-20">
-            <Download className="w-4 h-4" />
-            <span className="text-sm font-medium">{t("download")}</span>
-          </button>
 
           {/* 漫画网格 */}
           <div className={`${gridClass} p-6`}>
@@ -163,6 +190,29 @@ export default function ComicDisplay({
               />
             ))}
           </div>
+        </div>
+
+        {/* 底部按钮组 */}
+        <div className="flex justify-center gap-3">
+          {/* 重新生成按钮 */}
+          <button
+            onClick={onGenerate}
+            disabled={isGenerating}
+            className="bg-chart-3/90 hover:bg-chart-3 text-white rounded-lg px-4 py-3 flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
+          >
+            <RefreshCw
+              className={`w-4 h-4 ${isGenerating ? "animate-spin" : ""}`}
+            />
+            <span className="text-sm font-medium">
+              {isGenerating ? t("generating") : t("regenerate")}
+            </span>
+          </button>
+
+          {/* 下载按钮 */}
+          <button className="bg-primary/90 hover:bg-primary text-primary-foreground rounded-lg px-4 py-3 flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg">
+            <Download className="w-4 h-4" />
+            <span className="text-sm font-medium">{t("download")}</span>
+          </button>
         </div>
       </div>
     );

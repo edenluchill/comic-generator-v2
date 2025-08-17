@@ -241,7 +241,9 @@
         "writeStoryFirst": "写一个故事并点击生成按钮",
         "download": "下载",
         "poster": "海报",
-        "fourPanelComic": "四格漫画"
+        "fourPanelComic": "四格漫画",
+        "generateComic": "生成漫画",
+        "regenerate": "再生"
       }
     }
   },

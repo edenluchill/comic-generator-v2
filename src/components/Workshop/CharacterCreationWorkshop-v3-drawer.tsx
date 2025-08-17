@@ -61,6 +61,7 @@ export default function CharacterCreationWorkshop() {
         reader.onload = (e) => {
           setUploadedImage(e.target?.result as string);
           setUploadedFile(file);
+          setCharacterSaved(false); // 重置保存状态
           resetCharacterGeneration();
         };
         reader.readAsDataURL(file);
@@ -72,12 +73,14 @@ export default function CharacterCreationWorkshop() {
   const handleClearImage = useCallback(() => {
     setUploadedImage(null);
     setUploadedFile(null);
+    setCharacterSaved(false); // 重置保存状态
     resetCharacterGeneration();
   }, [resetCharacterGeneration]);
 
   const handleCharacterGeneration = useCallback(async () => {
     if (!uploadedFile) return;
     try {
+      setCharacterSaved(false); // 开始生成新角色时重置保存状态
       await generateCharacter({
         uploadedFile,
         style: selectedStyle,

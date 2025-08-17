@@ -19,6 +19,7 @@ import {
 import { formatDate, getStatusColor, getStatusText } from "@/lib/diary-utils";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 
 interface DiaryDetailModalProps {
   diary: DiaryWithComics;
@@ -108,6 +109,7 @@ function ModalHeader({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const updateDiary = useUpdateDiary();
   const deleteDiary = useDeleteDiary();
+  const t = useTranslations("Diary");
 
   // 当 diary.title 变化时，更新本地状态
   useEffect(() => {
@@ -134,8 +136,8 @@ function ModalHeader({
       setDisplayTitle(trimmedTitle);
       setIsEditingTitle(false);
     } catch (error) {
-      console.error("更新日记标题失败:", error);
-      alert("更新失败，请重试");
+      console.error(t("updateDiaryTitleFailed"), error);
+      alert(t("updateFailed"));
     }
   };
 
@@ -155,8 +157,8 @@ function ModalHeader({
       onDelete?.(diary.id);
       onClose(); // 删除后关闭模态框
     } catch (error) {
-      console.error("删除日记失败:", error);
-      alert("删除失败，请重试");
+      console.error(t("deleteDiaryFailed"), error);
+      alert(t("deleteFailed"));
     }
     setShowDeleteConfirm(false);
   };
@@ -184,13 +186,13 @@ function ModalHeader({
                   if (e.key === "Escape") handleCancelEdit();
                 }}
                 autoFocus
-                placeholder="请输入日记标题"
+                placeholder={t("enterDiaryTitle")}
               />
               <button
                 onClick={handleSaveTitle}
                 disabled={updateDiary.isPending}
                 className="p-1.5 hover:bg-chart-3/10 rounded-lg transition-all duration-300 text-chart-3 hover:scale-110 group backdrop-blur-sm border border-chart-3/20 disabled:opacity-50 shrink-0"
-                title="保存"
+                title={t("save")}
               >
                 <Check className="w-4 h-4 group-hover:scale-110 transition-transform" />
               </button>
@@ -198,7 +200,7 @@ function ModalHeader({
                 onClick={handleCancelEdit}
                 disabled={updateDiary.isPending}
                 className="p-1.5 hover:bg-muted/50 rounded-lg transition-all duration-300 text-muted-foreground hover:scale-110 group backdrop-blur-sm border border-border disabled:opacity-50 shrink-0"
-                title="取消"
+                title={t("cancel")}
               >
                 <XIcon className="w-4 h-4 group-hover:scale-110 transition-transform" />
               </button>
@@ -206,12 +208,12 @@ function ModalHeader({
           ) : (
             <>
               <h3 className="text-3xl font-bold bg-primary bg-clip-text text-transparent">
-                {displayTitle || "无标题日记"}
+                {displayTitle || t("untitledDiary")}
               </h3>
               <button
                 onClick={() => setIsEditingTitle(true)}
                 className="p-1.5 hover:bg-primary/10 rounded-lg transition-all duration-300 text-primary hover:scale-110 group backdrop-blur-sm border border-primary/20 opacity-0 group-hover:opacity-100 shrink-0"
-                title="编辑标题"
+                title={t("editTitle")}
               >
                 <Edit3 className="w-4 h-4 group-hover:scale-110 transition-transform" />
               </button>
@@ -230,7 +232,7 @@ function ModalHeader({
                 onClick={handleDeleteClick}
                 disabled={deleteDiary.isPending}
                 className="p-2 hover:bg-destructive/10 rounded-full transition-all duration-300 text-destructive hover:scale-110 group backdrop-blur-sm border border-destructive/20 disabled:opacity-50"
-                title="删除日记"
+                title={t("deleteDiary")}
               >
                 <Trash2 className="w-5 h-5 group-hover:scale-110 transition-transform" />
               </button>
@@ -240,17 +242,17 @@ function ModalHeader({
                   onClick={handleConfirmDelete}
                   disabled={deleteDiary.isPending}
                   className="px-3 py-1.5 bg-destructive hover:bg-destructive/80 text-destructive-foreground rounded-full text-xs font-medium transition-all duration-300 disabled:opacity-50"
-                  title="确认删除"
+                  title={t("confirmDelete")}
                 >
-                  {deleteDiary.isPending ? "删除中..." : "确认删除"}
+                  {deleteDiary.isPending ? t("deleting") : t("confirmDelete")}
                 </button>
                 <button
                   onClick={handleCancelDelete}
                   disabled={deleteDiary.isPending}
                   className="px-3 py-1.5 bg-muted hover:bg-muted/80 text-muted-foreground rounded-full text-xs font-medium transition-all duration-300 disabled:opacity-50"
-                  title="取消"
+                  title={t("cancel")}
                 >
-                  取消
+                  {t("cancel")}
                 </button>
               </div>
             )}
@@ -271,6 +273,8 @@ function ModalHeader({
 
 // 日记内容区域 - 使用主题色彩
 function DiaryContent({ diary }: { diary: DiaryWithComics }) {
+  const t = useTranslations("Diary");
+
   return (
     <div className="relative">
       {/* 日记本样式的内容区域 */}
@@ -306,7 +310,9 @@ function DiaryContent({ diary }: { diary: DiaryWithComics }) {
         <div className="relative z-10 pl-8">
           <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <Calendar className="w-4 h-4 text-primary" />
-            <span className="font-mono">日期: {formatDate(diary.date)}</span>
+            <span className="font-mono">
+              {t("date", { date: formatDate(diary.date) })}
+            </span>
             <span
               className={`ml-4 px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(
                 diary.status
@@ -319,7 +325,7 @@ function DiaryContent({ diary }: { diary: DiaryWithComics }) {
             className="text-foreground leading-relaxed whitespace-pre-wrap text-base font-mono"
             style={{ lineHeight: "1.4rem" }}
           >
-            {diary.content || "无内容"}
+            {diary.content || t("noContent")}
           </p>
         </div>
       </div>
@@ -387,6 +393,8 @@ function PhotoStyleComicGrid({ scenes }: { scenes: SimpleComicScene[] }) {
 
 // 海报卡片组件
 function PosterCard({ scene }: { scene: SimpleComicScene }) {
+  const t = useTranslations("Diary");
+
   return (
     <div className="transform transition-all duration-300 hover:scale-105 relative max-w-md w-full">
       <div className="relative bg-card rounded-xl shadow-2xl border-4 border-card overflow-hidden">
@@ -397,7 +405,7 @@ function PosterCard({ scene }: { scene: SimpleComicScene }) {
           <div className="relative">
             <Image
               src={scene.image_url}
-              alt="海报回忆"
+              alt={t("posterMemory")}
               className="w-full h-auto object-cover"
               width={512}
               height={384}
@@ -413,7 +421,7 @@ function PosterCard({ scene }: { scene: SimpleComicScene }) {
               <div className="w-16 h-16 bg-muted rounded-lg mx-auto mb-3 flex items-center justify-center">
                 <Sparkles className="w-8 h-8 text-muted-foreground" />
               </div>
-              <p className="text-lg font-medium">海报生成中...</p>
+              <p className="text-lg font-medium">{t("posterGenerating")}</p>
             </div>
           </div>
         )}
@@ -433,6 +441,7 @@ function MobilePhotoCard({
   scene: SimpleComicScene;
   index: number;
 }) {
+  const t = useTranslations("Diary");
   const rotations = ["rotate-1", "-rotate-1", "rotate-0.5", "-rotate-0.5"];
   const rotation = rotations[index % rotations.length];
 
@@ -447,7 +456,7 @@ function MobilePhotoCard({
         {scene.image_url ? (
           <Image
             src={scene.image_url}
-            alt={`回忆片段 ${index + 1}`}
+            alt={t("memoryFragment", { number: index + 1 })}
             className="w-full h-full object-cover"
             width={200}
             height={200}
@@ -456,7 +465,7 @@ function MobilePhotoCard({
           <div className="w-full h-full flex items-center justify-center bg-muted">
             <div className="text-center text-muted-foreground">
               <div className="w-8 h-8 bg-muted-foreground/30 rounded mx-auto mb-2"></div>
-              <p className="text-xs">场景{index + 1}</p>
+              <p className="text-xs">{t("scene", { number: index + 1 })}</p>
             </div>
           </div>
         )}
@@ -467,15 +476,17 @@ function MobilePhotoCard({
 
 // 空漫画状态 - 使用主题色彩
 function EmptyComicState() {
+  const t = useTranslations("Diary");
+
   return (
     <div className="bg-gradient-to-br from-muted/50 via-secondary/30 to-accent/20 rounded-2xl p-12 text-center border-2 border-dashed border-primary/30 shadow-inner">
       <div className="relative">
         <BookOpen className="w-16 h-16 mx-auto mb-4 text-primary/60" />
         <div className="absolute -inset-4 bg-gradient-to-r from-primary/10 via-accent/5 to-primary/10 rounded-full blur-xl"></div>
       </div>
-      <p className="text-primary/70 font-medium">还没有生成漫画回忆</p>
+      <p className="text-primary/70 font-medium">{t("noComicMemoryYet")}</p>
       <p className="text-muted-foreground text-sm mt-1">
-        快去创造美好的回忆吧~
+        {t("createBeautifulMemories")}
       </p>
     </div>
   );
@@ -489,22 +500,24 @@ function DiaryMetadata({
   diary: DiaryWithComics;
   comic: DiaryComic | null;
 }) {
+  const t = useTranslations("Diary");
+
   return (
     <div className="mt-8 bg-secondary/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-border">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-muted-foreground">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-primary rounded-full"></div>
-          <strong className="text-foreground">创建时间：</strong>
+          <strong className="text-foreground">{t("createdTime")}</strong>
           <span className="font-mono">{formatDate(diary.created_at)}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-accent rounded-full"></div>
-          <strong className="text-foreground">日记状态：</strong>{" "}
+          <strong className="text-foreground">{t("diaryStatus")}</strong>{" "}
           {getStatusText(diary.status)}
         </div>
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-chart-1 rounded-full"></div>
-          <strong className="text-foreground">日记ID：</strong>
+          <strong className="text-foreground">{t("diaryId")}</strong>
           <span className="font-mono">#{diary.id.slice(-8)}</span>
         </div>
       </div>
@@ -512,12 +525,12 @@ function DiaryMetadata({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-muted-foreground mt-4 pt-4 border-t border-border">
           <div className="flex items-center gap-2">
             <Sparkles className="w-3 h-3 text-chart-2" />
-            <strong className="text-foreground">漫画风格：</strong>{" "}
+            <strong className="text-foreground">{t("comicStyle")}</strong>{" "}
             {comic.style}
           </div>
           <div className="flex items-center gap-2">
             <Heart className="w-3 h-3 text-chart-3" />
-            <strong className="text-foreground">漫画状态：</strong>{" "}
+            <strong className="text-foreground">{t("comicStatus")}</strong>{" "}
             {getStatusText(comic.status)}
           </div>
         </div>

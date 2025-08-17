@@ -220,7 +220,29 @@
       "writeStory": "写故事",
       "chooseStyle": "选择样式",
       "generating": "正在生成...",
-      "complete": "完全的"
+      "complete": "完全的",
+      "backToWorkshop": "返回工作室",
+      "workshop": "车间",
+      "createComicWithCharacters": "用你的角色创作故事",
+      "deleteCharacterFailed": "删除角色失败：",
+      "generateComicFailed": "无法生成漫画：",
+      "retrySceneFailed": "重试场景失败：",
+      "createCharactersFirstTip": "💡 提示：生成漫画前需要先创建角色",
+      "DiaryInput": {
+        "storyDiary": "故事日记",
+        "placeholder": "在这里写下你的故事……\n\n例如：\n小明今天在公园里遇到了一只可爱的小猫。小猫很害羞，躲在一棵树后面。小明拿出一些鱼干，小心翼翼地靠近。最后，小猫被食物吸引，和小明成为了好朋友。",
+        "characterCount": "人物"
+      },
+      "ComicDisplay": {
+        "generationFailed": "生成失败",
+        "generating": "正在生成漫画...",
+        "generatingScene": "正在生成场景 {current} (共 {total} 个)",
+        "noComicGenerated": "尚未生成漫画",
+        "writeStoryFirst": "写一个故事并点击生成按钮",
+        "download": "下载",
+        "poster": "海报",
+        "fourPanelComic": "四格漫画"
+      }
     }
   },
   "Login": {
@@ -293,5 +315,36 @@
     "loading": "加载中...",
     "characterLibrary": "角色库",
     "characterLibraryWithCount": "角色库 ({count})"
+  },
+  "Diary": {
+    "myDiary": "我的日记",
+    "deletingDiary": "正在删除日记...",
+    "getDiaryFailed": "无法获取日记：{error}",
+    "unknownError": "未知错误",
+    "deleteDiaryFailed": "删除日记失败：",
+    "updateDiaryTitleFailed": "无法更新日记标题：",
+    "updateFailed": "更新失败，请重试",
+    "deleteFailed": "删除失败，请重试",
+    "untitledDiary": "无题日记",
+    "enterDiaryTitle": "输入日记标题",
+    "save": "节省",
+    "cancel": "取消",
+    "editTitle": "编辑标题",
+    "deleteDiary": "删除日记",
+    "confirmDelete": "确认删除",
+    "deleting": "正在删除...",
+    "date": "日期：{date}",
+    "noContent": "没有内容",
+    "posterMemory": "海报记忆",
+    "posterGenerating": "海报生成中...",
+    "memoryFragment": "记忆碎片 {number}",
+    "scene": "场景{number}",
+    "noComicMemoryYet": "尚未产生任何漫画记忆",
+    "createBeautifulMemories": "去创造美好的回忆吧~",
+    "createdTime": "创建时间:",
+    "diaryStatus": "日记状态：",
+    "diaryId": "日记编号：",
+    "comicStyle": "漫画风格：",
+    "comicStatus": "漫画状态："
   }
 }

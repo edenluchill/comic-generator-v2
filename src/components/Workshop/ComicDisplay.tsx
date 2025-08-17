@@ -3,6 +3,7 @@
 import { ImageIcon, Download, RefreshCw } from "lucide-react";
 import { ComicScene, ComicFormat, LayoutMode } from "@/types/diary";
 import { ProgressSpinner } from "../ui/loading";
+import { useTranslations } from "@/hooks/useTranslations";
 
 import FormatPicker from "./ComicDisplay/FormatPicker";
 import ComicSceneComponent from "./ComicDisplay/ComicScene";
@@ -37,13 +38,15 @@ export default function ComicDisplay({
   onFormatChange,
   layoutMode,
 }: ComicDisplayProps) {
+  const t = useTranslations("WorkshopPage.ComicGeneration.ComicDisplay");
+
   // 渲染函数 - 使用主题色彩
   const renderErrorState = () => (
     <div className="text-center text-destructive">
       <div className="w-16 h-16 mx-auto mb-4 bg-destructive/10 rounded-full flex items-center justify-center">
         <RefreshCw className="w-8 h-8 text-destructive" />
       </div>
-      <p className="text-lg mb-2">生成失败</p>
+      <p className="text-lg mb-2">{t("generationFailed")}</p>
       <p className="text-sm">{error}</p>
     </div>
   );
@@ -52,7 +55,7 @@ export default function ComicDisplay({
     <div className="text-center">
       <ProgressSpinner
         progress={progress}
-        message={progressMessage || "正在生成漫画..."}
+        message={progressMessage || t("generating")}
         color="primary"
         size="lg"
         showProgressBar={true}
@@ -60,7 +63,7 @@ export default function ComicDisplay({
       />
       {currentScene && totalScenes && (
         <p className="text-sm text-muted-foreground mt-2">
-          正在生成第 {currentScene} 个场景，共 {totalScenes} 个场景
+          {t("generatingScene", { current: currentScene, total: totalScenes })}
         </p>
       )}
     </div>
@@ -71,8 +74,8 @@ export default function ComicDisplay({
       <div className="w-32 h-32 mx-auto mb-4 bg-muted rounded-lg flex items-center justify-center">
         <ImageIcon className="w-12 h-12 text-muted-foreground" />
       </div>
-      <p className="text-lg mb-2 text-foreground/80">还没有生成漫画</p>
-      <p className="text-sm">写好故事后点击生成按钮</p>
+      <p className="text-lg mb-2 text-foreground/80">{t("noComicGenerated")}</p>
+      <p className="text-sm">{t("writeStoryFirst")}</p>
     </div>
   );
 
@@ -102,7 +105,7 @@ export default function ComicDisplay({
             {/* 浮动下载按钮 - 使用主题色彩 */}
             <button className="absolute top-4 right-4 bg-primary/90 hover:bg-primary text-primary-foreground rounded-lg px-3 py-2 flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg backdrop-blur-sm">
               <Download className="w-4 h-4" />
-              <span className="text-sm font-medium">下载</span>
+              <span className="text-sm font-medium">{t("download")}</span>
             </button>
 
             {/* 海报内容 */}
@@ -145,7 +148,7 @@ export default function ComicDisplay({
           {/* 浮动下载按钮 - 使用主题色彩 */}
           <button className="absolute top-4 right-4 bg-primary/90 hover:bg-primary text-primary-foreground rounded-lg px-3 py-2 flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg backdrop-blur-sm z-20">
             <Download className="w-4 h-4" />
-            <span className="text-sm font-medium">下载</span>
+            <span className="text-sm font-medium">{t("download")}</span>
           </button>
 
           {/* 漫画网格 */}
@@ -174,8 +177,8 @@ export default function ComicDisplay({
 
   // 获取动态标题
   const getTitle = () => {
-    if (format === "single") return "海报";
-    return "四格漫画";
+    if (format === "single") return t("poster");
+    return t("fourPanelComic");
   };
 
   return (

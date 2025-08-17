@@ -213,7 +213,29 @@
       "writeStory": "Write Story",
       "chooseStyle": "Choose Style",
       "generating": "Generating...",
-      "complete": "Complete"
+      "complete": "Complete",
+      "backToWorkshop": "Back to Workshop",
+      "workshop": "Workshop",
+      "createComicWithCharacters": "Create stories with your characters",
+      "deleteCharacterFailed": "Failed to delete character:",
+      "generateComicFailed": "Failed to generate comic:",
+      "retrySceneFailed": "Failed to retry scene:",
+      "createCharactersFirstTip": "💡 Tip: You need to create characters first before generating comics",
+      "DiaryInput": {
+        "storyDiary": "Story Diary",
+        "placeholder": "Write your story here...\n\nFor example:\nXiao Ming met a cute kitten in the park today. The kitten was very shy and hid behind a tree. Xiao Ming took out some dried fish and carefully approached. Finally, the kitten was attracted by the food and became good friends with Xiao Ming.",
+        "characterCount": "characters"
+      },
+      "ComicDisplay": {
+        "generationFailed": "Generation Failed",
+        "generating": "Generating comic...",
+        "generatingScene": "Generating scene {current} of {total}",
+        "noComicGenerated": "No comic generated yet",
+        "writeStoryFirst": "Write a story and click generate button",
+        "download": "Download",
+        "poster": "Poster",
+        "fourPanelComic": "Four-Panel Comic"
+      }
     }
   },
   "Character": {
@@ -250,6 +272,37 @@
     "loading": "Loading...",
     "characterLibrary": "Character Library",
     "characterLibraryWithCount": "Character Library ({count})"
+  },
+  "Diary": {
+    "myDiary": "My Diary",
+    "deletingDiary": "Deleting diary...",
+    "getDiaryFailed": "Failed to get diary: {error}",
+    "unknownError": "Unknown error",
+    "deleteDiaryFailed": "Failed to delete diary:",
+    "updateDiaryTitleFailed": "Failed to update diary title:",
+    "updateFailed": "Update failed, please try again",
+    "deleteFailed": "Delete failed, please try again",
+    "untitledDiary": "Untitled Diary",
+    "enterDiaryTitle": "Enter diary title",
+    "save": "Save",
+    "cancel": "Cancel",
+    "editTitle": "Edit Title",
+    "deleteDiary": "Delete Diary",
+    "confirmDelete": "Confirm Delete",
+    "deleting": "Deleting...",
+    "date": "Date: {date}",
+    "noContent": "No content",
+    "posterMemory": "Poster Memory",
+    "posterGenerating": "Poster generating...",
+    "memoryFragment": "Memory Fragment {number}",
+    "scene": "Scene{number}",
+    "noComicMemoryYet": "No comic memories generated yet",
+    "createBeautifulMemories": "Go create beautiful memories~",
+    "createdTime": "Created Time:",
+    "diaryStatus": "Diary Status:",
+    "diaryId": "Diary ID:",
+    "comicStyle": "Comic Style:",
+    "comicStatus": "Comic Status:"
   },
   "Profile": {
     "profileTitle": "My Profile",

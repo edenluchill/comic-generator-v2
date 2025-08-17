@@ -61,7 +61,7 @@ export default function DiaryCard({ diary, onClick }: DiaryCardProps) {
           {/* 文字部分 - 使用主题色彩 */}
           <div className="flex-1 mt-4 min-w-0">
             <p className="text-sm text-foreground/80 leading-relaxed line-clamp-5 relative">
-              {diary.content || "今天发生了很多有趣的事情..."}
+              {diary.content}
             </p>
           </div>
 
@@ -93,7 +93,7 @@ export default function DiaryCard({ diary, onClick }: DiaryCardProps) {
               ))}
 
               {/* 更多漫画指示 - 使用主题色彩 */}
-              {firstComic.comic_scene.length > 2 && (
+              {/* {firstComic.comic_scene.length > 2 && (
                 <div className="text-center mt-1">
                   <div className="w-4 h-4 bg-accent/40 rounded-full flex items-center justify-center mx-auto border border-accent/60">
                     <span className="text-[9px] text-primary font-medium">
@@ -101,7 +101,7 @@ export default function DiaryCard({ diary, onClick }: DiaryCardProps) {
                     </span>
                   </div>
                 </div>
-              )}
+              )} */}
             </div>
           )}
         </div>

@@ -11,6 +11,7 @@ import CreateDiaryCard from "./CreateDiaryCard";
 import DiaryDetailModal from "./DiaryDetailModal";
 import { createPortal } from "react-dom";
 import { Loader } from "../ui/loading";
+import { useTranslations } from "next-intl";
 
 interface DiaryListProps {
   onCreateNewDiary: () => void;
@@ -28,6 +29,7 @@ export default function DiaryList({
   const [selectedDiary, setSelectedDiary] = useState<DiaryWithComics | null>(
     null
   );
+  const t = useTranslations("Diary");
 
   const diaries = diariesData?.diaries || [];
 
@@ -45,7 +47,7 @@ export default function DiaryList({
       await deleteDiaryMutation.mutateAsync(diaryId);
       // 删除成功提示可以在这里添加，比如 toast 通知
     } catch (error) {
-      console.error("删除日记失败:", error);
+      console.error(t("deleteDiaryFailed"), error);
       // 错误提示可以在这里添加
     }
   };
@@ -66,7 +68,7 @@ export default function DiaryList({
         {/* 删除状态提示 - 使用主题色彩 */}
         {deleteDiaryMutation.isPending && (
           <div className="mb-4 p-3 bg-chart-2/10 text-chart-2 rounded-lg text-sm border border-chart-2/20">
-            正在删除日记...
+            {t("deletingDiary")}
           </div>
         )}
 
@@ -101,11 +103,13 @@ function DiaryListHeader({
   count: number;
   isLoading: boolean;
 }) {
+  const t = useTranslations("Diary");
+
   return (
     <div className="mb-4">
       <h3 className="text-lg font-semibold text-foreground mb-3">
         <div className="flex items-center gap-2">
-          我的日记本
+          {t("myDiary")}
           <span className="text-base font-normal bg-secondary text-primary px-2 py-1 rounded-full border border-border">
             {count}
           </span>
@@ -118,11 +122,13 @@ function DiaryListHeader({
 
 // 错误消息 - 使用主题色彩
 function ErrorMessage({ error }: { error: Error }) {
-  const errorMessage = error instanceof Error ? error.message : "未知错误";
+  const t = useTranslations("Diary");
+  const errorMessage =
+    error instanceof Error ? error.message : t("unknownError");
 
   return (
     <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-lg text-sm border border-destructive/20">
-      获取日记失败: {errorMessage}
+      {t("getDiaryFailed", { error: errorMessage })}
     </div>
   );
 }

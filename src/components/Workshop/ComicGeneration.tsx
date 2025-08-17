@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "@/hooks/useTranslations";
 import CharactersList from "./CharactersList";
 import DiaryInput from "./DiaryInput";
 import ComicDisplay from "./ComicDisplay";
@@ -49,6 +50,7 @@ const saveFormatPreference = (format: ComicFormat) => {
 };
 
 export default function ComicGeneration() {
+  const t = useTranslations("WorkshopPage.ComicGeneration");
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: characters = [], isLoading } = useCharacters();
@@ -107,7 +109,7 @@ export default function ComicGeneration() {
       await deleteCharacterMutation.mutateAsync(id);
       // 可以在这里添加成功提示
     } catch (error) {
-      console.error("删除角色失败:", error);
+      console.error(t("deleteCharacterFailed"), error);
       // 可以在这里添加错误提示
     }
   };
@@ -128,7 +130,7 @@ export default function ComicGeneration() {
         format: comicFormat, // 只传format，不传layout_mode
       });
     } catch (error) {
-      console.error("生成漫画失败:", error);
+      console.error(t("generateComicFailed"), error);
     }
   };
 
@@ -136,7 +138,7 @@ export default function ComicGeneration() {
     try {
       await retryScene(sceneId, newDescription);
     } catch (error) {
-      console.error("重试场景失败:", error);
+      console.error(t("retrySceneFailed"), error);
       // 可以在这里添加错误提示
     }
   };
@@ -147,8 +149,8 @@ export default function ComicGeneration() {
   // Header配置
   const backAction = createBackAction(
     ArrowLeft,
-    "返回工作室",
-    "工作室",
+    t("backToWorkshop"),
+    t("workshop"),
     handleBackToWorkshop
   );
 
@@ -164,7 +166,7 @@ export default function ComicGeneration() {
         {/* 使用可重用的Header组件 */}
         <WorkshopHeader
           leftAction={backAction}
-          title="用你的角色和故事创作四格漫画"
+          title={t("createComicWithCharacters")}
           mounted={mounted}
         />
 
@@ -232,7 +234,7 @@ export default function ComicGeneration() {
         {characters.length === 0 && (
           <div className="mt-4 text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-chart-1/10 text-chart-1 rounded-lg text-sm border border-chart-1/20">
-              💡 提示：你需要先创建角色才能生成漫画
+              {t("createCharactersFirstTip")}
             </div>
           </div>
         )}

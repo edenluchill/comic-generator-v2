@@ -83,9 +83,9 @@ export default function CharacterCreationWorkshop() {
         style: selectedStyle,
       });
     } catch (error) {
-      console.error("生成失败:", error);
+      console.error(t("CharacterGeneration.generationFailed"), error);
     }
-  }, [uploadedFile, selectedStyle, generateCharacter]);
+  }, [uploadedFile, selectedStyle, generateCharacter, t]);
 
   const handleSaveCharacter = useCallback(
     async (characterName: string) => {
@@ -98,7 +98,7 @@ export default function CharacterCreationWorkshop() {
           });
           setCharacterSaved(true);
         } catch (error) {
-          console.error("保存角色失败:", error);
+          console.error(t("CharacterGeneration.saveCharacterFailed"), error);
         }
       }
     },
@@ -107,6 +107,7 @@ export default function CharacterCreationWorkshop() {
       threeViewResult?.imageUrl,
       user,
       createCharacterMutation,
+      t,
     ]
   );
 
@@ -115,10 +116,10 @@ export default function CharacterCreationWorkshop() {
       try {
         await deleteCharacterMutation.mutateAsync(id);
       } catch (error) {
-        console.error("删除角色失败:", error);
+        console.error(t("CharacterGeneration.deleteCharacterFailed"), error);
       }
     },
-    [deleteCharacterMutation]
+    [deleteCharacterMutation, t]
   );
 
   const handleAddNewCharacter = useCallback(() => {
@@ -167,7 +168,7 @@ export default function CharacterCreationWorkshop() {
           <StepCard
             step={1}
             title={t("uploadImage")}
-            description="选择一张清晰的人物照片，我们将基于这张照片生成角色"
+            description={t("CharacterGeneration.step1Description")}
             icon={Upload}
             isActive={!step1Complete}
             isCompleted={step1Complete}
@@ -183,8 +184,8 @@ export default function CharacterCreationWorkshop() {
 
           <StepCard
             step={2}
-            title="生成并保存角色"
-            description="AI将为你生成专属的角色头像和三视图，并保存到你的角色库"
+            title={t("CharacterGeneration.step2Title")}
+            description={t("CharacterGeneration.step2Description")}
             icon={User}
             isActive={step1Complete && !step2Complete}
             isCompleted={step2Complete}
@@ -221,8 +222,8 @@ export default function CharacterCreationWorkshop() {
 
           <StepCard
             step={3}
-            title="创作漫画"
-            description="使用你的角色开始创作专属漫画故事"
+            title={t("CharacterGeneration.step3Title")}
+            description={t("CharacterGeneration.step3Description")}
             icon={Palette}
             isActive={false}
             isCompleted={false}
@@ -230,7 +231,7 @@ export default function CharacterCreationWorkshop() {
             actionButton={
               step2Complete
                 ? {
-                    text: "立即创作漫画",
+                    text: t("CharacterGeneration.createComicNow"),
                     onClick: handleSwitchToComic,
                   }
                 : undefined
@@ -240,10 +241,12 @@ export default function CharacterCreationWorkshop() {
               <div className="text-center py-6">
                 <div className="text-6xl mb-4">🎉</div>
                 <div className="text-lg font-semibold text-foreground mb-2">
-                  恭喜！角色创建完成
+                  {t("CharacterGeneration.congratulations")}
                 </div>
                 <div className="text-muted-foreground text-sm mb-6">
-                  现在可以使用 {characters.length} 个角色来创作你的专属漫画了
+                  {t("CharacterGeneration.canCreateComics", {
+                    count: characters.length,
+                  })}
                 </div>
 
                 {/* 调整次要按钮样式，使用主题色彩 */}
@@ -253,7 +256,7 @@ export default function CharacterCreationWorkshop() {
                     className="inline-flex items-center gap-2 px-3 py-1.5 bg-transparent border border-border text-muted-foreground rounded-lg hover:bg-secondary/50 hover:text-foreground hover:border-primary/30 transition-all duration-200 text-xs font-normal"
                   >
                     <User className="w-3 h-3" />
-                    添加更多角色
+                    {t("CharacterGeneration.addMoreCharacters")}
                   </button>
 
                   <div className="text-border text-xs">|</div>
@@ -263,7 +266,7 @@ export default function CharacterCreationWorkshop() {
                     className="inline-flex items-center gap-2 px-3 py-1.5 bg-transparent border border-border text-muted-foreground rounded-lg hover:bg-secondary/50 hover:text-foreground hover:border-primary/30 transition-all duration-200 text-xs font-normal"
                   >
                     <Users className="w-3 h-3" />
-                    查看角色库
+                    {t("CharacterGeneration.viewCharacterLibrary")}
                   </button>
                 </div>
               </div>

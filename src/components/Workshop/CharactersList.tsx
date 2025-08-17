@@ -6,6 +6,7 @@ import { Character } from "@/types/characters";
 import CharacterCard from "./CharacterCard";
 import CharacterDetailModal from "./CharacterDetailModal";
 import { SimpleSpinner } from "../ui/loading";
+import { useTranslations } from "@/hooks/useTranslations";
 
 interface CharactersListProps {
   onAddNewCharacter: () => void;
@@ -22,6 +23,7 @@ export default function CharactersList({
   loading = false,
   onDeleteCharacter,
 }: CharactersListProps) {
+  const t = useTranslations("Character");
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null
   );
@@ -35,7 +37,7 @@ export default function CharactersList({
       >
         <div className="mb-6">
           <h3 className="text-xl font-bold text-foreground mb-2 flex items-center gap-2">
-            我的角色库
+            {t("myCharacterLibrary")}
             <span className="text-base font-normal bg-secondary text-primary px-3 py-1 rounded-full border border-border">
               {characters.length}
             </span>
@@ -63,7 +65,7 @@ export default function CharactersList({
             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50">
               <div className="relative">
                 <div className="bg-card/95 backdrop-blur-md text-foreground text-xs font-medium px-3 py-2 rounded-xl shadow-lg border border-border whitespace-nowrap">
-                  创建新角色
+                  {t("createNewCharacter")}
                 </div>
                 <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-card/95 border-r border-b border-border rotate-45"></div>
               </div>

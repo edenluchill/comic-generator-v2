@@ -1,6 +1,7 @@
 import { ArrowLeft, Users } from "lucide-react";
 import { Character } from "@/types/characters";
 import Image from "next/image";
+import { useTranslations } from "@/hooks/useTranslations";
 
 export interface CharacterWorkshopNavigationBarProps {
   onBack: () => void;
@@ -17,6 +18,8 @@ export function CharacterWorkshopNavigationBar({
   loading,
   mounted,
 }: CharacterWorkshopNavigationBarProps) {
+  const t = useTranslations("Character");
+
   return (
     <div
       className={`
@@ -25,27 +28,24 @@ export function CharacterWorkshopNavigationBar({
         ${mounted ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4"}
       `}
     >
-      {/* 左侧：返回按钮 - 使用主题色彩 */}
       <button
         onClick={onBack}
         className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 text-primary hover:text-primary/80 hover:bg-secondary/50 active:scale-95"
       >
         <ArrowLeft className="w-4 h-4 flex-shrink-0" />
-        <span className="hidden sm:inline">返回控制台</span>
+        <span className="hidden sm:inline">{t("backToConsole")}</span>
       </button>
 
-      {/* 右侧：角色库信息 */}
       <div className="flex items-center gap-0">
         {loading ? (
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-muted animate-pulse" />
             <div className="text-sm font-medium text-muted-foreground">
-              加载中...
+              {t("loading")}
             </div>
           </div>
         ) : (
           <>
-            {/* 角色预览 - 使用主题色彩 */}
             {characters.length > 0 && (
               <div className="flex -space-x-1">
                 {characters.slice(0, 3).map((character) => (
@@ -65,7 +65,6 @@ export function CharacterWorkshopNavigationBar({
               </div>
             )}
 
-            {/* 角色库按钮 - 使用主题色彩 */}
             <button
               onClick={onOpenCharacterDrawer}
               className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-300 text-primary hover:text-primary/80 hover:bg-secondary/50 active:scale-95"
@@ -73,8 +72,8 @@ export function CharacterWorkshopNavigationBar({
               <Users className="w-4 h-4" />
               <span className="text-sm font-medium">
                 {characters.length > 0
-                  ? `角色库 (${characters.length})`
-                  : "角色库"}
+                  ? t("characterLibraryWithCount", { count: characters.length })
+                  : t("characterLibrary")}
               </span>
             </button>
           </>

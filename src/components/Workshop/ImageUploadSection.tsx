@@ -27,7 +27,7 @@ export default function ImageUploadSection({
   onDrop,
   onClearImage,
 }: ImageUploadSectionProps) {
-  const t = useTranslations("WorkshopPage");
+  const t = useTranslations("WorkshopPage.CharacterGeneration");
 
   const handleFileInputChange = (
     event: React.ChangeEvent<HTMLInputElement>

@@ -124,7 +124,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-theme-gradient">
-      <div className="container mx-auto px-4">
+      <div className="container flex flex-col mx-auto px-4 gap-16 md:gap-24">
         {/* Section 1: Hero Area */}
         <section className="min-h-screen flex flex-col justify-center relative overflow-hidden pt-16 pb-20">
           {/* Background decorations */}
@@ -180,7 +180,7 @@ export default function HomePage() {
         </section>
 
         {/* Section 2: Upload Photo Generate Multi-Style Characters */}
-        <section ref={sectionRef} className="max-w-6xl mx-auto py-16 md:py-24">
+        <section ref={sectionRef} className="max-w-6xl mx-auto ">
           <div className="grid md:grid-cols-3 gap-10 items-center relative">
             {/* Left: User uploaded image */}
             <div
@@ -351,10 +351,7 @@ export default function HomePage() {
         </section>
 
         {/* Section 3: AI Scene Composition */}
-        <section
-          ref={sceneCardsRef}
-          className="max-w-7xl mx-auto py-20 md:py-24"
-        >
+        <section ref={sceneCardsRef} className="max-w-7xl mx-auto ">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 backdrop-blur px-6 py-2 border border-primary/20 text-primary mb-6">
               <Stars className="w-5 h-5" />
@@ -586,24 +583,10 @@ export default function HomePage() {
               </p>
             </div>
           </div>
-
-          {/* Experience now */}
-          <div className="text-center">
-            <Link href={getLocalizedHref("/workshop")}>
-              <Button className="btn-theme-primary rounded-full px-12 py-4 text-lg font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300">
-                <Stars className="w-5 h-5 mr-2" />
-                {tc("experienceAISceneComposition")}
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <p className="mt-4 text-muted-foreground">
-              {tc("oneSentenceDescription")}
-            </p>
-          </div>
         </section>
 
         {/* Section 4: Multi-Character Story Generation */}
-        <section className="max-w-7xl mx-auto py-16 md:py-24">
+        <section className="max-w-7xl mx-auto ">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 backdrop-blur px-6 py-2 border border-primary/20 text-primary mb-6">
               <Heart className="w-5 h-5" />
@@ -638,7 +621,7 @@ export default function HomePage() {
                     <span className="bg-primary text-white rounded-full px-3 py-1 text-sm font-semibold shadow-lg">
                       花花
                     </span>
-                    <span className="bg-gradient-to-r from-accent to-purple text-white rounded-full px-3 py-1 text-sm font-semibold shadow-lg">
+                    <span className="bg-primary text-white rounded-full px-3 py-1 text-sm font-semibold shadow-lg">
                       多多
                     </span>
                   </div>
@@ -734,27 +717,10 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-
-          {/* Experience now button */}
-          <div className="text-center">
-            <Link href={getLocalizedHref("/workshop")}>
-              <Button className="btn-theme-primary rounded-full px-12 py-4 text-lg font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300">
-                <Heart className="w-5 h-5 mr-2" />
-                {tc("startCreatingMultiCharacterStory")}
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </Link>
-            <p className="mt-4 text-muted-foreground">
-              {tc("characterSelection")}
-            </p>
-          </div>
         </section>
 
         {/* Section 5: User Reviews & Sharing */}
-        <section
-          ref={userReviewsRef}
-          className="max-w-7xl mx-auto py-16 md:py-24"
-        >
+        <section ref={userReviewsRef} className="max-w-7xl mx-auto ">
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 backdrop-blur px-6 py-2 border border-primary/20 text-primary mb-6">
               <Heart className="w-5 h-5" />

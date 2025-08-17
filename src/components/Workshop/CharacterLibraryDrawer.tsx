@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useState } from "react";
 import CharacterDetailModal from "./CharacterDetailModal";
 import { Loader } from "../ui/loading";
+import { useTranslations } from "@/hooks/useTranslations";
 import {
   Sheet,
   SheetContent,
@@ -32,13 +33,13 @@ export function CharacterLibraryDrawer({
   onStartComic,
   loading,
 }: CharacterLibraryDrawerProps) {
+  const t = useTranslations("Character");
   const [selectedCharacter, setSelectedCharacter] = useState<Character | null>(
     null
   );
 
   const handleDeleteCharacter = async (id: string) => {
     await onDelete(id);
-    // 如果删除的是当前选中的角色，关闭 modal
     if (selectedCharacter?.id === id) {
       setSelectedCharacter(null);
     }
@@ -57,21 +58,24 @@ export function CharacterLibraryDrawer({
                 <Users className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <SheetTitle>角色列表</SheetTitle>
+                <SheetTitle>{t("characterList")}</SheetTitle>
                 <SheetDescription>
                   {characters.length === 0
-                    ? "暂无角色"
-                    : `共 ${characters.length} 个角色`}
+                    ? t("noCharacters")
+                    : t("totalCharacters", { count: characters.length })}
                 </SheetDescription>
               </div>
             </div>
           </SheetHeader>
 
-          {/* 内容区域 */}
           <div className="flex-1 overflow-y-auto -mx-6 px-6">
             {loading ? (
               <div className="flex items-center justify-center py-8">
-                <Loader message="加载角色库..." color="primary" size="md" />
+                <Loader
+                  message={t("loadingCharacters")}
+                  color="primary"
+                  size="md"
+                />
               </div>
             ) : characters.length === 0 ? (
               <div className="text-center py-8">
@@ -79,10 +83,10 @@ export function CharacterLibraryDrawer({
                   <Users className="w-8 h-8 text-primary" />
                 </div>
                 <h4 className="text-foreground font-medium mb-2">
-                  还没有创建角色
+                  {t("noCharactersCreated")}
                 </h4>
                 <p className="text-muted-foreground text-sm">
-                  先创建一个角色开始制作漫画
+                  {t("createCharacterToStart")}
                 </p>
               </div>
             ) : (
@@ -108,9 +112,9 @@ export function CharacterLibraryDrawer({
                           {character.name}
                         </h4>
                         <p className="text-xs text-muted-foreground">
-                          创建于{" "}
+                          {t("createdOn")}{" "}
                           {new Date(character.created_at).toLocaleDateString(
-                            "zh-CN",
+                            undefined,
                             {
                               month: "short",
                               day: "numeric",
@@ -120,7 +124,7 @@ export function CharacterLibraryDrawer({
                       </div>
                       <button
                         onClick={(e) => {
-                          e.stopPropagation(); // 阻止冒泡，避免触发角色详情
+                          e.stopPropagation();
                           onDelete(character.id);
                         }}
                         className="w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors opacity-0 group-hover:opacity-100 rounded-lg hover:bg-destructive/10"
@@ -134,7 +138,6 @@ export function CharacterLibraryDrawer({
             )}
           </div>
 
-          {/* 底部区域 */}
           <SheetFooter className="-mx-6 mt-6 p-6 border-t border-border bg-gradient-to-r from-secondary/50 to-accent/30">
             {characters.length > 0 ? (
               <button
@@ -145,12 +148,12 @@ export function CharacterLibraryDrawer({
                 className="w-full py-3 bg-gradient-to-r from-chart-3 to-chart-4 hover:from-chart-3/80 hover:to-chart-4/80 text-white rounded-xl shadow-lg hover:shadow-xl transition-all font-medium flex items-center justify-center gap-2"
               >
                 <Palette className="w-4 h-4" />
-                开始制作漫画
+                {t("startMakingComic")}
               </button>
             ) : (
               <div className="text-center py-2">
                 <p className="text-muted-foreground text-sm">
-                  创建角色后即可开始制作漫画
+                  {t("createCharacterFirst")}
                 </p>
               </div>
             )}
@@ -158,7 +161,6 @@ export function CharacterLibraryDrawer({
         </SheetContent>
       </Sheet>
 
-      {/* 角色详情模态框 */}
       {selectedCharacter && (
         <CharacterDetailModal
           character={selectedCharacter}

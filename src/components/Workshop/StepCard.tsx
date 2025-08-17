@@ -1,4 +1,5 @@
 import { CheckCircle, Lock } from "lucide-react";
+import { useTranslations } from "@/hooks/useTranslations";
 
 export interface StepCardProps {
   step: number;
@@ -23,6 +24,8 @@ export function StepCard({
   children,
   actionButton,
 }: StepCardProps) {
+  const t = useTranslations("WorkshopPage");
+
   return (
     <div
       className={`bg-card rounded-2xl p-6 shadow-lg border-2 transition-all duration-300 ${
@@ -58,7 +61,7 @@ export function StepCard({
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <span className="text-sm font-medium text-muted-foreground">
-              步骤 {step}
+              {t("stepNumber", { step })}
             </span>
             {isCompleted && <CheckCircle className="w-4 h-4 text-chart-3" />}
           </div>
@@ -101,7 +104,9 @@ export function StepCard({
 
       {isLocked && (
         <div className="text-center py-4">
-          <div className="text-muted-foreground text-sm">完成上一步后解锁</div>
+          <div className="text-muted-foreground text-sm">
+            {t("completeToUnlock")}
+          </div>
         </div>
       )}
     </div>

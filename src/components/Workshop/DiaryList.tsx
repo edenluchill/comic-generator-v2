@@ -60,12 +60,12 @@ export default function DiaryList({
         {/* 标题 */}
         <DiaryListHeader count={diaries.length} isLoading={isLoading} />
 
-        {/* 错误提示 */}
+        {/* 错误提示 - 使用主题色彩 */}
         {error && <ErrorMessage error={error} />}
 
-        {/* 删除状态提示 */}
+        {/* 删除状态提示 - 使用主题色彩 */}
         {deleteDiaryMutation.isPending && (
-          <div className="mb-4 p-3 bg-blue-50 text-blue-700 rounded-lg text-sm">
+          <div className="mb-4 p-3 bg-chart-2/10 text-chart-2 rounded-lg text-sm border border-chart-2/20">
             正在删除日记...
           </div>
         )}
@@ -93,7 +93,7 @@ export default function DiaryList({
   );
 }
 
-// 日记列表标题
+// 日记列表标题 - 使用主题色彩
 function DiaryListHeader({
   count,
   isLoading,
@@ -103,21 +103,25 @@ function DiaryListHeader({
 }) {
   return (
     <div className="mb-4">
-      <h3 className="text-lg font-semibold text-amber-800 mb-3">
+      <h3 className="text-lg font-semibold text-foreground mb-3">
         <div className="flex items-center gap-2">
-          我的日记本 ({count}){isLoading && <Loader size="sm" />}
+          我的日记本
+          <span className="text-base font-normal bg-secondary text-primary px-2 py-1 rounded-full border border-border">
+            {count}
+          </span>
+          {isLoading && <Loader size="sm" />}
         </div>
       </h3>
     </div>
   );
 }
 
-// 错误消息
+// 错误消息 - 使用主题色彩
 function ErrorMessage({ error }: { error: Error }) {
   const errorMessage = error instanceof Error ? error.message : "未知错误";
 
   return (
-    <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+    <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-lg text-sm border border-destructive/20">
       获取日记失败: {errorMessage}
     </div>
   );

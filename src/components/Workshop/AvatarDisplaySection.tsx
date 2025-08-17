@@ -82,21 +82,23 @@ export default function AvatarDisplaySection({
             unoptimized
           />
 
-          {/* 角色生成完成状态 */}
+          {/* 角色生成完成状态 - 使用主题色彩 */}
           <div className="flex items-center gap-2">
-            <p className="text-xs text-green-600">✓ 头像生成完成</p>
+            <p className="text-xs text-chart-3">✓ 头像生成完成</p>
             {threeViewResult && (
-              <span className="text-xs text-purple-600">
+              <span className="text-xs text-primary">
                 • 点击右上角查看3视图
               </span>
             )}
           </div>
 
-          {/* 名字编辑和保存区域 */}
+          {/* 名字编辑和保存区域 - 使用主题色彩 */}
           {avatarResult && threeViewResult && !isSaved && (
             <div className="w-full max-w-sm space-y-3">
               <div className="text-center">
-                <p className="text-sm text-gray-600 mb-2">给角色起个名字</p>
+                <p className="text-sm text-muted-foreground mb-2">
+                  给角色起个名字
+                </p>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
@@ -104,12 +106,12 @@ export default function AvatarDisplaySection({
                     onChange={(e) => setCharacterName(e.target.value)}
                     onKeyDown={handleKeyPress}
                     placeholder="输入角色名字"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="flex-1 px-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm text-foreground placeholder-muted-foreground"
                   />
                   <button
                     onClick={handleSaveCharacter}
                     disabled={!characterName.trim()}
-                    className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 text-white rounded-lg transition-colors text-sm font-medium flex items-center gap-1"
+                    className="px-4 py-2 btn-theme-primary disabled:bg-muted disabled:text-muted-foreground rounded-lg transition-colors text-sm font-medium flex items-center gap-1"
                     title="保存角色"
                   >
                     <Save className="w-4 h-4" />
@@ -120,9 +122,9 @@ export default function AvatarDisplaySection({
             </div>
           )}
 
-          {/* 已保存状态 */}
+          {/* 已保存状态 - 使用主题色彩 */}
           {isSaved && (
-            <div className="flex items-center gap-2 text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+            <div className="flex items-center gap-2 text-chart-3 bg-chart-3/10 px-3 py-2 rounded-lg border border-chart-3/20">
               <Check className="w-4 h-4" />
               <span className="text-sm font-medium">角色已保存到列表</span>
             </div>
@@ -136,32 +138,32 @@ export default function AvatarDisplaySection({
 
   return (
     <>
-      <div className="bg-white/80 backdrop-blur-sm rounded-3xl flex flex-col relative">
-        {/* 3视图浮动按钮 */}
+      <div className="bg-card/80 backdrop-blur-sm rounded-3xl flex flex-col relative border border-border">
+        {/* 3视图浮动按钮 - 使用主题色彩 */}
         {threeViewResult && (
           <button
             onClick={() => setShowThreeViewModal(true)}
-            className="absolute top-4 right-4 bg-purple-500 hover:bg-purple-600 text-white p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110 z-10"
+            className="absolute top-4 right-4 bg-primary hover:bg-primary/80 text-primary-foreground p-2 rounded-full shadow-lg transition-all duration-300 hover:scale-110 z-10"
             title="查看3视图"
           >
             <Eye className="w-4 h-4" />
           </button>
         )}
 
-        <div className="flex-1 relative">{renderContent()}</div>
+        <div className="flex-1 relative p-6">{renderContent()}</div>
       </div>
 
-      {/* 3视图模态框 */}
+      {/* 3视图模态框 - 使用主题色彩 */}
       {showThreeViewModal && threeViewResult && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-card rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-border shadow-2xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-bold text-gray-800">角色3视图</h3>
+              <h3 className="text-xl font-bold text-foreground">角色3视图</h3>
               <button
                 onClick={() => setShowThreeViewModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-muted/50 rounded-full transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 text-muted-foreground" />
               </button>
             </div>
             <div className="text-center">
@@ -173,7 +175,7 @@ export default function AvatarDisplaySection({
                 height={400}
                 unoptimized
               />
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-muted-foreground mt-2">
                 这个3视图可用于生成不同动作的漫画角色
               </p>
             </div>

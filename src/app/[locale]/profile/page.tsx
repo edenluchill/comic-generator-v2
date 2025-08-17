@@ -24,7 +24,7 @@ const formatDate = (dateString: string) => {
 // ✅ 使用统一的FullScreenLoader替代自定义LoadingState
 const LoadingState = () => <FullScreenLoader background="light" />;
 
-// 错误状态组件保持不变
+// 错误状态组件 - 使用主题色彩
 const ErrorState = ({
   error,
   onGoHome,
@@ -32,11 +32,11 @@ const ErrorState = ({
   error: string | null;
   onGoHome: () => void;
 }) => (
-  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-    <Card className="w-full max-w-md border-red-200">
+  <div className="min-h-screen bg-background flex items-center justify-center">
+    <Card className="w-full max-w-md border-destructive/20">
       <CardContent className="p-6 text-center">
-        <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-        <p className="text-red-600">{error || "无法加载用户信息"}</p>
+        <AlertCircle className="w-12 h-12 text-destructive mx-auto mb-4" />
+        <p className="text-destructive">{error || "无法加载用户信息"}</p>
         <Button onClick={onGoHome} className="mt-4" variant="outline">
           返回首页
         </Button>
@@ -106,8 +106,14 @@ export default function ProfilePage() {
   const isPremium = profile.subscription_tier === "premium";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 py-4 px-4">
-      <div className="max-w-6xl mx-auto space-y-8">
+    <div className="min-h-screen bg-theme-gradient py-4 px-4">
+      {/* 背景装饰 - 使用主题色彩 */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-10 left-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-primary/10 to-accent/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-10 right-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-accent/10 to-primary/10 rounded-full blur-3xl animate-pulse delay-1000" />
+      </div>
+
+      <div className="max-w-6xl mx-auto space-y-8 relative z-10">
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1 space-y-6">
             <UserInfoCard

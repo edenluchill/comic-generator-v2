@@ -7,21 +7,21 @@ import { SimpleSpinner } from "@/components/ui/loading";
 
 interface TransactionHistoryProps {
   transactions: CreditTransaction[];
-  loading?: boolean; // Add loading prop
+  loading?: boolean;
 }
 
 const getTransactionIcon = (type: string) => {
   switch (type) {
     case "deduction":
-      return <TrendingUp className="w-4 h-4 text-red-500" />;
+      return <TrendingUp className="w-4 h-4 text-destructive" />;
     case "refill":
-      return <Zap className="w-4 h-4 text-green-500" />;
+      return <Zap className="w-4 h-4 text-chart-3" />;
     case "monthly_reset":
-      return <Calendar className="w-4 h-4 text-blue-500" />;
+      return <Calendar className="w-4 h-4 text-chart-2" />;
     case "subscription_bonus":
-      return <Crown className="w-4 h-4 text-amber-500" />;
+      return <Crown className="w-4 h-4 text-primary" />;
     default:
-      return <Clock className="w-4 h-4 text-gray-500" />;
+      return <Clock className="w-4 h-4 text-muted-foreground" />;
   }
 };
 
@@ -30,32 +30,33 @@ const TransactionHistory: FC<TransactionHistoryProps> = ({
   loading = false,
 }) => {
   return (
-    <Card>
+    <Card className="bg-card border-border">
       <CardHeader>
-        <CardTitle className="text-lg">最近交易记录</CardTitle>
+        <CardTitle className="text-lg text-foreground">最近交易记录</CardTitle>
       </CardHeader>
       <CardContent>
         {loading ? (
           <div className="flex items-center justify-center py-8">
-            {/* ✅ 使用统一的SimpleSpinner替代自定义spinner */}
             <SimpleSpinner size="md" color="primary" />
           </div>
         ) : transactions.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">暂无交易记录</div>
+          <div className="text-center py-8 text-muted-foreground">
+            暂无交易记录
+          </div>
         ) : (
           <div className="space-y-3">
             {transactions.map((transaction) => (
               <div
                 key={transaction.id}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                className="flex items-center justify-between p-3 bg-secondary/30 rounded-lg border border-border hover:bg-secondary/50 transition-colors"
               >
                 <div className="flex items-center gap-3">
                   {getTransactionIcon(transaction.transaction_type)}
                   <div>
-                    <div className="font-medium text-gray-900 text-sm">
+                    <div className="font-medium text-foreground text-sm">
                       {transaction.description}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-muted-foreground">
                       {new Date(transaction.created_at).toLocaleString("zh-CN")}
                     </div>
                   </div>
@@ -63,13 +64,15 @@ const TransactionHistory: FC<TransactionHistoryProps> = ({
                 <div className="text-right">
                   <div
                     className={`font-semibold ${
-                      transaction.amount > 0 ? "text-green-600" : "text-red-600"
+                      transaction.amount > 0
+                        ? "text-chart-3"
+                        : "text-destructive"
                     }`}
                   >
                     {transaction.amount > 0 ? "+" : ""}
                     {transaction.amount}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted-foreground">
                     余额: {transaction.balance_after}
                   </div>
                 </div>
@@ -82,6 +85,7 @@ const TransactionHistory: FC<TransactionHistoryProps> = ({
           <Button
             variant="outline"
             size="sm"
+            className="hover:bg-secondary/50 hover:border-primary/30"
             onClick={() => {
               /* TODO: 查看完整历史 */
             }}

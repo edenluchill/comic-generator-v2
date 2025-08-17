@@ -8,6 +8,7 @@ import { Home, Pencil, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import { lazy, memo } from "react";
+import { ThemeToggle } from "./Header/ThemeToggle";
 
 const AccountMenu = lazy(() => import("./Header/AccountMenu"));
 const LanguagePicker = lazy(() => import("./Header/LanguagePicker"));
@@ -27,7 +28,7 @@ const Header = memo(function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-rose-100/50 shadow-sm">
+    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border shadow-sm transition-colors duration-300">
       <div className="max-w-6xl mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo区域 */}
@@ -36,15 +37,15 @@ const Header = memo(function Header() {
             className="flex items-center gap-3 group"
           >
             <div className="relative">
-              <div className="w-10 h-10 border-2 border-rose-300/60 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:border-rose-400 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-rose-300/20">
-                <Palette className="w-5 h-5 text-rose-500 group-hover:text-rose-600 transition-colors" />
+              <div className="w-10 h-10 border-2 border-primary/60 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:border-primary group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-primary/20">
+                <Palette className="w-5 h-5 text-primary group-hover:text-primary/80 transition-colors" />
               </div>
             </div>
             <div className="">
-              <h1 className="text-xl font-bold bg-gradient-to-r from-rose-500 to-pink-500 bg-clip-text text-transparent">
+              <h1 className="text-xl font-bold bg-primary bg-clip-text text-transparent">
                 {headerT("title")}
               </h1>
-              <p className="text-xs text-rose-500/60 -mt-1">
+              <p className="text-xs text-muted-foreground -mt-1">
                 {headerT("subtitle")}
               </p>
             </div>
@@ -56,7 +57,7 @@ const Header = memo(function Header() {
             <PremiumButton />
 
             {/* 桌面端导航链接 - 独立分组 */}
-            <nav className="hidden md:flex items-center gap-1 backdrop-blur-sm rounded-lg p-1 border border-rose-200/30 shadow-sm">
+            <nav className="hidden md:flex items-center gap-1 backdrop-blur-sm rounded-lg p-1 border border-border shadow-sm">
               <Link href={getLocalizedHref("/")}>
                 <Button
                   variant="ghost"
@@ -65,10 +66,10 @@ const Header = memo(function Header() {
                     "h-8 px-3 transition-all duration-200",
                     "flex items-center gap-0.5",
                     "text-sm font-medium",
-                    "hover:bg-pink-400/10 hover:text-rose-600",
+                    "hover:bg-primary/10 hover:text-primary",
                     isActive("/")
-                      ? "bg-rose-400/15 text-rose-600 shadow-sm border-rose-200/40 hover:bg-rose-400/15 hover:text-rose-600"
-                      : "text-rose-500/80 ",
+                      ? "bg-primary/15 text-primary shadow-sm border-primary/30 hover:bg-primary/15 hover:text-primary"
+                      : "text-muted-foreground",
                     "rounded-md border border-transparent"
                   )}
                 >
@@ -85,10 +86,10 @@ const Header = memo(function Header() {
                     "h-8 px-3 transition-all duration-200",
                     "flex items-center gap-0.5",
                     "text-sm font-medium",
-                    "hover:bg-pink-400/10 hover:text-rose-600",
+                    "hover:bg-primary/10 hover:text-primary",
                     isActive("/workshop")
-                      ? "bg-rose-400/15 text-rose-600 shadow-sm border-rose-200/40 hover:bg-rose-400/15 hover:text-rose-600"
-                      : "text-rose-500/80 ",
+                      ? "bg-primary/15 text-primary shadow-sm border-primary/30 hover:bg-primary/15 hover:text-primary"
+                      : "text-muted-foreground",
                     "rounded-md border border-transparent"
                   )}
                 >
@@ -100,6 +101,9 @@ const Header = memo(function Header() {
 
             {/* 功能按钮组 */}
             <div className="flex items-center gap-1.5">
+              {/* 主题切换按钮 */}
+              <ThemeToggle />
+
               {/* 语言选择器 */}
               <LanguagePicker />
 

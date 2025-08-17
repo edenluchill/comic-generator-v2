@@ -153,11 +153,11 @@ export default function ComicGeneration() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 relative">
-      {/* 背景装饰元素 */}
+    <div className="min-h-screen bg-theme-gradient relative">
+      {/* 背景装饰元素 - 使用主题色彩 */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-amber-400/10 to-orange-400/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-10 right-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-orange-400/10 to-yellow-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-10 left-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-primary/10 to-accent/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-10 right-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-accent/10 to-primary/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
       <div className="container mx-auto px-4 py-6 relative z-10 max-w-6xl">
@@ -179,10 +179,10 @@ export default function ComicGeneration() {
           />
         </div>
 
-        {/* 删除错误信息 */}
+        {/* 删除错误信息 - 使用主题色彩 */}
         {deleteCharacterMutation.error && (
           <div className="mb-4 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-destructive/10 text-destructive rounded-lg text-sm border border-destructive/20">
               ❌ {deleteCharacterMutation.error.message}
             </div>
           </div>
@@ -228,10 +228,10 @@ export default function ComicGeneration() {
           </div>
         </div>
 
-        {/* 提示信息 */}
+        {/* 提示信息 - 使用主题色彩 */}
         {characters.length === 0 && (
           <div className="mt-4 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg text-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-chart-1/10 text-chart-1 rounded-lg text-sm border border-chart-1/20">
               💡 提示：你需要先创建角色才能生成漫画
             </div>
           </div>

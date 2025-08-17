@@ -4,7 +4,6 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { LayoutMode } from "@/types/diary";
 import { LAYOUT_OPTIONS } from "@/lib/constants/comic-display.constants";
-import { COMIC_DISPLAY_STYLES } from "@/lib/styles/comic-display.styles";
 
 interface LayoutPickerProps {
   layoutMode: LayoutMode;
@@ -38,7 +37,7 @@ export default function LayoutPicker({
         <button
           onClick={() => setShowDropdown(!showDropdown)}
           disabled={disabled}
-          className={COMIC_DISPLAY_STYLES.dropdown.button}
+          className="flex items-center justify-between gap-3 px-3 py-2 bg-card border border-border rounded-lg hover:bg-secondary/50 hover:border-primary/30 transition-all duration-200 text-sm font-medium text-foreground disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
         >
           <div className="flex items-center gap-2">
             <CurrentIcon className="w-4 h-4" />
@@ -52,7 +51,7 @@ export default function LayoutPicker({
         </button>
 
         {showDropdown && (
-          <div className={COMIC_DISPLAY_STYLES.dropdown.menu}>
+          <div className="absolute top-full right-0 mt-2 bg-card/95 backdrop-blur-xl border border-border rounded-lg shadow-xl z-50 min-w-[160px] overflow-hidden">
             {LAYOUT_OPTIONS.map((option, index) => {
               const Icon = option.icon;
               const isSelected = layoutMode === option.value;
@@ -66,10 +65,10 @@ export default function LayoutPicker({
                     onLayoutModeChange(option.value);
                     setShowDropdown(false);
                   }}
-                  className={`${COMIC_DISPLAY_STYLES.dropdown.item} ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-200 ${
                     isSelected
-                      ? COMIC_DISPLAY_STYLES.dropdown.itemSelected
-                      : COMIC_DISPLAY_STYLES.dropdown.itemDefault
+                      ? "bg-primary/10 text-primary border-l-2 border-primary"
+                      : "text-foreground hover:bg-secondary/50 hover:text-primary"
                   } ${isFirst ? "rounded-t-lg" : ""} ${
                     isLast ? "rounded-b-lg" : ""
                   }`}

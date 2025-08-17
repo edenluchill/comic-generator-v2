@@ -41,11 +41,11 @@ export default function WorkshopHeader({
         disabled={action.disabled}
         className={`
           flex items-center gap-2 px-2 sm:px-3 py-1.5 rounded-lg 
-          transition-all duration-300 text-sm
+          transition-all duration-300 text-sm border border-transparent
           ${
             action.disabled
-              ? "text-gray-400 cursor-not-allowed opacity-50"
-              : "text-amber-600 hover:text-amber-700 hover:bg-white/50 active:scale-95"
+              ? "text-muted-foreground cursor-not-allowed opacity-50"
+              : "text-primary hover:text-primary/80 hover:bg-secondary/50 hover:border-border active:scale-95"
           }
           ${align === "right" ? "flex-row-reverse" : "flex-row"}
         `}
@@ -74,11 +74,11 @@ export default function WorkshopHeader({
         {leftAction && <ActionButton action={leftAction} align="left" />}
       </div>
 
-      {/* 中间：标题区域 */}
+      {/* 中间：标题区域 - 使用主题色彩 */}
       <div className="flex-1 px-2 sm:px-4">
         <div className="text-center">
           {title && typeof title === "string" ? (
-            <h1 className="text-amber-700 text-sm sm:text-base md:text-lg lg:text-xl font-medium leading-tight">
+            <h1 className="text-foreground text-sm sm:text-base md:text-lg lg:text-xl font-medium leading-tight">
               {title}
             </h1>
           ) : (

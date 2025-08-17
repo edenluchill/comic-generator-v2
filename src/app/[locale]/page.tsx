@@ -125,38 +125,38 @@ export default function HomePage() {
   }, [userReviewsVisible]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-rose-50 via-pink-50 to-violet-50">
+    <div className="min-h-screen bg-theme-gradient">
       <div className="container mx-auto px-4">
-        {/* Section 1: 英雄区域 - 优化布局让内容在一屏内显示 */}
+        {/* Section 1: 英雄区域 - 使用主题色彩 */}
         <section className="min-h-screen flex flex-col justify-center relative overflow-hidden pt-16 pb-20">
-          {/* 背景装饰 */}
+          {/* 背景装饰 - 使用主题色彩 */}
           <div className="absolute inset-0 opacity-30">
-            <div className="absolute top-20 left-10 w-32 h-32 bg-rose-200 rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute top-40 right-20 w-24 h-24 bg-pink-200 rounded-full blur-2xl animate-pulse delay-1000"></div>
-            <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-violet-200 rounded-full blur-3xl animate-pulse delay-2000"></div>
-            <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-rose-300 rounded-full blur-2xl animate-pulse delay-500"></div>
+            <div className="absolute top-20 left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute top-40 right-20 w-24 h-24 bg-accent/30 rounded-full blur-2xl animate-pulse delay-1000"></div>
+            <div className="absolute bottom-32 left-1/4 w-40 h-40 bg-secondary/40 rounded-full blur-3xl animate-pulse delay-2000"></div>
+            <div className="absolute bottom-20 right-1/3 w-28 h-28 bg-primary/25 rounded-full blur-2xl animate-pulse delay-500"></div>
           </div>
 
-          {/* 主要内容区域 - 调整为更紧凑的布局 */}
+          {/* 主要内容区域 */}
           <div className="flex-1 flex flex-col justify-center max-w-7xl mx-auto px-4 text-center relative z-10">
-            {/* 主标题 - 进一步缩小 */}
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-rose-900 leading-tight mb-3">
-              <span className="bg-gradient-to-r from-rose-600 via-pink-600 to-violet-600 bg-clip-text text-transparent">
+            {/* 主标题 */}
+            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight mb-3">
+              <span className="bg-primary bg-clip-text text-primary">
                 {t("title")}
               </span>
             </h1>
 
-            {/* 描述 - 减少字体大小和边距 */}
-            <p className="text-base md:text-lg lg:text-xl text-rose-600 max-w-3xl mx-auto leading-relaxed mb-6">
+            {/* 描述 */}
+            <p className="text-base md:text-lg lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-6">
               {t("description1")} {t("description2")}
             </p>
 
-            {/* 按钮组 - 减少边距 */}
+            {/* 按钮组 */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
               <Link href={getLocalizedHref("/workshop")}>
                 <Button
                   size="lg"
-                  className="rounded-full bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white px-8 py-4 text-base font-semibold shadow-2xl hover:shadow-rose-300/50 transition-all transform hover:scale-105"
+                  className="btn-theme-primary rounded-full px-8 py-4 text-base font-semibold shadow-2xl"
                 >
                   {t("startCreating")}
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -164,18 +164,18 @@ export default function HomePage() {
               </Link>
             </div>
 
-            {/* 三步创作流程 - 确保在一屏内显示 */}
+            {/* 三步创作流程 */}
             <div className="flex-1">
               <ThreeStepsSection />
             </div>
           </div>
 
-          {/* 增强的浮动鼠标提示 - 更加突出和动态 */}
+          {/* 浮动鼠标提示 */}
           <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 animate-bounce">
-            <div className="flex flex-col items-center gap-2 text-rose-400">
+            <div className="flex flex-col items-center gap-2 text-muted-foreground">
               <span className="text-sm">向下滚动了解更多</span>
-              <div className="w-6 h-10 border-2 border-rose-300 rounded-full flex justify-center">
-                <div className="w-1 h-3 bg-rose-300 rounded-full mt-2 animate-pulse"></div>
+              <div className="w-6 h-10 border-2 border-border rounded-full flex justify-center">
+                <div className="w-1 h-3 bg-primary rounded-full mt-2 animate-pulse"></div>
               </div>
             </div>
           </div>
@@ -192,8 +192,8 @@ export default function HomePage() {
                   : "-translate-x-8 opacity-0"
               }`}
             >
-              <div className="relative rounded-3xl border border-rose-100 bg-white/70 p-3 shadow-md">
-                <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-rose-50">
+              <div className="relative rounded-3xl border border-border bg-card/70 p-3 shadow-md">
+                <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-secondary">
                   <Image
                     src="/samples/upload.jpg"
                     alt="用户上传的图片"
@@ -202,10 +202,10 @@ export default function HomePage() {
                     sizes="(min-width: 768px) 33vw, 100vw"
                     priority
                   />
-                  <span className="absolute bottom-3 left-3 text-rose-600/90 text-sm bg-white/70 rounded-full px-3 py-1 border border-rose-100">
+                  <span className="absolute bottom-3 left-3 text-primary text-sm bg-card/70 rounded-full px-3 py-1 border border-border">
                     用户上传的图片
                   </span>
-                  <Stars className="absolute top-4 right-4 w-5 h-5 text-rose-300/70" />
+                  <Stars className="absolute top-4 right-4 w-5 h-5 text-muted-foreground" />
                 </div>
               </div>
             </div>
@@ -219,11 +219,11 @@ export default function HomePage() {
               }`}
               style={{ position: "relative" }}
             >
-              <h2 className="text-2xl md:text-3xl font-semibold text-rose-900">
+              <h2 className="text-2xl md:text-3xl font-semibold text-foreground">
                 一步 · 上传照片生成多风格角色
               </h2>
               <p
-                className="mt-3 text-rose-700 leading-relaxed"
+                className="mt-3 text-muted-foreground leading-relaxed"
                 style={{
                   textAlign: "justify",
                   shapeOutside:
@@ -234,12 +234,12 @@ export default function HomePage() {
                 上传你的珍贵照片，AI 分析五官与风格要素，并生成多种 style
                 的专属角色头像与设定图。右侧展示不同风格效果，支持多风格创作。
               </p>
-              <ul className="mt-2 space-y-2 text-rose-600">
+              <ul className="mt-2 space-y-2 text-muted-foreground">
                 <li className="flex items-center gap-2">
-                  <Heart className="w-4 h-4 text-pink-500" /> 支持人像/生活照
+                  <Heart className="w-4 h-4 text-primary" /> 支持人像/生活照
                 </li>
                 <li className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-violet-500" />{" "}
+                  <Sparkles className="w-4 h-4 text-accent" />{" "}
                   自动分析五官与风格要素
                 </li>
               </ul>
@@ -251,12 +251,12 @@ export default function HomePage() {
                 <div className="absolute -inset-4 md:-inset-6">
                   {styleExamples.map((ex, i) => {
                     const positions = [
-                      { top: "-8%", left: "18%", rotate: -20, z: 10 }, // 心形左上
-                      { top: "-8%", left: "58%", rotate: 20, z: 20 }, // 心形右上
-                      { top: "12%", left: "6%", rotate: -10, z: 30 }, // 心形左侧
-                      { top: "12%", left: "70%", rotate: 10, z: 40 }, // 心形右侧
-                      { top: "50%", left: "26%", rotate: 5, z: 50 }, // 心形左下
-                      { top: "58%", left: "46%", rotate: -8, z: 60 }, // 心形底部（向右上）
+                      { top: "-8%", left: "18%", rotate: -20, z: 10 },
+                      { top: "-8%", left: "58%", rotate: 20, z: 20 },
+                      { top: "12%", left: "6%", rotate: -10, z: 30 },
+                      { top: "12%", left: "70%", rotate: 10, z: 40 },
+                      { top: "50%", left: "26%", rotate: 5, z: 50 },
+                      { top: "58%", left: "46%", rotate: -8, z: 60 },
                     ];
                     const p = positions[i] || positions[positions.length - 1];
                     return (
@@ -282,12 +282,12 @@ export default function HomePage() {
                           alt={ex.name}
                           className="object-cover"
                         />
-                        <span className="absolute bottom-2 left-2 text-rose-800 text-xs bg-rose-100/80 rounded-full px-2.5 py-1">
+                        <span className="absolute bottom-2 left-2 text-primary-foreground text-xs bg-primary/80 rounded-full px-2.5 py-1">
                           {ex.name}
                         </span>
 
                         {/* Hover时显示的三视图 */}
-                        <div className="absolute inset-0 bg-white/95 backdrop-blur-sm rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                        <div className="absolute inset-0 bg-card/95 backdrop-blur-sm rounded-xl opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
                           <div className="relative w-full h-full p-2">
                             <Image
                               src="/samples/three_view.png"
@@ -296,7 +296,7 @@ export default function HomePage() {
                               className="object-contain"
                               sizes="(min-width: 768px) 44vw, 42vw"
                             />
-                            <div className="absolute top-2 right-2 bg-rose-500 text-white text-xs rounded-full px-2 py-1 font-medium">
+                            <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs rounded-full px-2 py-1 font-medium">
                               三视图
                             </div>
                           </div>
@@ -310,7 +310,7 @@ export default function HomePage() {
 
             {/* 风筝线连接动画 */}
             <div
-              className={`absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-1000 delay-500 kite1 ${
+              className={`absolute inset-0 w-full h-full pointer-events-none transition-opacity duration-1000 delay-500 ${
                 isVisible ? "opacity-100" : "opacity-0"
               }`}
               style={{ zIndex: 2 }}
@@ -326,11 +326,14 @@ export default function HomePage() {
                     {`
                       .kite-line {
                         fill: none;
-                        stroke: #f8bbd9;
+                        stroke: oklch(0.65 0.15 340 / 0.4);
                         stroke-width: 0.6;
                         stroke-dasharray: 3,2;
                         stroke-linecap: round;
                         animation: dash 8s linear infinite;
+                      }
+                      .dark .kite-line {
+                        stroke: oklch(0.75 0.12 340 / 0.6);
                       }
                       @keyframes dash {
                         to {
@@ -340,7 +343,6 @@ export default function HomePage() {
                     `}
                   </style>
                 </defs>
-                {/* 风筝线路径 - 更自然的曲线 */}
                 <path
                   d="M 32 89 C 40 78, 50 88, 60 80 C 70 72, 82 85, 85 78"
                   className="kite-line"
@@ -356,16 +358,16 @@ export default function HomePage() {
           className="max-w-7xl mx-auto py-20 md:py-24"
         >
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 rounded-full bg-rose-100 backdrop-blur px-6 py-2 border border-rose-200 text-rose-700 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 backdrop-blur px-6 py-2 border border-primary/20 text-primary mb-6">
               <Stars className="w-5 h-5" />
               <span className="font-medium">
                 AI Scene Composition • Rich Visuals • Simple Input
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-rose-600 via-pink-600 to-violet-600 bg-clip-text text-transparent mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold bg-primary bg-clip-text text-transparent mb-4">
               AI 智能场景构图
             </h2>
-            <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               仅从简单描述，AI
               智能生成丰富多样的场景构图。从温馨日常到浪漫时刻，从都市夜景到田园风光，创造无限可能的视觉表达
             </p>
@@ -373,13 +375,13 @@ export default function HomePage() {
 
           {/* 输入示例 */}
           <div className="text-center mb-8">
-            <div className="inline-block bg-white rounded-xl p-6 shadow-lg border border-gray-100">
-              <div className="bg-gradient-to-r from-rose-50 to-pink-50 rounded-lg p-4 border-l-4 border-rose-400">
-                <p className="text-rose-800 text-xl font-medium italic">
+            <div className="inline-block bg-card rounded-xl p-6 shadow-lg border border-border">
+              <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-lg p-4 border-l-4 border-primary">
+                <p className="text-primary text-xl font-medium italic">
                   &quot;她寻找爱情的故事&quot;
                 </p>
               </div>
-              <p className="text-gray-600 text-sm mt-3">
+              <p className="text-muted-foreground text-sm mt-3">
                 仅用8个字，AI 即可根据选定风格生成多样化场景构图
               </p>
             </div>
@@ -389,7 +391,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             {/* 场景一：乡村宁静时光 */}
             <div
-              className={`bg-white rounded-2xl p-6 shadow-xl border border-gray-100 group hover:scale-105 transition-all duration-700 ${
+              className={`bg-card rounded-2xl p-6 shadow-xl border border-border group hover:scale-105 transition-all duration-700 ${
                 sceneCardsVisible
                   ? "translate-y-0 opacity-100 scale-100"
                   : "translate-y-8 opacity-0 scale-95"
@@ -405,7 +407,7 @@ export default function HomePage() {
                   sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                 />
                 <div
-                  className={`absolute top-3 right-3 bg-gradient-to-r from-orange-400 to-amber-500 text-white rounded-full px-3 py-1 text-xs font-semibold shadow-lg transition-all duration-500 ${
+                  className={`absolute top-3 right-3 bg-accent/40 to-amber-500 text-white rounded-full px-3 py-1 text-xs font-semibold shadow-lg transition-all duration-500 ${
                     sceneCardsVisible
                       ? "translate-y-0 opacity-100"
                       : "translate-y-2 opacity-0"
@@ -416,7 +418,7 @@ export default function HomePage() {
                 </div>
               </div>
               <h4
-                className={`text-lg font-bold text-orange-800 mb-2 transition-all duration-500 ${
+                className={`text-lg font-bold text-accent mb-2 transition-all duration-500 ${
                   sceneCardsVisible
                     ? "translate-y-0 opacity-100"
                     : "translate-y-2 opacity-0"
@@ -426,7 +428,7 @@ export default function HomePage() {
                 乡村宁静时光
               </h4>
               <p
-                className={`text-gray-600 text-sm transition-all duration-500 ${
+                className={`text-muted-foreground text-sm transition-all duration-500 ${
                   sceneCardsVisible
                     ? "translate-y-0 opacity-100"
                     : "translate-y-2 opacity-0"
@@ -439,7 +441,7 @@ export default function HomePage() {
 
             {/* 场景二：都市寻爱之夜 */}
             <div
-              className={`bg-white rounded-2xl p-6 shadow-xl border border-gray-100 group hover:scale-105 transition-all duration-700 ${
+              className={`bg-card rounded-2xl p-6 shadow-xl border border-border group hover:scale-105 transition-all duration-700 ${
                 sceneCardsVisible
                   ? "translate-y-0 opacity-100 scale-100"
                   : "translate-y-8 opacity-0 scale-95"
@@ -455,7 +457,7 @@ export default function HomePage() {
                   sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                 />
                 <div
-                  className={`absolute top-3 right-3 bg-gradient-to-r from-violet-400 to-purple-500 text-white rounded-full px-3 py-1 text-xs font-semibold shadow-lg transition-all duration-500 ${
+                  className={`absolute top-3 right-3 bg-accent/40 to-purple-500 text-white rounded-full px-3 py-1 text-xs font-semibold shadow-lg transition-all duration-500 ${
                     sceneCardsVisible
                       ? "translate-y-0 opacity-100"
                       : "translate-y-2 opacity-0"
@@ -466,7 +468,7 @@ export default function HomePage() {
                 </div>
               </div>
               <h4
-                className={`text-lg font-bold text-violet-800 mb-2 transition-all duration-500 ${
+                className={`text-lg font-bold text-accent mb-2 transition-all duration-500 ${
                   sceneCardsVisible
                     ? "translate-y-0 opacity-100"
                     : "translate-y-2 opacity-0"
@@ -476,7 +478,7 @@ export default function HomePage() {
                 都市寻爱之夜
               </h4>
               <p
-                className={`text-gray-600 text-sm transition-all duration-500 ${
+                className={`text-muted-foreground text-sm transition-all duration-500 ${
                   sceneCardsVisible
                     ? "translate-y-0 opacity-100"
                     : "translate-y-2 opacity-0"
@@ -489,7 +491,7 @@ export default function HomePage() {
 
             {/* 场景三：蓝天下相遇 */}
             <div
-              className={`bg-white rounded-2xl p-6 shadow-xl border border-gray-100 group hover:scale-105 transition-all duration-700 ${
+              className={`bg-card rounded-2xl p-6 shadow-xl border border-border group hover:scale-105 transition-all duration-700 ${
                 sceneCardsVisible
                   ? "translate-y-0 opacity-100 scale-100"
                   : "translate-y-8 opacity-0 scale-95"
@@ -505,7 +507,7 @@ export default function HomePage() {
                   sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                 />
                 <div
-                  className={`absolute top-3 right-3 bg-gradient-to-r from-sky-400 to-blue-500 text-white rounded-full px-3 py-1 text-xs font-semibold shadow-lg transition-all duration-500 ${
+                  className={`absolute top-3 right-3 bg-accent/40 to-blue-500 text-white rounded-full px-3 py-1 text-xs font-semibold shadow-lg transition-all duration-500 ${
                     sceneCardsVisible
                       ? "translate-y-0 opacity-100"
                       : "translate-y-2 opacity-0"
@@ -516,7 +518,7 @@ export default function HomePage() {
                 </div>
               </div>
               <h4
-                className={`text-lg font-bold text-sky-800 mb-2 transition-all duration-500 ${
+                className={`text-lg font-bold text-accent mb-2 transition-all duration-500 ${
                   sceneCardsVisible
                     ? "translate-y-0 opacity-100"
                     : "translate-y-2 opacity-0"
@@ -526,7 +528,7 @@ export default function HomePage() {
                 蓝天下相遇
               </h4>
               <p
-                className={`text-gray-600 text-sm transition-all duration-500 ${
+                className={`text-muted-foreground text-sm transition-all duration-500 ${
                   sceneCardsVisible
                     ? "translate-y-0 opacity-100"
                     : "translate-y-2 opacity-0"
@@ -539,7 +541,7 @@ export default function HomePage() {
 
             {/* 场景四：绿意婚礼时刻 */}
             <div
-              className={`bg-white rounded-2xl p-6 shadow-xl border border-gray-100 group hover:scale-105 transition-all duration-700 ${
+              className={`bg-card rounded-2xl p-6 shadow-xl border border-border group hover:scale-105 transition-all duration-700 ${
                 sceneCardsVisible
                   ? "translate-y-0 opacity-100 scale-100"
                   : "translate-y-8 opacity-0 scale-95"
@@ -555,7 +557,7 @@ export default function HomePage() {
                   sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                 />
                 <div
-                  className={`absolute top-3 right-3 bg-gradient-to-r from-emerald-400 to-green-500 text-white rounded-full px-3 py-1 text-xs font-semibold shadow-lg transition-all duration-500 ${
+                  className={`absolute top-3 right-3 bg-accent/40 to-green-500 text-white rounded-full px-3 py-1 text-xs font-semibold shadow-lg transition-all duration-500 ${
                     sceneCardsVisible
                       ? "translate-y-0 opacity-100"
                       : "translate-y-2 opacity-0"
@@ -566,7 +568,7 @@ export default function HomePage() {
                 </div>
               </div>
               <h4
-                className={`text-lg font-bold text-emerald-800 mb-2 transition-all duration-500 ${
+                className={`text-lg font-bold text-accent mb-2 transition-all duration-500 ${
                   sceneCardsVisible
                     ? "translate-y-0 opacity-100"
                     : "translate-y-2 opacity-0"
@@ -576,7 +578,7 @@ export default function HomePage() {
                 绿意婚礼时刻
               </h4>
               <p
-                className={`text-gray-600 text-sm transition-all duration-500 ${
+                className={`text-muted-foreground text-sm transition-all duration-500 ${
                   sceneCardsVisible
                     ? "translate-y-0 opacity-100"
                     : "translate-y-2 opacity-0"
@@ -591,13 +593,13 @@ export default function HomePage() {
           {/* 立即体验 */}
           <div className="text-center">
             <Link href={getLocalizedHref("/workshop")}>
-              <Button className="rounded-full bg-gradient-to-r from-rose-600 via-pink-600 to-violet-600 hover:from-rose-700 hover:via-pink-700 hover:to-violet-700 text-white px-12 py-4 text-lg font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300">
+              <Button className="btn-theme-primary rounded-full px-12 py-4 text-lg font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300">
                 <Stars className="w-5 h-5 mr-2" />
                 体验AI场景构图
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <p className="mt-4 text-gray-500">
+            <p className="mt-4 text-muted-foreground">
               一句话描述，无限场景可能 • 专业构图 • 即时生成
             </p>
           </div>
@@ -606,16 +608,16 @@ export default function HomePage() {
         {/* Section 4: 多角色故事生成 - 精简设计 */}
         <section className="max-w-7xl mx-auto py-16 md:py-24">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 rounded-full bg-rose-100 backdrop-blur px-6 py-2 border border-rose-200 text-rose-700 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 backdrop-blur px-6 py-2 border border-primary/20 text-primary mb-6">
               <Heart className="w-5 h-5" />
               <span className="font-medium">
                 Multi-Character Story Generation
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-rose-600 via-pink-600 to-violet-600 bg-clip-text text-transparent mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold bg-primary bg-clip-text text-transparent mb-4">
               多角色故事生成
             </h2>
-            <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               选择多个角色，AI
               智能生成角色间的互动故事，创造丰富的人物关系与情节发展
             </p>
@@ -624,8 +626,8 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-16 items-center mb-12">
             {/* 左侧：主展示图 */}
             <div className="relative">
-              <div className="bg-white rounded-3xl p-6 shadow-2xl border border-rose-100 group hover:scale-105 transition-transform duration-500">
-                <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden bg-gradient-to-br from-rose-50 to-pink-50">
+              <div className="bg-card rounded-3xl p-6 shadow-2xl border border-primary group hover:scale-105 transition-transform duration-500">
+                <div className="relative aspect-[4/3] w-full rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-accent/10">
                   <Image
                     src="/samples/multi_character.png"
                     alt="多角色故事生成界面"
@@ -637,17 +639,17 @@ export default function HomePage() {
 
                   {/* 角色标签 */}
                   <div className="absolute top-4 left-4 flex gap-2">
-                    <span className="bg-gradient-to-r from-rose-500 to-pink-500 text-white rounded-full px-3 py-1 text-sm font-semibold shadow-lg">
+                    <span className="bg-primary text-white rounded-full px-3 py-1 text-sm font-semibold shadow-lg">
                       花花
                     </span>
-                    <span className="bg-gradient-to-r from-violet-500 to-purple-500 text-white rounded-full px-3 py-1 text-sm font-semibold shadow-lg">
+                    <span className="bg-gradient-to-r from-accent to-purple text-white rounded-full px-3 py-1 text-sm font-semibold shadow-lg">
                       多多
                     </span>
                   </div>
 
                   {/* 故事类型标签 */}
                   <div className="absolute bottom-4 right-4">
-                    <span className="bg-white/90 backdrop-blur text-rose-700 rounded-full px-4 py-2 text-sm font-medium shadow-lg">
+                    <span className="bg-card/90 backdrop-blur text-primary rounded-full px-4 py-2 text-sm font-medium shadow-lg">
                       浪漫爱情故事
                     </span>
                   </div>
@@ -658,10 +660,10 @@ export default function HomePage() {
             {/* 右侧：功能介绍 */}
             <div className="space-y-8">
               <div className="space-y-6">
-                <h3 className="text-3xl font-bold text-rose-900">
+                <h3 className="text-3xl font-bold text-foreground">
                   多角色互动，创造精彩故事
                 </h3>
-                <p className="text-lg text-gray-700 leading-relaxed">
+                <p className="text-lg text-muted-foreground leading-relaxed">
                   从你的角色库中选择2-4个角色，AI
                   将根据角色设定、性格特点与关系背景，智能生成专属的多角色互动故事。
                 </p>
@@ -669,44 +671,44 @@ export default function HomePage() {
 
               {/* 功能特点 */}
               <div className="grid gap-4">
-                <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-rose-50 to-pink-50 rounded-xl border border-rose-100">
-                  <div className="w-10 h-10 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="flex items-start gap-4 p-4 bg-primary/10 rounded-xl border border-primary/20">
+                  <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
                     <Heart className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-rose-900 mb-1">
+                    <h4 className="font-semibold text-foreground mb-1">
                       角色关系智能分析
                     </h4>
-                    <p className="text-rose-700 text-sm">
+                    <p className="text-muted-foreground text-sm">
                       AI
                       分析角色间的性格匹配度、关系类型，生成符合角色设定的互动情节
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-violet-50 to-purple-50 rounded-xl border border-violet-100">
-                  <div className="w-10 h-10 bg-gradient-to-r from-violet-500 to-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="flex items-start gap-4 p-4 bg-accent/10 rounded-xl border border-accent/20">
+                  <div className="w-10 h-10 bg-gradient-to-r from-accent to-purple rounded-full flex items-center justify-center flex-shrink-0">
                     <Sparkles className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-violet-900 mb-1">
+                    <h4 className="font-semibold text-accent mb-1">
                       多样化故事类型
                     </h4>
-                    <p className="text-violet-700 text-sm">
+                    <p className="text-muted-foreground text-sm">
                       支持浪漫爱情、友情冒险、家庭温馨等多种故事类型
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 bg-gradient-to-r from-sky-50 to-blue-50 rounded-xl border border-sky-100">
-                  <div className="w-10 h-10 bg-gradient-to-r from-sky-500 to-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="flex items-start gap-4 p-4 bg-primary/10 rounded-xl border border-primary/20">
+                  <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
                     <Stars className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-sky-900 mb-1">
+                    <h4 className="font-semibold text-foreground mb-1">
                       个性化情节发展
                     </h4>
-                    <p className="text-sky-700 text-sm">
+                    <p className="text-muted-foreground text-sm">
                       根据角色背景设定，生成符合角色成长轨迹的个性化情节
                     </p>
                   </div>
@@ -714,24 +716,24 @@ export default function HomePage() {
               </div>
 
               {/* 使用流程 */}
-              <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-100">
-                <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                  <span className="w-6 h-6 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
+              <div className="bg-card rounded-xl p-6 shadow-lg border border-border">
+                <h4 className="font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <span className="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white text-sm font-bold">
                     1
                   </span>
                   简单三步，生成多角色故事
                 </h4>
-                <div className="space-y-3 text-sm text-gray-600">
+                <div className="space-y-3 text-sm text-muted-foreground">
                   <div className="flex items-center gap-3">
-                    <span className="w-2 h-2 bg-rose-400 rounded-full"></span>
+                    <span className="w-2 h-2 bg-primary rounded-full"></span>
                     <span>从角色库中选择2-4个角色组合</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="w-2 h-2 bg-pink-400 rounded-full"></span>
+                    <span className="w-2 h-2 bg-accent rounded-full"></span>
                     <span>选择故事类型与场景设定</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="w-2 h-2 bg-violet-400 rounded-full"></span>
+                    <span className="w-2 h-2 bg-primary rounded-full"></span>
                     <span>AI 生成专属多角色互动故事</span>
                   </div>
                 </div>
@@ -742,13 +744,13 @@ export default function HomePage() {
           {/* 立即体验按钮 */}
           <div className="text-center">
             <Link href={getLocalizedHref("/workshop")}>
-              <Button className="rounded-full bg-gradient-to-r from-rose-600 via-pink-600 to-violet-600 hover:from-rose-700 hover:via-pink-700 hover:to-violet-700 text-white px-12 py-4 text-lg font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300">
+              <Button className="btn-theme-primary rounded-full px-12 py-4 text-lg font-semibold shadow-2xl transform hover:scale-105 transition-all duration-300">
                 <Heart className="w-5 h-5 mr-2" />
                 开始创作多角色故事
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
             </Link>
-            <p className="mt-4 text-gray-500">
+            <p className="mt-4 text-muted-foreground">
               角色选择 • 智能分析 • 专属故事生成
             </p>
           </div>
@@ -760,16 +762,16 @@ export default function HomePage() {
           className="max-w-7xl mx-auto py-16 md:py-24"
         >
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 rounded-full bg-rose-100 backdrop-blur px-6 py-2 border border-rose-200 text-rose-700 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 backdrop-blur px-6 py-2 border border-primary/20 text-primary mb-6">
               <Heart className="w-5 h-5" />
               <span className="font-medium">
                 User Reviews & Community Creations
               </span>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-rose-600 via-pink-600 to-violet-600 bg-clip-text text-transparent mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold bg-primary bg-clip-text text-transparent mb-4">
               用户评价与创作分享
             </h2>
-            <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl text-muted-foreground max-w-4xl mx-auto leading-relaxed">
               看看其他用户如何使用AI创作出精彩的故事，分享你的创作成果
             </p>
           </div>
@@ -778,7 +780,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8 mb-16">
             {/* 评价1 */}
             <div
-              className={`bg-white rounded-2xl p-6 shadow-xl border border-rose-100 group hover:scale-105 transition-all duration-700 ${
+              className={`bg-card rounded-2xl p-6 shadow-xl border border-primary group hover:scale-105 transition-all duration-700 ${
                 userReviewsVisible
                   ? "translate-y-0 opacity-100 scale-100"
                   : "translate-y-8 opacity-0 scale-95"
@@ -786,11 +788,11 @@ export default function HomePage() {
               style={{ transitionDelay: "0ms" }}
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-rose-400 to-pink-400 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg">
                   小
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">小雅</h4>
+                  <h4 className="font-semibold text-foreground">小雅</h4>
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
                       <Stars
@@ -801,15 +803,15 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed mb-4">
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                 &quot;太神奇了！上传照片后AI生成了多种风格的角色，每个都很有特色。故事生成功能更是让我惊喜，角色之间的互动非常自然。&quot;
               </p>
-              <div className="text-xs text-gray-500">2024年1月15日</div>
+              <div className="text-xs text-muted-foreground">2024年1月15日</div>
             </div>
 
             {/* 评价2 */}
             <div
-              className={`bg-white rounded-2xl p-6 shadow-xl border border-violet-100 group hover:scale-105 transition-all duration-700 ${
+              className={`bg-card rounded-2xl p-6 shadow-xl border border-accent/20 group hover:scale-105 transition-all duration-700 ${
                 userReviewsVisible
                   ? "translate-y-0 opacity-100 scale-100"
                   : "translate-y-8 opacity-0 scale-95"
@@ -817,11 +819,11 @@ export default function HomePage() {
               style={{ transitionDelay: "200ms" }}
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-violet-400 to-purple-400 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                <div className="w-12 h-12 bg-gradient-to-r from-accent to-purple rounded-full flex items-center justify-center text-white font-bold text-lg">
                   阿
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">阿明</h4>
+                  <h4 className="font-semibold text-foreground">阿明</h4>
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
                       <Stars
@@ -832,15 +834,15 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed mb-4">
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                 &quot;作为一个创作者，这个工具帮我节省了大量时间。角色设定很丰富，故事情节也很吸引人。强烈推荐给所有喜欢创作的朋友！&quot;
               </p>
-              <div className="text-xs text-gray-500">2024年1月12日</div>
+              <div className="text-xs text-muted-foreground">2024年1月12日</div>
             </div>
 
             {/* 评价3 */}
             <div
-              className={`bg-white rounded-2xl p-6 shadow-xl border border-sky-100 group hover:scale-105 transition-all duration-700 ${
+              className={`bg-card rounded-2xl p-6 shadow-xl border border-primary group hover:scale-105 transition-all duration-700 ${
                 userReviewsVisible
                   ? "translate-y-0 opacity-100 scale-100"
                   : "translate-y-8 opacity-0 scale-95"
@@ -848,11 +850,11 @@ export default function HomePage() {
               style={{ transitionDelay: "400ms" }}
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-gradient-to-r from-sky-400 to-blue-400 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold text-lg">
                   梦
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">梦梦</h4>
+                  <h4 className="font-semibold text-foreground">梦梦</h4>
                   <div className="flex items-center gap-1">
                     {[...Array(5)].map((_, i) => (
                       <Stars
@@ -863,20 +865,20 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed mb-4">
+              <p className="text-muted-foreground text-sm leading-relaxed mb-4">
                 &quot;界面设计很漂亮，操作简单易懂。生成的故事质量很高，角色性格鲜明。已经用它创作了好几篇故事了，每次都有新的惊喜。&quot;
               </p>
-              <div className="text-xs text-gray-500">2024年1月10日</div>
+              <div className="text-xs text-muted-foreground">2024年1月10日</div>
             </div>
           </div>
 
           {/* 创作分享展示 */}
           <div className="mb-12">
             <div className="text-center mb-8">
-              <h3 className="text-3xl font-bold text-gray-900 mb-4">
+              <h3 className="text-3xl font-bold text-foreground mb-4">
                 社区创作精选
               </h3>
-              <p className="text-gray-600 max-w-2xl mx-auto">
+              <p className="text-muted-foreground max-w-2xl mx-auto">
                 来自用户的精彩创作，展示AI漫画生成的无限可能
               </p>
             </div>
@@ -884,7 +886,7 @@ export default function HomePage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {/* 创作1 - 花园茶会 */}
               <div
-                className={`bg-white rounded-xl p-4 shadow-lg border border-gray-100 group hover:scale-105 transition-all duration-700 ${
+                className={`bg-card rounded-xl p-4 shadow-lg border border-border group hover:scale-105 transition-all duration-700 ${
                   userReviewsVisible
                     ? "translate-y-0 opacity-100 scale-100"
                     : "translate-y-8 opacity-0 scale-95"
@@ -899,25 +901,25 @@ export default function HomePage() {
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                     sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                   />
-                  <div className="absolute top-2 right-2 bg-rose-500 text-white text-xs rounded-full px-2 py-1">
+                  <div className="absolute top-2 right-2 bg-primary text-white text-xs rounded-full px-2 py-1">
                     热门
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-foreground">
                     花园茶会时光
                   </span>
                   <div className="flex items-center gap-1 text-yellow-400">
                     <Stars className="w-3 h-3 fill-current" />
-                    <span className="text-xs text-gray-500">4.9</span>
+                    <span className="text-xs text-muted-foreground">4.9</span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">by 小雅</p>
+                <p className="text-xs text-muted-foreground mt-1">by 小雅</p>
               </div>
 
               {/* 创作2 - 婚礼情侣 */}
               <div
-                className={`bg-white rounded-xl p-4 shadow-lg border border-gray-100 group hover:scale-105 transition-all duration-700 ${
+                className={`bg-card rounded-xl p-4 shadow-lg border border-border group hover:scale-105 transition-all duration-700 ${
                   userReviewsVisible
                     ? "translate-y-0 opacity-100 scale-100"
                     : "translate-y-8 opacity-0 scale-95"
@@ -932,25 +934,25 @@ export default function HomePage() {
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                     sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                   />
-                  <div className="absolute top-2 right-2 bg-violet-500 text-white text-xs rounded-full px-2 py-1">
+                  <div className="absolute top-2 right-2 bg-accent text-white text-xs rounded-full px-2 py-1">
                     新作
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-foreground">
                     浪漫婚礼时刻
                   </span>
                   <div className="flex items-center gap-1 text-yellow-400">
                     <Stars className="w-3 h-3 fill-current" />
-                    <span className="text-xs text-gray-500">4.8</span>
+                    <span className="text-xs text-muted-foreground">4.8</span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">by 阿明</p>
+                <p className="text-xs text-muted-foreground mt-1">by 阿明</p>
               </div>
 
               {/* 创作3 - 奔跑女孩 */}
               <div
-                className={`bg-white rounded-xl p-4 shadow-lg border border-gray-100 group hover:scale-105 transition-all duration-700 ${
+                className={`bg-card rounded-xl p-4 shadow-lg border border-border group hover:scale-105 transition-all duration-700 ${
                   userReviewsVisible
                     ? "translate-y-0 opacity-100 scale-100"
                     : "translate-y-8 opacity-0 scale-95"
@@ -965,25 +967,25 @@ export default function HomePage() {
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                     sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                   />
-                  <div className="absolute top-2 right-2 bg-sky-500 text-white text-xs rounded-full px-2 py-1">
+                  <div className="absolute top-2 right-2 bg-primary text-white text-xs rounded-full px-2 py-1">
                     精选
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-foreground">
                     阳光下的奔跑
                   </span>
                   <div className="flex items-center gap-1 text-yellow-400">
                     <Stars className="w-3 h-3 fill-current" />
-                    <span className="text-xs text-gray-500">4.9</span>
+                    <span className="text-xs text-muted-foreground">4.9</span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">by 梦梦</p>
+                <p className="text-xs text-muted-foreground mt-1">by 梦梦</p>
               </div>
 
               {/* 创作4 - 校园情侣 */}
               <div
-                className={`bg-white rounded-xl p-4 shadow-lg border border-gray-100 group hover:scale-105 transition-all duration-700 ${
+                className={`bg-card rounded-xl p-4 shadow-lg border border-border group hover:scale-105 transition-all duration-700 ${
                   userReviewsVisible
                     ? "translate-y-0 opacity-100 scale-100"
                     : "translate-y-8 opacity-0 scale-95"
@@ -998,43 +1000,43 @@ export default function HomePage() {
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
                     sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                   />
-                  <div className="absolute top-2 right-2 bg-emerald-500 text-white text-xs rounded-full px-2 py-1">
+                  <div className="absolute top-2 right-2 bg-accent text-white text-xs rounded-full px-2 py-1">
                     推荐
                   </div>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-foreground">
                     校园甜蜜时光
                   </span>
                   <div className="flex items-center gap-1 text-yellow-400">
                     <Stars className="w-3 h-3 fill-current" />
-                    <span className="text-xs text-gray-500">4.7</span>
+                    <span className="text-xs text-muted-foreground">4.7</span>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">by 小雅</p>
+                <p className="text-xs text-muted-foreground mt-1">by 小雅</p>
               </div>
             </div>
           </div>
 
           {/* 分享你的创作 */}
           <div className="text-center">
-            <div className="bg-gradient-to-r from-rose-50 to-pink-50 rounded-3xl p-8 border border-rose-100">
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            <div className="bg-gradient-to-r from-primary/10 to-accent/10 rounded-3xl p-8 border border-primary/20">
+              <h3 className="text-2xl font-bold text-foreground mb-4">
                 分享你的创作
               </h3>
-              <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
                 创作完成后，可以将你的作品分享到社区，获得其他用户的点赞和评论
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href={getLocalizedHref("/workshop")}>
-                  <Button className="rounded-full bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-700 hover:to-pink-700 text-white px-8 py-3 font-semibold shadow-lg transform hover:scale-105 transition-all duration-300">
+                  <Button className="btn-theme-primary rounded-full px-8 py-3 font-semibold shadow-lg transform hover:scale-105 transition-all duration-300">
                     <Heart className="w-4 h-4 mr-2" />
                     开始创作
                   </Button>
                 </Link>
                 <Button
                   variant="outline"
-                  className="rounded-full border-rose-300 text-rose-600 hover:bg-rose-50 px-8 py-3 font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
+                  className="rounded-full border-primary text-primary hover:bg-primary/5 px-8 py-3 font-semibold shadow-lg transform hover:scale-105 transition-all duration-300"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
                   查看社区
@@ -1045,35 +1047,37 @@ export default function HomePage() {
         </section>
 
         {/* Footer */}
-        <footer className="bg-gradient-to-r from-gray-100 via-gray-50 to-gray-100 text-gray-800 border-t border-gray-200">
+        <footer className="bg-gradient-to-r from-muted/10 via-muted/5 to-muted/10 text-muted-foreground border-t border-border shadow-sm transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-4 py-16">
             {/* 主要内容区域 */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
               {/* 公司信息 */}
               <div className="lg:col-span-2">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-r from-rose-500 to-pink-500 rounded-xl flex items-center justify-center">
+                  <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
                     <Palette className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold bg-gradient-to-r from-rose-600 to-pink-600 bg-clip-text text-transparent">
+                    <h3 className="text-2xl font-bold bg-primary bg-clip-text text-transparent">
                       Harjimi AI
                     </h3>
-                    <p className="text-gray-600 text-sm">AI漫画生成器</p>
+                    <p className="text-muted-foreground text-sm">
+                      AI漫画生成器
+                    </p>
                   </div>
                 </div>
-                <p className="text-gray-700 mb-6 leading-relaxed">
+                <p className="text-muted-foreground mb-6 leading-relaxed">
                   Harjimi AI
                   致力于为用户提供最先进的AI漫画生成技术。我们结合人工智能与创意设计，
                   让每个人都能轻松创作出独特的漫画作品，释放无限创意可能。
                 </p>
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2 text-gray-600">
+                  <div className="flex items-center gap-2 text-muted-foreground">
                     <Stars className="w-4 h-4 text-yellow-500" />
                     <span className="text-sm">4.9/5.0 用户评分</span>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Heart className="w-4 h-4 text-rose-500" />
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Heart className="w-4 h-4 text-primary" />
                     <span className="text-sm">10,000+ 用户信赖</span>
                   </div>
                 </div>
@@ -1081,52 +1085,52 @@ export default function HomePage() {
 
               {/* 产品功能 */}
               <div>
-                <h4 className="text-lg font-semibold mb-6 text-gray-900">
+                <h4 className="text-lg font-semibold mb-6 text-foreground">
                   产品功能
                 </h4>
                 <ul className="space-y-3">
                   <li>
                     <Link
                       href={getLocalizedHref("/workshop")}
-                      className="text-gray-600 hover:text-rose-600 transition-colors flex items-center gap-2"
+                      className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                     >
-                      <span className="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+                      <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                       AI角色生成
                     </Link>
                   </li>
                   <li>
                     <Link
                       href={getLocalizedHref("/workshop")}
-                      className="text-gray-600 hover:text-rose-600 transition-colors flex items-center gap-2"
+                      className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                     >
-                      <span className="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+                      <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                       多角色故事
                     </Link>
                   </li>
                   <li>
                     <Link
                       href={getLocalizedHref("/workshop")}
-                      className="text-gray-600 hover:text-rose-600 transition-colors flex items-center gap-2"
+                      className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                     >
-                      <span className="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+                      <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                       场景构图
                     </Link>
                   </li>
                   <li>
                     <Link
                       href={getLocalizedHref("/workshop")}
-                      className="text-gray-600 hover:text-rose-600 transition-colors flex items-center gap-2"
+                      className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                     >
-                      <span className="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+                      <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                       风格转换
                     </Link>
                   </li>
                   <li>
                     <Link
                       href={getLocalizedHref("/workshop")}
-                      className="text-gray-600 hover:text-rose-600 transition-colors flex items-center gap-2"
+                      className="text-muted-foreground hover:text-primary transition-colors flex items-center gap-2"
                     >
-                      <span className="w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+                      <span className="w-1.5 h-1.5 bg-primary rounded-full"></span>
                       社区分享
                     </Link>
                   </li>
@@ -1135,37 +1139,41 @@ export default function HomePage() {
 
               {/* 联系我们 */}
               <div>
-                <h4 className="text-lg font-semibold mb-6 text-gray-900">
+                <h4 className="text-lg font-semibold mb-6 text-foreground">
                   联系我们
                 </h4>
                 <ul className="space-y-3">
-                  <li className="flex items-center gap-3 text-gray-700">
-                    <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center">
-                      <Mail className="w-4 h-4 text-rose-600" />
+                  <li className="flex items-center gap-3 text-muted-foreground">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <Mail className="w-4 h-4 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm font-medium">邮箱</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-muted-foreground">
                         contact@harjimi.ai
                       </p>
                     </div>
                   </li>
-                  <li className="flex items-center gap-3 text-gray-700">
-                    <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center">
-                      <Globe className="w-4 h-4 text-rose-600" />
+                  <li className="flex items-center gap-3 text-muted-foreground">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <Globe className="w-4 h-4 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm font-medium">官网</p>
-                      <p className="text-xs text-gray-500">www.harjimi.ai</p>
+                      <p className="text-xs text-muted-foreground">
+                        www.harjimi.ai
+                      </p>
                     </div>
                   </li>
-                  <li className="flex items-center gap-3 text-gray-700">
-                    <div className="w-8 h-8 bg-rose-100 rounded-lg flex items-center justify-center">
-                      <MessageCircle className="w-4 h-4 text-rose-600" />
+                  <li className="flex items-center gap-3 text-muted-foreground">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                      <MessageCircle className="w-4 h-4 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm font-medium">客服</p>
-                      <p className="text-xs text-gray-500">7×24小时在线</p>
+                      <p className="text-xs text-muted-foreground">
+                        7×24小时在线
+                      </p>
                     </div>
                   </li>
                 </ul>
@@ -1173,10 +1181,10 @@ export default function HomePage() {
             </div>
 
             {/* 分隔线 */}
-            <div className="border-t border-gray-300 pt-8 mb-8">
+            <div className="border-t border-border/30 pt-8 mb-8">
               <div className="grid md:grid-cols-2 gap-6 items-center">
                 {/* 版权信息 */}
-                <div className="text-gray-600 text-sm">
+                <div className="text-muted-foreground text-sm">
                   <p>© 2024 Harjimi AI. 保留所有权利。</p>
                   <p className="mt-1">AI漫画生成技术 | 创意设计服务</p>
                 </div>
@@ -1185,25 +1193,25 @@ export default function HomePage() {
                 <div className="flex flex-wrap gap-6 text-sm">
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-rose-600 transition-colors"
+                    className="text-muted-foreground hover:text-primary transition-colors"
                   >
                     隐私政策
                   </Link>
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-rose-600 transition-colors"
+                    className="text-muted-foreground hover:text-primary transition-colors"
                   >
                     服务条款
                   </Link>
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-rose-600 transition-colors"
+                    className="text-muted-foreground hover:text-primary transition-colors"
                   >
                     使用协议
                   </Link>
                   <Link
                     href="#"
-                    className="text-gray-600 hover:text-rose-600 transition-colors"
+                    className="text-muted-foreground hover:text-primary transition-colors"
                   >
                     Cookie政策
                   </Link>
@@ -1213,7 +1221,7 @@ export default function HomePage() {
 
             {/* 底部装饰 */}
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 text-gray-500 text-sm">
+              <div className="inline-flex items-center gap-2 text-muted-foreground text-sm">
                 <Sparkles className="w-4 h-4" />
                 <span>用AI创造无限可能</span>
                 <Sparkles className="w-4 h-4" />

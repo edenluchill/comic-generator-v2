@@ -140,15 +140,16 @@ export default function CharacterCreationWorkshop() {
 
   const isCreatingCharacter = createCharacterMutation.isPending;
 
-  // 步骤状态计算 - 合并第二步和第三步
+  // 步骤状态计算
   const step1Complete = !!uploadedFile;
-  const step2Complete = characterSaved; // 现在第二步包括生成和保存
+  const step2Complete = characterSaved;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 relative">
+    <div className="min-h-screen bg-theme-gradient relative">
+      {/* 背景装饰 - 使用主题色彩 */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-amber-400/10 to-orange-400/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-10 right-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-orange-400/10 to-yellow-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-10 left-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-primary/10 to-accent/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-10 right-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-accent/10 to-primary/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
       <div className="container mx-auto px-3 py-3 relative z-10 max-w-4xl">
@@ -238,28 +239,28 @@ export default function CharacterCreationWorkshop() {
             {step2Complete && (
               <div className="text-center py-6">
                 <div className="text-6xl mb-4">🎉</div>
-                <div className="text-lg font-semibold text-gray-800 mb-2">
+                <div className="text-lg font-semibold text-foreground mb-2">
                   恭喜！角色创建完成
                 </div>
-                <div className="text-gray-600 text-sm mb-6">
+                <div className="text-muted-foreground text-sm mb-6">
                   现在可以使用 {characters.length} 个角色来创作你的专属漫画了
                 </div>
 
-                {/* 调整次要按钮样式，降低视觉权重 */}
+                {/* 调整次要按钮样式，使用主题色彩 */}
                 <div className="flex items-center justify-center gap-3 mt-8">
                   <button
                     onClick={handleAddNewCharacter}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-transparent border border-gray-300 text-gray-500 rounded-lg hover:bg-gray-50 hover:text-gray-600 transition-all duration-200 text-xs font-normal"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-transparent border border-border text-muted-foreground rounded-lg hover:bg-secondary/50 hover:text-foreground hover:border-primary/30 transition-all duration-200 text-xs font-normal"
                   >
                     <User className="w-3 h-3" />
                     添加更多角色
                   </button>
 
-                  <div className="text-gray-300 text-xs">|</div>
+                  <div className="text-border text-xs">|</div>
 
                   <button
                     onClick={() => setIsDrawerOpen(true)}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-transparent border border-gray-300 text-gray-500 rounded-lg hover:bg-gray-50 hover:text-gray-600 transition-all duration-200 text-xs font-normal"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-transparent border border-border text-muted-foreground rounded-lg hover:bg-secondary/50 hover:text-foreground hover:border-primary/30 transition-all duration-200 text-xs font-normal"
                   >
                     <Users className="w-3 h-3" />
                     查看角色库
@@ -270,16 +271,16 @@ export default function CharacterCreationWorkshop() {
           </StepCard>
         </div>
 
-        {/* 错误信息 */}
+        {/* 错误信息 - 使用主题色彩 */}
         {error && (
           <div className="mt-6 text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-destructive/10 text-destructive rounded-lg text-sm border border-destructive/20">
               ❌ {error.message || error.toString()}
             </div>
           </div>
         )}
 
-        {/* 角色库抽屉 */}
+        {/* 角色库抽屉 - 现在使用 Sheet */}
         <CharacterLibraryDrawer
           isOpen={isDrawerOpen}
           onClose={() => setIsDrawerOpen(false)}

@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { ImageIcon, Download, RefreshCw, Edit, Check, X } from "lucide-react";
 import { ComicScene } from "@/types/diary";
-import { COMIC_DISPLAY_STYLES } from "@/lib/styles/comic-display.styles";
 
 interface PosterDisplayProps {
   scene?: ComicScene;
@@ -108,8 +107,8 @@ export default function PosterDisplay({
   };
 
   return (
-    <div className={COMIC_DISPLAY_STYLES.poster43Container}>
-      <div className={COMIC_DISPLAY_STYLES.comicBook}>
+    <div className="w-full max-w-5xl mx-auto">
+      <div className="bg-gradient-to-br from-secondary via-accent/30 to-primary/20 p-8 rounded-lg shadow-2xl border border-border relative overflow-hidden group">
         {/* 纸质纹理效果 */}
         <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-transparent via-amber-100 to-transparent"></div>
 
@@ -124,7 +123,7 @@ export default function PosterDisplay({
         {scene?.image_url && onDownload && (
           <button
             onClick={handleDownload}
-            className={COMIC_DISPLAY_STYLES.downloadButton}
+            className="absolute top-4 right-4 flex items-center gap-2 px-4 py-2 bg-card/90 backdrop-blur-sm text-foreground rounded-full hover:bg-card hover:shadow-lg transition-all duration-300 border border-border opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 z-30"
           >
             <Download className="w-4 h-4" />
             <span className="text-sm font-medium">下载</span>
@@ -148,8 +147,8 @@ export default function PosterDisplay({
 
         {/* 4:3海报内容 */}
         <div className="flex justify-center items-center min-h-[500px] relative z-10">
-          <div className={COMIC_DISPLAY_STYLES.sceneContainer}>
-            <div className={COMIC_DISPLAY_STYLES.scenePanels.poster43}>
+          <div className="relative group">
+            <div className="aspect-[4/3] bg-card border-4 border-border rounded-lg overflow-hidden relative shadow-lg flex items-center justify-center w-full max-w-4xl mx-auto">
               {/* 生成中状态 */}
               {isGenerating ? (
                 <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50">
@@ -161,7 +160,7 @@ export default function PosterDisplay({
                 <Image
                   src={scene.image_url}
                   alt="4:3海报"
-                  className={COMIC_DISPLAY_STYLES.posterImage}
+                  className="w-full h-full object-contain max-w-[1024px] max-h-[768px]"
                   width={1024}
                   height={768}
                   priority

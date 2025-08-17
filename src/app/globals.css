@@ -43,73 +43,114 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+/* ========== 粉色主题 (默认) ========== */
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
+
+  /* 基础背景和前景色 - 温暖的粉色调 */
+  --background: oklch(0.99 0.01 15); /* 非常浅的暖白色 */
+  --foreground: oklch(0.2 0.02 15); /* 深棕色文字 */
+
+  /* 卡片和弹出层 - 纯净白色 */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.2 0.02 15);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --popover-foreground: oklch(0.2 0.02 15);
+
+  /* 主色调 - 你的粉色渐变 */
+  --primary: oklch(0.65 0.15 340); /* rose-600 equivalent */
+  --primary-foreground: oklch(0.98 0.01 340);
+
+  /* 次要色调 - 浅粉色 */
+  --secondary: oklch(0.96 0.03 340); /* rose-50 equivalent */
+  --secondary-foreground: oklch(0.5 0.08 340);
+
+  /* 静音色调 - 中性粉色 */
+  --muted: oklch(0.95 0.02 340);
+  --muted-foreground: oklch(0.55 0.05 340);
+
+  /* 强调色 - 亮粉色 */
+  --accent: oklch(0.92 0.05 340);
+  --accent-foreground: oklch(0.4 0.1 340);
+
+  /* 边框和输入 - 柔和粉色 */
+  --border: oklch(0.9 0.03 340);
+  --input: oklch(0.95 0.02 340);
+  --ring: oklch(0.65 0.15 340);
+
+  /* 危险色 - 保持红色 */
+  --destructive: oklch(0.65 0.2 25);
+
+  /* 图表色彩 - 粉色系列 */
+  --chart-1: oklch(0.65 0.15 340); /* rose */
+  --chart-2: oklch(0.7 0.12 320); /* pink */
+  --chart-3: oklch(0.6 0.18 300); /* fuchsia */
+  --chart-4: oklch(0.55 0.2 280); /* purple */
+  --chart-5: oklch(0.5 0.15 260); /* violet */
+
+  /* 侧边栏 - 浅粉色背景 */
+  --sidebar: oklch(0.98 0.01 340);
+  --sidebar-foreground: oklch(0.3 0.05 340);
+  --sidebar-primary: oklch(0.65 0.15 340);
+  --sidebar-primary-foreground: oklch(0.98 0.01 340);
+  --sidebar-accent: oklch(0.94 0.04 340);
+  --sidebar-accent-foreground: oklch(0.4 0.08 340);
+  --sidebar-border: oklch(0.9 0.03 340);
+  --sidebar-ring: oklch(0.65 0.15 340);
 }
 
+/* ========== 深色主题 - 优雅的深粉色调 ========== */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* 基础背景和前景色 - 深色调 */
+  --background: oklch(0.08 0.01 340); /* 深粉灰色 */
+  --foreground: oklch(0.95 0.02 340); /* 浅粉白色 */
+
+  /* 卡片和弹出层 - 稍亮的深色 */
+  --card: oklch(0.12 0.02 340);
+  --card-foreground: oklch(0.95 0.02 340);
+  --popover: oklch(0.12 0.02 340);
+  --popover-foreground: oklch(0.95 0.02 340);
+
+  /* 主色调 - 亮粉色在深色背景上 */
+  --primary: oklch(0.75 0.12 340); /* 亮粉色 */
+  --primary-foreground: oklch(0.08 0.01 340);
+
+  /* 次要色调 - 深粉灰色 */
+  --secondary: oklch(0.18 0.03 340);
+  --secondary-foreground: oklch(0.9 0.03 340);
+
+  /* 静音色调 */
+  --muted: oklch(0.15 0.02 340);
+  --muted-foreground: oklch(0.7 0.04 340);
+
+  /* 强调色 */
+  --accent: oklch(0.2 0.04 340);
+  --accent-foreground: oklch(0.85 0.05 340);
+
+  /* 边框和输入 - 半透明 */
+  --border: oklch(1 0 0 / 12%);
+  --input: oklch(1 0 0 / 8%);
+  --ring: oklch(0.75 0.12 340);
+
+  /* 危险色 - 深色版本 */
+  --destructive: oklch(0.7 0.18 25);
+
+  /* 图表色彩 - 深色版本 */
+  --chart-1: oklch(0.7 0.12 340); /* rose */
+  --chart-2: oklch(0.75 0.1 320); /* pink */
+  --chart-3: oklch(0.65 0.15 300); /* fuchsia */
+  --chart-4: oklch(0.6 0.18 280); /* purple */
+  --chart-5: oklch(0.55 0.12 260); /* violet */
+
+  /* 侧边栏 - 深色版本 */
+  --sidebar: oklch(0.1 0.01 340);
+  --sidebar-foreground: oklch(0.9 0.02 340);
+  --sidebar-primary: oklch(0.7 0.12 340);
+  --sidebar-primary-foreground: oklch(0.1 0.01 340);
+  --sidebar-accent: oklch(0.16 0.03 340);
+  --sidebar-accent-foreground: oklch(0.85 0.04 340);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.7 0.12 340);
 }
 
 @layer base {
@@ -117,7 +158,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground transition-colors duration-300;
   }
 }
 
@@ -205,66 +246,41 @@
   }
 }
 
-@keyframes slide-in-down {
+@keyframes scale-in {
   from {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: scale(0.9);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
   }
 }
 
-@keyframes bounce-slow {
+@keyframes gradient-shift {
   0%,
-  20%,
-  53%,
-  80%,
   100% {
-    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-    transform: translate3d(0, 0, 0);
+    background-position: 0% 50%;
   }
-  40%,
-  43% {
-    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
-    transform: translate3d(0, -15px, 0);
-  }
-  70% {
-    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
-    transform: translate3d(0, -7px, 0);
-  }
-  90% {
-    transform: translate3d(0, -2px, 0);
+  50% {
+    background-position: 100% 50%;
   }
 }
 
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* ========== 动画类定义 ========== */
-/* 初始状态：元素开始时是隐藏的，避免闪烁 */
+/* ========== 自定义工具类 ========== */
 .animate-fadeIn {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeIn 0.6s ease-out forwards;
+  animation: fadeIn 0.6s ease-out;
 }
 
 .animate-shimmer {
+  animation: shimmer 2s linear infinite;
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.4),
+    rgba(255, 255, 255, 0.2),
     transparent
   );
   background-size: 200% 100%;
-  animation: shimmer 2s infinite;
 }
 
 .animate-float {
@@ -280,127 +296,106 @@
 }
 
 .animate-fade-in-up {
-  opacity: 0;
-  transform: translateY(30px);
-  animation: fade-in-up 0.6s ease-out forwards;
+  animation: fade-in-up 0.6s ease-out;
 }
 
 .animate-slide-in-left {
-  opacity: 0;
-  transform: translateX(-30px);
-  animation: slide-in-left 0.6s ease-out forwards;
+  animation: slide-in-left 0.6s ease-out;
 }
 
 .animate-slide-in-right {
-  opacity: 0;
-  transform: translateX(30px);
-  animation: slide-in-right 0.6s ease-out forwards;
+  animation: slide-in-right 0.6s ease-out;
 }
 
-.animate-slide-in-down {
-  opacity: 0;
-  transform: translateY(-20px);
-  animation: slide-in-down 0.6s ease-out forwards;
+.animate-scale-in {
+  animation: scale-in 0.4s ease-out;
 }
 
-.animate-bounce-slow {
-  animation: bounce-slow 3s ease-in-out infinite;
+.animate-gradient-shift {
+  animation: gradient-shift 3s ease-in-out infinite;
+  background-size: 200% 200%;
 }
 
-.animate-spin-slow {
-  animation: spin-slow 4s linear infinite;
-}
-
-/* 自定义滚动条 */
-.overflow-y-auto::-webkit-scrollbar {
-  width: 6px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 10px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb {
-  background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
-  border-radius: 10px;
-}
-
-.overflow-y-auto::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(to bottom, #2563eb, #7c3aed);
-}
-
-/* 玻璃态效果增强 */
-.backdrop-blur-lg {
-  backdrop-filter: blur(16px);
-}
-
-/* 自定义阴影 */
-.shadow-elegant {
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15),
-    0 0 0 1px rgba(255, 255, 255, 0.2);
-}
-
-/* ========== 移动端底部安全区域 ========== */
-:root {
-  --mobile-nav-height: 4rem; /* 64px */
-}
-
-/* 移动端底部安全区域工具类 */
+/* ========== 响应式工具类 ========== */
 .pb-mobile-safe {
-  padding-bottom: calc(
-    var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px)
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+/* ========== 特殊效果 ========== */
+.glass-effect {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-effect {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.text-shadow-soft {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.dark .text-shadow-soft {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* ========== 主题特定的渐变背景 ========== */
+.bg-theme-gradient {
+  background: linear-gradient(
+    135deg,
+    oklch(0.99 0.01 15) 0%,
+    oklch(0.96 0.03 340) 50%,
+    oklch(0.94 0.05 320) 100%
   );
 }
 
-@media (min-width: 768px) {
-  .pb-mobile-safe {
-    padding-bottom: 1rem; /* 桌面端恢复正常 */
-  }
-}
-
-/* 容器底部安全区域 */
-.mb-mobile-safe {
-  margin-bottom: calc(
-    var(--mobile-nav-height) + env(safe-area-inset-bottom, 0px)
+.dark .bg-theme-gradient {
+  background: linear-gradient(
+    135deg,
+    oklch(0.08 0.01 340) 0%,
+    oklch(0.12 0.02 340) 50%,
+    oklch(0.15 0.03 320) 100%
   );
 }
 
-@media (min-width: 768px) {
-  .mb-mobile-safe {
-    margin-bottom: 0;
-  }
+/* ========== 按钮主题样式 ========== */
+.btn-theme-primary {
+  background: linear-gradient(
+    135deg,
+    oklch(0.65 0.15 340) 0%,
+    oklch(0.7 0.12 320) 100%
+  );
+  color: oklch(0.98 0.01 340);
+  border: none;
+  transition: all 0.3s ease;
 }
 
-/* ========== 移动端安全区域工具类 ========== */
-@layer utilities {
-  /* 移动端底部安全区域 - padding版本 */
-  .pb-mobile-safe {
-    padding-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
-  }
+.btn-theme-primary:hover {
+  background: linear-gradient(
+    135deg,
+    oklch(0.6 0.18 340) 0%,
+    oklch(0.65 0.15 320) 100%
+  );
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px oklch(0.65 0.15 340 / 0.3);
+}
 
-  /* 移动端底部安全区域 - margin版本 */
-  .mb-mobile-safe {
-    margin-bottom: calc(4rem + env(safe-area-inset-bottom, 0px));
-  }
+.dark .btn-theme-primary {
+  background: linear-gradient(
+    135deg,
+    oklch(0.75 0.12 340) 0%,
+    oklch(0.8 0.1 320) 100%
+  );
+  color: oklch(0.08 0.01 340);
+}
 
-  /* Drawer专用 - 高度计算 */
-  .h-mobile-drawer {
-    height: calc(
-      100vh - 5.5rem - env(safe-area-inset-bottom, 0px)
-    ); /* 70px header */
-  }
-
-  /* 桌面端恢复正常 */
-  @media (min-width: 768px) {
-    .pb-mobile-safe {
-      padding-bottom: 1rem;
-    }
-    .mb-mobile-safe {
-      margin-bottom: 0;
-    }
-    .h-mobile-drawer {
-      height: calc(100vh - 4.375rem);
-    }
-  }
+.dark .btn-theme-primary:hover {
+  background: linear-gradient(
+    135deg,
+    oklch(0.8 0.15 340) 0%,
+    oklch(0.85 0.12 320) 100%
+  );
+  box-shadow: 0 4px 12px oklch(0.75 0.12 340 / 0.4);
 }

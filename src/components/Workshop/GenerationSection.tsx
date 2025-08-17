@@ -27,7 +27,7 @@ export default function GenerationSection({
 }: GenerationSectionProps) {
   return (
     <div
-      className={`bg-white rounded-xl shadow-sm border border-gray-100 p-6 transition-all duration-1000 ${
+      className={`bg-card rounded-xl shadow-sm border border-border p-6 transition-all duration-1000 ${
         mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
       }`}
     >
@@ -42,14 +42,14 @@ export default function GenerationSection({
         {/* 生成按钮区域 */}
         <div className="flex gap-3">
           {!hasResults ? (
-            // 初次生成按钮
+            // 初次生成按钮 - 使用主题色彩
             <button
               onClick={onGenerate}
               disabled={!canGenerate || isProcessing}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-lg font-medium transition-all ${
                 canGenerate && !isProcessing
-                  ? "bg-blue-500 hover:bg-blue-600 text-white shadow-md hover:shadow-lg"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  ? "btn-theme-primary shadow-lg hover:shadow-xl"
+                  : "bg-muted text-muted-foreground cursor-not-allowed"
               }`}
             >
               <Wand2
@@ -58,14 +58,14 @@ export default function GenerationSection({
               {isProcessing ? "生成中..." : "开始生成"}
             </button>
           ) : (
-            // 重新生成按钮
+            // 重新生成按钮 - 使用主题色彩
             <button
               onClick={onRegenerate || onGenerate}
               disabled={isProcessing}
               className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-lg font-medium transition-all ${
                 !isProcessing
-                  ? "bg-green-500 hover:bg-green-600 text-white shadow-md hover:shadow-lg"
-                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  ? "bg-gradient-to-r from-chart-3 to-chart-4 hover:from-chart-3/80 hover:to-chart-4/80 text-white shadow-lg hover:shadow-xl"
+                  : "bg-muted text-muted-foreground cursor-not-allowed"
               }`}
             >
               <RefreshCw
@@ -76,14 +76,14 @@ export default function GenerationSection({
           )}
         </div>
 
-        {/* 提示信息 */}
+        {/* 提示信息 - 使用主题色彩 */}
         <div className="text-center">
           {!hasResults ? (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               💡 选择你喜欢的风格，然后点击生成按钮开始创建角色
             </p>
           ) : (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               🎨 想要不同风格？选择新的风格然后重新生成
             </p>
           )}

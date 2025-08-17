@@ -49,14 +49,14 @@ const UserInfoCard: FC<UserInfoCardProps> = ({
       <Card
         className={`${
           isPremium
-            ? "bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 shadow-lg"
-            : "bg-white shadow-md"
-        } transition-all duration-200`}
+            ? "bg-gradient-to-br from-secondary/50 to-accent/30 border-primary/30 shadow-lg shadow-primary/10"
+            : "bg-card shadow-md"
+        } transition-all duration-200 border border-border`}
       >
         {/* 头像和基本信息区域 */}
         <CardHeader className="text-center">
           <div className="relative mx-auto mb-6">
-            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-2xl font-bold shadow-xl">
+            <div className="w-28 h-28 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground text-2xl font-bold shadow-xl">
               {getDisplayAvatar() ? (
                 <Image
                   src={getDisplayAvatar()!}
@@ -71,18 +71,18 @@ const UserInfoCard: FC<UserInfoCardProps> = ({
             </div>
             {isPremium && (
               <div className="absolute -top-1 -right-1">
-                <Crown className="w-10 h-10 text-amber-500 bg-white rounded-full p-2 shadow-lg border-2 border-amber-200" />
+                <Crown className="w-10 h-10 text-primary bg-card rounded-full p-2 shadow-lg border-2 border-primary/30" />
               </div>
             )}
           </div>
 
           <CardTitle>
             <div className="space-y-3">
-              <h2 className="text-2xl font-bold text-gray-900">
+              <h2 className="text-2xl font-bold text-foreground">
                 {profile.full_name || "未设置姓名"}
               </h2>
               {isPremium && (
-                <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 px-4 py-2 rounded-full text-sm font-medium">
+                <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-secondary to-accent/50 text-primary px-4 py-2 rounded-full text-sm font-medium border border-primary/20">
                   <Star className="w-4 h-4" />
                   拾光伙伴
                 </div>
@@ -95,27 +95,29 @@ const UserInfoCard: FC<UserInfoCardProps> = ({
           {/* 账户信息区域 */}
           <div className="space-y-4">
             <div className="space-y-3">
-              <div className="flex items-center gap-3 text-gray-700">
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                  <Mail className="w-4 h-4 text-gray-600" />
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                  <Mail className="w-4 h-4 text-primary" />
                 </div>
-                <span className="text-sm font-medium">{profile.email}</span>
+                <span className="text-sm font-medium text-foreground">
+                  {profile.email}
+                </span>
               </div>
 
-              <div className="flex items-center gap-3 text-gray-700">
-                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                  <Calendar className="w-4 h-4 text-gray-600" />
+              <div className="flex items-center gap-3 text-muted-foreground">
+                <div className="w-8 h-8 rounded-full bg-secondary flex items-center justify-center">
+                  <Calendar className="w-4 h-4 text-primary" />
                 </div>
                 <span className="text-sm">加入时间: {memberSince}</span>
               </div>
 
               {isPremium && profile.subscription_expires_at && (
-                <div className="flex items-center gap-3 text-gray-700">
-                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <div className="w-8 h-8 rounded-full bg-chart-3/20 flex items-center justify-center">
+                    <CheckCircle className="w-4 h-4 text-chart-3" />
                   </div>
                   <div>
-                    <div className="text-sm font-medium">
+                    <div className="text-sm font-medium text-foreground">
                       订阅至: {formatDate(profile.subscription_expires_at)}
                     </div>
                   </div>
@@ -125,11 +127,11 @@ const UserInfoCard: FC<UserInfoCardProps> = ({
           </div>
 
           {/* 操作按钮区域 */}
-          <div className="pt-6 border-t border-gray-200">
+          <div className="pt-6 border-t border-border">
             <div className="grid grid-cols-2 gap-3">
               <Button
                 variant="outline"
-                className="flex items-center justify-center gap-2 hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-center gap-2 hover:bg-secondary/50 hover:border-primary/30 transition-colors"
                 onClick={() => setIsEditModalOpen(true)}
               >
                 <Edit3 className="w-4 h-4" />
@@ -138,7 +140,7 @@ const UserInfoCard: FC<UserInfoCardProps> = ({
 
               <Button
                 variant="outline"
-                className="flex items-center justify-center gap-2 text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 transition-colors"
+                className="flex items-center justify-center gap-2 text-destructive border-destructive/30 hover:bg-destructive/10 hover:border-destructive/50 transition-colors"
                 onClick={onSignOut}
               >
                 <LogOut className="w-4 h-4" />

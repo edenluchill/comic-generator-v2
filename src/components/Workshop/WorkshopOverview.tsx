@@ -49,23 +49,25 @@ export default function WorkshopOverview() {
   };
 
   return (
-    <div className="min-h-screen pb-8 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 relative">
-      {/* 背景装饰 */}
+    <div className="min-h-screen pb-8 bg-theme-gradient relative">
+      {/* 背景装饰 - 使用主题色彩 */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-amber-400/10 to-orange-400/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-10 right-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-orange-400/10 to-yellow-400/10 rounded-full blur-3xl animate-pulse delay-1000" />
+        <div className="absolute top-10 left-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-primary/10 to-accent/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-10 right-10 w-32 h-32 md:w-48 md:h-48 bg-gradient-to-r from-accent/10 to-primary/10 rounded-full blur-3xl animate-pulse delay-1000" />
       </div>
 
       <div className="container mx-auto px-4 py-2 relative z-10 max-w-6xl">
-        {/* 标题 */}
+        {/* 标题 - 使用主题色彩 */}
         <div
           className={`mb-4 text-center transition-all duration-1000 delay-500 ${
             mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
           }`}
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-700 rounded-lg text-sm">
-            <Sparkles className="w-4 h-4" />
-            <span>提示：先创建角色，再写日记生成漫画</span>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-primary rounded-lg text-sm shadow-sm border border-border">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <span className="font-medium">
+              提示：先创建角色，再写日记生成漫画
+            </span>
           </div>
         </div>
 
@@ -85,10 +87,10 @@ export default function WorkshopOverview() {
             />
           </div>
 
-          {/* 错误提示 */}
+          {/* 错误提示 - 使用主题色彩 */}
           {deleteCharacterMutation.error && (
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-destructive/10 text-destructive rounded-lg text-sm border border-destructive/20">
                 ❌ {deleteCharacterMutation.error.message}
               </div>
             </div>

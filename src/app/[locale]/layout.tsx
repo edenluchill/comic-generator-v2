@@ -21,11 +21,11 @@ export default async function RootLayout({
   const messages = await getMessages({ locale });
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
       </head>
-      <body>
+      <body className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
         <NextIntlClientProvider messages={messages} locale={locale}>
           <ClientLayout>{children}</ClientLayout>
         </NextIntlClientProvider>

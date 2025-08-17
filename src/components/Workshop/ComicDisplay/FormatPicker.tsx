@@ -4,23 +4,24 @@ import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { ComicFormat } from "@/types/diary";
 import { FORMAT_OPTIONS } from "@/lib/constants/comic-display.constants";
-import { COMIC_DISPLAY_STYLES } from "@/lib/styles/comic-display.styles";
 
 interface FormatPickerProps {
-  format: ComicFormat;
+  currentFormat: ComicFormat;
   onFormatChange: (format: ComicFormat) => void;
   disabled?: boolean;
 }
 
 export default function FormatPicker({
-  format,
+  currentFormat,
   onFormatChange,
   disabled = false,
 }: FormatPickerProps) {
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const currentFormat = FORMAT_OPTIONS.find((opt) => opt.value === format);
-  const CurrentIcon = currentFormat?.icon || FORMAT_OPTIONS[0].icon;
+  const currentOption = FORMAT_OPTIONS.find(
+    (opt) => opt.value === currentFormat
+  );
+  const CurrentIcon = currentOption?.icon || FORMAT_OPTIONS[0].icon;
 
   const handleClickOutside = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -38,24 +39,24 @@ export default function FormatPicker({
         <button
           onClick={() => setShowDropdown(!showDropdown)}
           disabled={disabled}
-          className={COMIC_DISPLAY_STYLES.dropdown.button}
+          className="flex items-center justify-between gap-3 px-3 py-2 bg-card border border-border rounded-lg hover:bg-secondary/50 hover:border-primary/30 transition-all duration-200 text-sm font-medium text-foreground disabled:opacity-50 disabled:cursor-not-allowed min-w-[120px]"
         >
           <div className="flex items-center gap-2">
-            <CurrentIcon className="w-4 h-4" />
-            {currentFormat?.label}
+            <CurrentIcon className="w-4 h-4 text-primary" />
+            {currentOption?.label}
           </div>
           <ChevronDown
-            className={`w-4 h-4 transition-transform duration-200 ${
+            className={`w-4 h-4 transition-transform duration-200 text-muted-foreground ${
               showDropdown ? "rotate-180" : ""
             }`}
           />
         </button>
 
         {showDropdown && (
-          <div className={COMIC_DISPLAY_STYLES.dropdown.menu}>
+          <div className="absolute top-full right-0 mt-2 bg-card/95 backdrop-blur-xl border border-border rounded-lg shadow-xl z-50 min-w-[160px] overflow-hidden">
             {FORMAT_OPTIONS.map((option, index) => {
               const Icon = option.icon;
-              const isSelected = format === option.value;
+              const isSelected = currentFormat === option.value;
               const isFirst = index === 0;
               const isLast = index === FORMAT_OPTIONS.length - 1;
 
@@ -66,16 +67,21 @@ export default function FormatPicker({
                     onFormatChange(option.value);
                     setShowDropdown(false);
                   }}
-                  className={`${COMIC_DISPLAY_STYLES.dropdown.item} ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all duration-200 ${
                     isSelected
-                      ? COMIC_DISPLAY_STYLES.dropdown.itemSelected
-                      : COMIC_DISPLAY_STYLES.dropdown.itemDefault
+                      ? "bg-primary/10 text-primary border-l-2 border-primary"
+                      : "text-foreground hover:bg-secondary/50 hover:text-primary"
                   } ${isFirst ? "rounded-t-lg" : ""} ${
                     isLast ? "rounded-b-lg" : ""
                   }`}
                 >
                   <Icon className="w-4 h-4" />
-                  {option.label}
+                  <div>
+                    <div className="font-medium">{option.label}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {option.label}
+                    </div>
+                  </div>
                 </button>
               );
             })}

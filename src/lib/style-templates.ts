@@ -84,7 +84,7 @@ const STYLE_CONFIGS = {
     threeViewPrefix: "hand-drawn pencil sketch style cute {type}",
     threeViewFeatures:
       "kawaii sketch design, soft pencil lines, traditional drawing",
-  },
+  }
 };
 
 /**

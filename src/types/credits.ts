@@ -146,6 +146,7 @@ export const CREDIT_COSTS = {
   POSTER_GENERATION: 20, // 一个海报1个场景，每个场景20个credit
   CHARACTER_GENERATION: 20, // 生成Flux角色（头像+3视图）
   SCENE_REGENERATION: 10, // 重新生成单个场景
+  STYLE_TRANSFER: 15, // 风格转换服务
 } as const;
 
 export const SUBSCRIPTION_PLANS = {

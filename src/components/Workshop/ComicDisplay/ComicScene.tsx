@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ImageIcon, RefreshCw, Edit, Check, X } from "lucide-react";
+import { ImageIcon, RefreshCw, Edit, Check, X, Copy, Heart, MoreHorizontal } from "lucide-react";
 import { ComicScene as ComicSceneType } from "@/types/diary";
 
 interface ComicSceneProps {
@@ -10,6 +10,7 @@ interface ComicSceneProps {
   index: number;
   panelStyle: string;
   onRetryScene?: (sceneId: string, newDescription: string) => Promise<void>;
+  onImageClick?: (imageUrl: string) => void;
 }
 
 export default function ComicScene({
@@ -17,6 +18,7 @@ export default function ComicScene({
   index,
   panelStyle,
   onRetryScene,
+  onImageClick,
 }: ComicSceneProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedDescription, setEditedDescription] = useState("");
@@ -106,9 +108,10 @@ export default function ComicScene({
           <Image
             src={scene.image_url}
             alt={`场景 ${index + 1}`}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity duration-200"
             width={300}
             height={300}
+            onClick={() => onImageClick?.(scene.image_url)}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-muted">

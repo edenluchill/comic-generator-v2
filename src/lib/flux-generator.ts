@@ -117,7 +117,7 @@ export class FluxCharacterGenerator {
             "x-key": this.apiKey,
             "Content-Type": "application/json",
           },
-          timeout: 30000,
+          timeout: 60000, // 增加到60秒以适应复杂漫画场景
         }
       );
 
@@ -242,7 +242,7 @@ export class FluxCharacterGenerator {
     taskId: string,
     pollingUrl?: string,
     onProgress?: (progress: number, status: string) => void,
-    maxWaitTime = 300000 // 5分钟超时
+    maxWaitTime = 600000 // 10分钟超时 - 增加超时时间以适应漫画生成
   ): Promise<FluxGenerationResult> {
     const startTime = Date.now();
 

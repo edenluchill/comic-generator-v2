@@ -224,7 +224,19 @@
       "DiaryInput": {
         "storyDiary": "Story Diary",
         "placeholder": "Write your story here...\n\nFor example:\nXiao Ming met a cute kitten in the park today. The kitten was very shy and hid behind a tree. Xiao Ming took out some dried fish and carefully approached. Finally, the kitten was attracted by the food and became good friends with Xiao Ming.",
-        "characterCount": "characters"
+        "characterCount": "characters",
+        "aiExpand": "AI Expand",
+        "expanding": "Expanding...",
+        "storyExpansion": "AI Story Expansion",
+        "environmentDescription": "Environment Description",
+        "emotionalAtmosphere": "Emotional Atmosphere",
+        "expandedStory": "Expanded Story",
+        "additionalDetails": "Additional Details",
+        "useExpandedVersion": "Use Expanded Version",
+        "copy": "Copy",
+        "copied": "Copied",
+        "insufficientCredits": "Insufficient credits to expand story",
+        "expansionFailed": "Story expansion failed"
       },
       "ComicDisplay": {
         "generationFailed": "Generation Failed",

@@ -2,7 +2,7 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import CharacterCreationWorkshop from "@/components/Workshop/CharacterCreationWorkshop-v3-drawer";
+import CharacterCreationWorkshop from "@/components/Workshop/CharacterCreationWorkshop";
 import ComicGeneration from "@/components/Workshop/ComicGeneration";
 import WorkshopOverview from "@/components/Workshop/WorkshopOverview";
 import AuthGuard from "@/components/AuthGuard";

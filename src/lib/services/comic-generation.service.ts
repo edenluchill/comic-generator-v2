@@ -263,7 +263,12 @@ export class ComicGenerationService {
 
         return { success: true, scene: updatedScene, index };
       } catch (sceneError) {
-        console.error(`Scene ${index + 1} generation failed:`, sceneError);
+        console.error(`Scene ${index + 1} generation failed:`, {
+          sceneId: scene.id,
+          error: sceneError,
+          retryCount: scene.retry_count,
+          sceneDescription: sceneDesc.description.substring(0, 100) + "..."
+        });
 
         // 标记场景为失败状态
         await comicDatabaseService.markSceneFailed(scene.id, scene.retry_count);
@@ -307,6 +312,7 @@ export class ComicGenerationService {
 
     // 如果有任何失败，抛出错误
     if (errors.length > 0) {
+      console.warn("部分场景生成失败:", errors);
       throw new Error(`场景生成失败:\n${errors.join("\n")}`);
     }
 

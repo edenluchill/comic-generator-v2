@@ -10,7 +10,7 @@ export interface FaceAnalysisOptions {
 }
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.MYOPENAI_API_KEY,
 });
 
 export class FaceAnalysisService {

@@ -46,7 +46,10 @@ export async function POST(request: NextRequest) {
 
     // 字段验证
     const { isValid: fieldsValid, errors: fieldErrors } =
-      validateRequiredFields(body! as unknown as Record<string, unknown>, ["story", "characters"]);
+      validateRequiredFields(body! as unknown as Record<string, unknown>, [
+        "story",
+        "characters",
+      ]);
 
     if (!fieldsValid) {
       return createValidationErrorResponse(fieldErrors.join(", "));
@@ -70,13 +73,13 @@ export async function POST(request: NextRequest) {
     }
 
     // 构建角色信息
-    const characterNames = characters.map(c => c.name).join("、");
-    
+    const characterNames = characters.map((c) => c.name).join("、");
+
     // 获取格式参数
     const format = (body as ExpandStoryRequest).format || "four";
-    
+
     let prompt: string;
-    
+
     if (format === "single") {
       // 海报模式：单个详细场景
       prompt = `你是一个专业的漫画故事扩展专家。请基于用户提供的故事大纲，将其扩展成一个详细的单幅海报场景描述。
@@ -145,33 +148,42 @@ export async function POST(request: NextRequest) {
     }
 
     // 调用 ChatGPT API
-    const openaiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content: "你是一个专业的漫画故事扩展专家，擅长为漫画创作提供丰富的故事细节。"
-          },
-          {
-            role: "user",
-            content: prompt
-          }
-        ],
-        temperature: 0.7,
-        max_tokens: 1500,
-      }),
-    });
+    const openaiResponse = await fetch(
+      "https://api.openai.com/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.MYOPENAI_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              role: "system",
+              content:
+                "你是一个专业的漫画故事扩展专家，擅长为漫画创作提供丰富的故事细节。",
+            },
+            {
+              role: "user",
+              content: prompt,
+            },
+          ],
+          temperature: 0.7,
+          max_tokens: 1500,
+        }),
+      }
+    );
 
     if (!openaiResponse.ok) {
       const errorText = await openaiResponse.text();
       console.error("OpenAI API 错误:", openaiResponse.status, errorText);
-      throw new Error(`OpenAI API 调用失败: ${openaiResponse.status} - ${errorText.substring(0, 100)}`);
+      throw new Error(
+        `OpenAI API 调用失败: ${openaiResponse.status} - ${errorText.substring(
+          0,
+          100
+        )}`
+      );
     }
 
     const openaiData = await openaiResponse.json();
@@ -186,25 +198,25 @@ export async function POST(request: NextRequest) {
     let expandedData: ExpandStoryResponse;
     try {
       console.log("尝试解析 JSON 内容:", content.substring(0, 200) + "...");
-      
+
       // 移除 markdown 代码块标记
       let cleanContent = content.trim();
-      if (cleanContent.startsWith('```json')) {
-        cleanContent = cleanContent.replace(/^```json\s*/, '');
+      if (cleanContent.startsWith("```json")) {
+        cleanContent = cleanContent.replace(/^```json\s*/, "");
       }
-      if (cleanContent.startsWith('```')) {
-        cleanContent = cleanContent.replace(/^```\s*/, '');
+      if (cleanContent.startsWith("```")) {
+        cleanContent = cleanContent.replace(/^```\s*/, "");
       }
-      if (cleanContent.endsWith('```')) {
-        cleanContent = cleanContent.replace(/\s*```$/, '');
+      if (cleanContent.endsWith("```")) {
+        cleanContent = cleanContent.replace(/\s*```$/, "");
       }
-      
+
       console.log("清理后的内容:", cleanContent.substring(0, 200) + "...");
       expandedData = JSON.parse(cleanContent);
     } catch (parseError) {
       console.error("JSON 解析失败:", parseError);
       console.log("原始内容:", content);
-      
+
       // 尝试提取 JSON 部分
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
@@ -250,7 +262,6 @@ export async function POST(request: NextRequest) {
         headers: { "Content-Type": "application/json" },
       }
     );
-
   } catch (error) {
     console.error("扩展故事时出错:", error);
     return handleApiError(error);

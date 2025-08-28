@@ -7,6 +7,7 @@ The Story Expansion feature enhances the comic generation workflow by using Chat
 ## Features
 
 ### AI-Powered Story Enhancement
+
 - **Environment Description**: Detailed scene settings, locations, time, weather
 - **Character Interactions**: Enhanced dialogue and interaction details
 - **Emotional Expression**: Character emotions and psychological states
@@ -14,6 +15,7 @@ The Story Expansion feature enhances the comic generation workflow by using Chat
 - **Visual Elements**: Comic-appropriate visual descriptions
 
 ### User Interface
+
 - **Expand Button**: Located in the diary input section with AI icon
 - **Real-time Feedback**: Loading states and progress indicators
 - **Result Preview**: Modal overlay showing expanded content
@@ -22,12 +24,14 @@ The Story Expansion feature enhances the comic generation workflow by using Chat
 ## Technical Implementation
 
 ### API Endpoint
+
 - **Route**: `/api/expand-story`
 - **Method**: POST
 - **Authentication**: Required (Bearer token)
 - **Credit Cost**: 1 credit per expansion
 
 ### Request Format
+
 ```json
 {
   "story": "User's original story text",
@@ -43,6 +47,7 @@ The Story Expansion feature enhances the comic generation workflow by using Chat
 ```
 
 ### Response Format
+
 ```json
 {
   "success": true,
@@ -58,12 +63,14 @@ The Story Expansion feature enhances the comic generation workflow by using Chat
 ### Components
 
 #### EnhancedDiaryInput
+
 - Replaces the original DiaryInput component
 - Integrates story expansion functionality
 - Provides modal overlay for result display
 - Handles user interactions and state management
 
 #### useStoryExpansion Hook
+
 - Manages expansion state and API calls
 - Handles error states and loading indicators
 - Integrates with credit system
@@ -92,6 +99,7 @@ The Story Expansion feature enhances the comic generation workflow by using Chat
 ## Internationalization
 
 The feature supports multiple languages with translation keys:
+
 - `aiExpand`: AI Expand button text
 - `expanding`: Loading state text
 - `storyExpansion`: Modal title
@@ -115,7 +123,8 @@ The feature supports multiple languages with translation keys:
 ## Environment Variables
 
 Required environment variables:
-- `OPENAI_API_KEY`: OpenAI API key for ChatGPT integration
+
+- `MYOPENAI_API_KEY`: OpenAI API key for ChatGPT integration
 
 ## Future Enhancements
 

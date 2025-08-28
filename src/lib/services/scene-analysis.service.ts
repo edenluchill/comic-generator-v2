@@ -2,8 +2,7 @@ import OpenAI from "openai";
 // import { Character } from "@/types/characters";
 
 const openai = new OpenAI({
-  apiKey:
-    "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",
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 export interface SceneAnalysisOptions {

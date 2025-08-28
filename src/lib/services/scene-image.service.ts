@@ -1,13 +1,8 @@
 import { createFluxCharacterGenerator } from "@/lib/flux-generator";
 import { downloadAndStoreImage } from "@/lib/image-storage";
-import { SceneCharacter } from "@/types/diary";
-import { Character } from "@/types/characters";
-import { characterStitchService } from "./character-stitch.service";
-import { promptProcessingService } from "./prompt-processing.service";
 
 export interface SceneImageGenerationOptions {
   sceneDescription: string;
-  sceneCharacters: SceneCharacter[];
   style: string;
   userId: string;
   sceneId: string;
@@ -17,7 +12,6 @@ export interface SceneImageGenerationOptions {
 export interface SceneImageResult {
   imageUrl: string;
   imagePrompt: string;
-  stitchedReferenceUrl?: string;
 }
 
 export class SceneImageService {
@@ -29,37 +23,18 @@ export class SceneImageService {
   async generateSceneImage(
     options: SceneImageGenerationOptions
   ): Promise<SceneImageResult> {
-    const {
-      sceneDescription,
-      sceneCharacters,
-      style,
-      userId,
-      sceneId,
-      onProgress,
-    } = options;
+    const { sceneDescription, style, userId, sceneId, onProgress } = options;
 
-    // 步骤1：处理角色名字替换
-    const processedPrompt = promptProcessingService.processScenePrompt({
-      sceneDescription,
-      characters: sceneCharacters,
-      style,
+    // 构建完整的提示词
+    const fullPrompt = this.buildScenePrompt(sceneDescription, style);
+
+    // 使用 generate 方法生成图片（不需要输入图片）
+    const imageResult = await this.generator.generate(fullPrompt, {
+      aspectRatio: "1:1",
+      outputFormat: "png",
+      promptUpsampling: true,
+      safetyTolerance: 2,
     });
-
-    // 步骤2：拼接角色图片
-    const { referenceImage, stitchedReferenceUrl } =
-      await this.prepareReferenceImage(sceneCharacters);
-
-    // 步骤3：生成图片
-    const imageResult = await this.generator.imageEdit(
-      referenceImage,
-      processedPrompt.processedPrompt,
-      {
-        aspectRatio: "1:1",
-        outputFormat: "png",
-        promptUpsampling: true,
-        safetyTolerance: 2,
-      }
-    );
 
     // 等待图片生成完成
     const completedImage = await this.generator.waitForCompletion(
@@ -82,8 +57,7 @@ export class SceneImageService {
 
     return {
       imageUrl: storedImageUrl,
-      imagePrompt: processedPrompt.processedPrompt,
-      stitchedReferenceUrl,
+      imagePrompt: fullPrompt,
     };
   }
 
@@ -93,32 +67,18 @@ export class SceneImageService {
   async retrySceneImage(
     sceneId: string,
     sceneDescription: string,
-    sceneCharacters: SceneCharacter[],
     style: string,
     userId: string
   ): Promise<SceneImageResult> {
-    // 使用 processScenePrompt 统一处理角色名字替换
-    const processedPrompt = promptProcessingService.processScenePrompt({
-      sceneDescription,
-      characters: sceneCharacters,
-      style,
+    // 构建完整的提示词
+    const fullPrompt = this.buildScenePrompt(sceneDescription, style);
+
+    const imageResult = await this.generator.generate(fullPrompt, {
+      aspectRatio: "1:1",
+      outputFormat: "png",
+      promptUpsampling: true,
+      safetyTolerance: 2,
     });
-
-    // 使用统一的拼接逻辑
-    const { referenceImage } = await this.prepareReferenceImage(
-      sceneCharacters
-    );
-
-    const imageResult = await this.generator.imageEdit(
-      referenceImage || "",
-      processedPrompt.processedPrompt, // 使用处理后的prompt
-      {
-        aspectRatio: "1:1",
-        outputFormat: "png",
-        promptUpsampling: true,
-        safetyTolerance: 2,
-      }
-    );
 
     const completedImage = await this.generator.waitForCompletion(
       imageResult.id,
@@ -138,55 +98,25 @@ export class SceneImageService {
 
     return {
       imageUrl: storedImageUrl,
-      imagePrompt: processedPrompt.processedPrompt, // 使用处理后的prompt
+      imagePrompt: fullPrompt,
     };
   }
 
   /**
-   * 构建图片生成prompt
+   * 构建场景提示词
    */
-  private buildImagePrompt(
-    sceneDescription: string,
-    sceneCharacters: Character[],
-    style: string
-  ): string {
-    let imagePrompt = `${style} style comic scene: ${sceneDescription}`;
+  private buildScenePrompt(sceneDescription: string, style: string): string {
+    // 根据风格添加相应的提示词前缀
+    const stylePrompts: Record<string, string> = {
+      cute: "cute, kawaii, adorable style, ",
+      realistic: "realistic, detailed, high quality, ",
+      minimal: "minimal, simple, clean style, ",
+      kawaii: "kawaii, cute, Japanese style, ",
+    };
 
-    if (sceneCharacters.length > 0) {
-      const characterDescriptions = sceneCharacters
-        .map((c) => `character ${c.name} (reference image provided)`)
-        .join(", ");
-      imagePrompt += `. Features: ${characterDescriptions}`;
-    }
+    const stylePrefix = stylePrompts[style] || "";
 
-    return imagePrompt;
-  }
-
-  // 添加统一的角色拼接方法
-  private async prepareReferenceImage(
-    characters: SceneCharacter[]
-  ): Promise<{ referenceImage: string; stitchedReferenceUrl?: string }> {
-    let referenceImage = "";
-    let stitchedReferenceUrl: string | undefined;
-
-    if (characters.length === 0) {
-      return { referenceImage };
-    }
-
-    if (characters.length === 1) {
-      referenceImage = characters[0].avatar_url;
-    } else {
-      const stitchResult = await characterStitchService.stitchCharacters({
-        characters,
-        spacing: 10,
-        backgroundColor: "white",
-        direction: "horizontal",
-      });
-      referenceImage = stitchResult.stitchedImageUrl;
-      stitchedReferenceUrl = stitchResult.stitchedImageUrl;
-    }
-
-    return { referenceImage, stitchedReferenceUrl };
+    return `${stylePrefix}${sceneDescription}, high quality, detailed, beautiful composition`;
   }
 }
 

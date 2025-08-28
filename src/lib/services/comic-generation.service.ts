@@ -1,10 +1,5 @@
-import {
-  ComicScene,
-  SceneDescription,
-  SceneCharacter,
-  ComicFormat,
-} from "@/types/diary";
-import { Character } from "@/types/characters";
+import { ComicScene } from "@/types/diary";
+
 import { sceneAnalysisService } from "./scene-analysis.service";
 import { comicDatabaseService } from "./comic-database.service";
 import { sceneImageService } from "./scene-image.service";
@@ -14,43 +9,44 @@ import { CREDIT_COSTS } from "@/types/credits";
 
 export interface ComicGenerationOptions {
   userId: string;
-  diaryContent: string;
-  characters: SceneCharacter[];
+  content: string; // 改为content，不再使用diaryContent
   style: string;
-  format: ComicFormat; // 新增
+  comicId?: string; // 可选的现有comic ID
+  controller: ReadableStreamDefaultController;
+  encoder: TextEncoder;
+}
+
+export interface AddPageOptions {
+  userId: string;
+  comicId: string;
+  pageNumber: number;
+  content: string; // 改为content，不再使用diaryContent
+  style: string;
   controller: ReadableStreamDefaultController;
   encoder: TextEncoder;
 }
 
 export interface ComicGenerationResult {
   comic_id: string;
-  scenes: ComicScene[];
+  scene: ComicScene;
   status: "completed" | "failed";
 }
 
 export class ComicGenerationService {
   /**
-   * 生成完整的漫画
+   * 生成单页漫画
    */
   async generateComic(
     options: ComicGenerationOptions
   ): Promise<ComicGenerationResult> {
-    const {
-      userId,
-      diaryContent,
-      characters,
-      style,
-      format,
-      controller,
-      encoder,
-    } = options;
+    const { userId, content, style, comicId, controller, encoder } = options;
 
     try {
-      // 步骤0：检查用户credits
+      // 步骤1：检查用户credits
       StreamUtils.encodeProgress(encoder, controller, {
         step: "checking",
         message: "正在检查用户余额...",
-        progress: 2,
+        progress: 5,
       });
 
       const creditCheck = await creditService.checkCredits(
@@ -65,96 +61,105 @@ export class ComicGenerationService {
         );
       }
 
-      // 步骤1：验证角色信息并创建日记记录
-      StreamUtils.encodeProgress(encoder, controller, {
-        step: "analyzing",
-        message: "正在验证角色信息...",
-        progress: 5,
-      });
-
-      // 现在直接使用传入的角色信息，转换为Character格式
-      const characterData: Character[] = characters.map((c) => ({
-        id: c.id,
-        name: c.name,
-        avatar_url: c.avatar_url,
-        three_view_url: c.avatar_url, // 暂时使用avatar_url
-        created_at: "",
-        user_id: userId,
-      }));
-
-      // 可选：验证角色属于用户
-      const characterIds = characters.map((c) => c.id);
-      const isValidCharacters =
-        await comicDatabaseService.validateUserCharacters(userId, characterIds);
-      if (!isValidCharacters) {
-        throw new Error("角色验证失败，请确保角色属于当前用户");
-      }
-
-      // 步骤2：场景分析 - 根据格式决定场景数量
+      // 步骤2：分析故事内容，生成单个场景描述
       StreamUtils.encodeProgress(encoder, controller, {
         step: "analyzing",
         message: "正在分析故事内容...",
-        progress: 10,
+        progress: 15,
       });
 
-      const { scenes: sceneDescriptions, title } =
+      const { scene: sceneDescription, title } =
         await sceneAnalysisService.analyzeScenes({
-          diaryContent,
-          characters: characterData,
+          diaryContent: content, // 传递content作为diaryContent
         });
 
-      // 步骤3：创建日记记录
-      StreamUtils.encodeProgress(encoder, controller, {
-        step: "analyzing",
-        message: "正在保存日记...",
-        progress: 20,
-      });
+      let finalComicId = comicId;
 
-      const diary = await comicDatabaseService.createDiary(
-        userId,
-        diaryContent,
-        title
-      );
+      if (!comicId) {
+        // 如果没有提供comic_id，创建新的漫画
+        // 步骤3：创建漫画记录
+        StreamUtils.encodeProgress(encoder, controller, {
+          step: "generating_scenes",
+          message: "正在创建漫画...",
+          progress: 35,
+        });
 
-      // 步骤4：创建漫画记录
+        finalComicId = await comicDatabaseService.createComic({
+          userId,
+          title,
+          content,
+          style,
+        });
+      } else {
+        // 如果提供了comic_id，获取现有漫画信息
+        const existingComic = await comicDatabaseService.getComicWithScenes(
+          comicId
+        );
+        if (!existingComic) {
+          throw new Error("指定的漫画不存在");
+        }
+        if (existingComic.user_id !== userId) {
+          throw new Error("无权限访问此漫画");
+        }
+      }
+
+      // 步骤4：创建场景记录（先创建空的场景记录）
       StreamUtils.encodeProgress(encoder, controller, {
         step: "generating_scenes",
-        message: "正在创建漫画...",
-        progress: 30,
+        message: "正在创建场景...",
+        progress: 45,
       });
 
-      const comic = await comicDatabaseService.createComic(
-        diary.id,
-        userId,
+      // 获取下一个场景顺序号
+      const comic = await comicDatabaseService.getComicWithScenes(
+        finalComicId!
+      );
+      const nextSceneOrder = (comic?.scenes?.length || 0) + 1;
+
+      const scene = await comicDatabaseService.createScene({
+        comicId: finalComicId!,
+        sceneOrder: nextSceneOrder,
+        content: content,
+        description: sceneDescription.description,
+        mood: sceneDescription.mood,
+        quote: sceneDescription.quote,
+      });
+
+      // 步骤5：生成场景图片
+      StreamUtils.encodeProgress(encoder, controller, {
+        step: "generating_images",
+        message: "正在生成场景图片...",
+        progress: 60,
+      });
+
+      const imageResult = await sceneImageService.generateSceneImage({
+        sceneDescription: sceneDescription.description,
         style,
-        format, // 新增参数
-        undefined, // 新增参数
-        title // title参数保持可选
-      );
-
-      // 步骤5：创建场景记录
-      const scenes = await comicDatabaseService.createScenes(
-        comic.id,
-        sceneDescriptions,
-        characterData
-      );
-
-      // 步骤6：生成场景图片
-      const completedScenes = await this.generateSceneImages(
-        scenes,
-        sceneDescriptions,
-        characterData,
-        style,
         userId,
-        controller,
-        encoder
+        sceneId: scene.id,
+      });
+
+      // 步骤6：更新场景图片信息
+      StreamUtils.encodeProgress(encoder, controller, {
+        step: "finalizing",
+        message: "正在保存场景图片...",
+        progress: 80,
+      });
+
+      const updatedScene = await comicDatabaseService.updateSceneImage(
+        scene.id,
+        imageResult.imageUrl,
+        imageResult.imagePrompt
       );
 
-      // 步骤7：扣减用户credits
+      // 步骤7：更新comic的scene_ids数组
+      await comicDatabaseService.addSceneToComic(finalComicId!, scene.id);
+
+      // 步骤8：扣减用户credits
       StreamUtils.encodeProgress(encoder, controller, {
         step: "finalizing",
         message: "正在扣减积分...",
-        progress: 95,
+        progress: 90,
       });
 
       const deductionResult = await creditService.deductCredits({
@@ -162,33 +167,32 @@ export class ComicGenerationService {
         amount: CREDIT_COSTS.COMIC_GENERATION,
         description: `生成漫画 - ${title || "无标题"}`,
         relatedEntityType: "comic",
-        relatedEntityId: comic.id,
+        relatedEntityId: finalComicId!,
         metadata: {
-          comic_id: comic.id,
-          scenes_count: completedScenes.length,
+          comic_id: finalComicId!,
+          scene_id: scene.id,
           style: style,
-          format: format, // 新增元数据
         },
       });
 
       if (!deductionResult.success) {
         // 记录错误但不阻止漫画完成，因为用户已经生成了漫画
         console.error("扣减credits失败:", deductionResult.message);
-        // 可以选择在这里添加补偿逻辑，比如将漫画标记为需要补扣credits
       }
 
-      // 步骤8：完成漫画生成
+      // 步骤9：完成漫画生成
       StreamUtils.encodeProgress(encoder, controller, {
         step: "completed",
         message: "漫画生成完成！",
         progress: 100,
       });
 
-      await comicDatabaseService.completeComic(comic.id, diary.id);
+      // 标记漫画为完成状态
+      await comicDatabaseService.completeComic(finalComicId!);
 
       return {
-        comic_id: comic.id,
-        scenes: completedScenes,
+        comic_id: finalComicId!,
+        scene: updatedScene,
         status: "completed",
       };
     } catch (error) {
@@ -198,136 +202,131 @@ export class ComicGenerationService {
   }
 
   /**
-   * 生成所有场景的图片 - 并行版本
+   * 添加页面到现有漫画
    */
-  private async generateSceneImages(
-    scenes: ComicScene[],
-    sceneDescriptions: SceneDescription[],
-    characterData: Character[],
-    style: string,
-    userId: string,
-    controller: ReadableStreamDefaultController,
-    encoder: TextEncoder
-  ): Promise<ComicScene[]> {
-    // 发送开始生成消息
-    StreamUtils.encodeProgress(encoder, controller, {
-      step: "generating_images",
-      total_scenes: scenes.length,
-      message: `正在并行生成${scenes.length}个场景...`,
-      progress: 40,
-    });
+  async addPageToComic(
+    options: AddPageOptions
+  ): Promise<ComicGenerationResult> {
+    const { userId, comicId, pageNumber, content, style, controller, encoder } =
+      options;
 
-    // 用于追踪已完成的场景数量
-    let completedCount = 0;
+    try {
+      // 步骤1：检查用户credits
+      StreamUtils.encodeProgress(encoder, controller, {
+        step: "checking",
+        message: "正在检查用户余额...",
+        progress: 5,
+      });
 
-    // 创建并行任务
-    const generateTasks = scenes.map(async (scene, index) => {
-      const sceneDesc = sceneDescriptions[index];
-
-      try {
-        // 更新场景状态
-        await comicDatabaseService.updateSceneStatus(scene.id, "processing");
-
-        // 找到场景中需要的角色
-        const sceneCharacters = characterData.filter((c: Character) =>
-          sceneDesc.character_ids.includes(c.id)
-        );
-
-        // 生成场景图片（移除进度回调，因为我们将在完成时通知）
-        const imageResult = await sceneImageService.generateSceneImage({
-          sceneDescription: sceneDesc.description,
-          sceneCharacters,
-          style,
-          userId,
-          sceneId: scene.id,
-          // 移除 onProgress 回调
-        });
-
-        // 更新场景记录
-        const updatedScene = await comicDatabaseService.updateSceneImage(
-          scene.id,
-          imageResult.imageUrl,
-          imageResult.imagePrompt
-        );
-
-        // 增加完成计数并通知前端
-        completedCount++;
-        const progressPercentage = 40 + (completedCount / scenes.length) * 50; // 40-90% 的进度区间
-
-        StreamUtils.encodeProgress(encoder, controller, {
-          step: "generating_images",
-          total_scenes: scenes.length,
-          message: `已完成${completedCount}/${scenes.length}个场景`,
-          progress: progressPercentage,
-        });
-
-        return { success: true, scene: updatedScene, index };
-      } catch (sceneError) {
-        console.error(`Scene ${index + 1} generation failed:`, {
-          sceneId: scene.id,
-          error: sceneError,
-          retryCount: scene.retry_count,
-          sceneDescription: sceneDesc.description.substring(0, 100) + "..."
-        });
-
-        // 标记场景为失败状态
-        await comicDatabaseService.markSceneFailed(scene.id, scene.retry_count);
-
-        return {
-          success: false,
-          error: sceneError,
-          index,
-          sceneId: scene.id,
-        };
-      }
-    });
-
-    // 等待所有任务完成
-    const results = await Promise.allSettled(generateTasks);
-
-    // 处理结果
-    const completedScenes: (ComicScene | undefined)[] = new Array(
-      scenes.length
-    );
-    const errors: string[] = [];
-
-    results.forEach((result, index) => {
-      if (result.status === "fulfilled") {
-        const taskResult = result.value;
-        if (taskResult.success) {
-          completedScenes[taskResult.index] = taskResult.scene;
-        } else {
-          errors.push(
-            `第${taskResult.index + 1}个场景生成失败: ${
-              taskResult.error instanceof Error
-                ? taskResult.error.message
-                : "未知错误"
-            }`
-          );
-        }
-      } else {
-        errors.push(`第${index + 1}个场景生成失败: ${result.reason}`);
-      }
-    });
-
-    // 如果有任何失败，抛出错误
-    if (errors.length > 0) {
-      console.warn("部分场景生成失败:", errors);
-      throw new Error(`场景生成失败:\n${errors.join("\n")}`);
-    }
-
-    // 确保返回的数组按照原始顺序排列
-    const orderedScenes = completedScenes.filter(
-      (scene) => scene !== undefined
-    );
-
-    if (orderedScenes.length !== scenes.length) {
-      throw new Error(
-        `场景生成不完整: 预期${scenes.length}个场景，实际完成${orderedScenes.length}个`
+      const creditCheck = await creditService.checkCredits(
+        userId,
+        CREDIT_COSTS.COMIC_GENERATION
       );
-    }
 
-    return orderedScenes;
+      if (!creditCheck.hasEnoughCredits) {
+        throw new Error(
+          creditCheck.message ||
+            `余额不足，需要 ${CREDIT_COSTS.COMIC_GENERATION} credits，当前只有 ${creditCheck.currentCredits} credits`
+        );
+      }
+
+      // 步骤2：分析故事内容，生成场景描述
+      StreamUtils.encodeProgress(encoder, controller, {
+        step: "analyzing",
+        message: "正在分析故事内容...",
+        progress: 15,
+      });
+
+      const { scene: sceneDescription } =
+        await sceneAnalysisService.analyzeScenes({
+          diaryContent: content,
+        });
+
+      // 步骤3：创建场景记录
+      StreamUtils.encodeProgress(encoder, controller, {
+        step: "generating",
+        message: `正在创建第${pageNumber}页...`,
+        progress: 35,
+      });
+
+      const scene = await comicDatabaseService.createScene({
+        comicId,
+        sceneOrder: pageNumber,
+        content: content,
+        description: sceneDescription.description,
+        mood: sceneDescription.mood,
+      });
+
+      // 步骤4：生成场景图片
+      StreamUtils.encodeProgress(encoder, controller, {
+        step: "generating",
+        message: "正在生成场景图片...",
+        progress: 50,
+      });
+
+      const imageResult = await sceneImageService.generateSceneImage({
+        sceneDescription: sceneDescription.description,
+        style: style || "cute",
+        userId,
+        sceneId: scene.id,
+      });
+
+      // 步骤5：更新场景图片信息
+      StreamUtils.encodeProgress(encoder, controller, {
+        step: "finalizing",
+        message: "正在保存场景图片...",
+        progress: 75,
+      });
+
+      const updatedScene = await comicDatabaseService.updateSceneImage(
+        scene.id,
+        imageResult.imageUrl,
+        imageResult.imagePrompt
+      );
+
+      // 步骤6：更新comic的scene_ids数组
+      await comicDatabaseService.addSceneToComic(comicId, scene.id);
+
+      // 步骤7：扣减用户credits
+      StreamUtils.encodeProgress(encoder, controller, {
+        step: "finalizing",
+        message: "正在扣减积分...",
+        progress: 85,
+      });
+
+      const deductionResult = await creditService.deductCredits({
+        userId,
+        amount: CREDIT_COSTS.COMIC_GENERATION,
+        description: `添加漫画页面 - 第${pageNumber}页`,
+        relatedEntityType: "comic",
+        relatedEntityId: comicId,
+        metadata: {
+          comic_id: comicId,
+          scene_id: scene.id,
+          page_number: pageNumber,
+        },
+      });
+
+      if (!deductionResult.success) {
+        console.error("扣减credits失败:", deductionResult.message);
+      }
+
+      // 步骤8：完成
+      StreamUtils.encodeProgress(encoder, controller, {
+        step: "completed",
+        message: `第${pageNumber}页添加完成！`,
+        progress: 100,
+      });
+
+      return {
+        comic_id: comicId,
+        scene: updatedScene,
+        status: "completed",
+      };
+    } catch (error) {
+      console.error("添加漫画页面失败:", error);
+      throw error;
+    }
   }
 }
 

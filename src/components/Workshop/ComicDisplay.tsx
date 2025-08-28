@@ -1,7 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { ImageIcon, Download, RefreshCw, Wand2, X } from "lucide-react";
+import {
+  ImageIcon,
+  Download,
+  RefreshCw,
+  Wand2,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+} from "lucide-react";
 import { ComicScene, ComicFormat, LayoutMode } from "@/types/diary";
 import { useTranslations } from "@/hooks/useTranslations";
 
@@ -23,6 +32,7 @@ interface ComicDisplayProps {
   layoutMode: LayoutMode;
   onLayoutModeChange: (mode: LayoutMode) => void;
   selectedComicStyle?: string;
+  onAddNewPage?: () => void; // 新增：添加新页面的回调
 }
 
 export default function ComicDisplay({
@@ -37,16 +47,29 @@ export default function ComicDisplay({
   error,
   onRetryScene,
   format,
-  onFormatChange,
-  layoutMode,
-  onLayoutModeChange,
+  // onFormatChange,
+  // layoutMode,
+  // onLayoutModeChange,
   selectedComicStyle = "4koma",
+  onAddNewPage,
 }: ComicDisplayProps) {
   const t = useTranslations("WorkshopPage.ComicGeneration.ComicDisplay");
-  
+
+  // 翻页状态
+  const [currentPageIndex, setCurrentPageIndex] = useState(0);
+
   // Modal state for image popup
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // 计算总页数（包括现有场景 + 1个添加新页面的页面）
+  const totalPages = (scenes?.length || 0) + 1;
+
+  // 是否在最后一页（添加新页面页面）
+  const isOnAddNewPageScreen = currentPageIndex >= (scenes?.length || 0);
+
+  // 当前显示的场景
+  const currentScene_display = scenes?.[currentPageIndex];
 
   // Handle image click
   const handleImageClick = (imageUrl: string) => {
@@ -58,6 +81,20 @@ export default function ComicDisplay({
   const closeModal = () => {
     setIsModalOpen(false);
     setSelectedImage(null);
+  };
+
+  // 翻页函数
+  const goToPrevPage = () => {
+    setCurrentPageIndex((prev) => Math.max(0, prev - 1));
+  };
+
+  const goToNextPage = () => {
+    setCurrentPageIndex((prev) => Math.min(totalPages - 1, prev + 1));
+  };
+
+  // 跳转到特定页面
+  const goToPage = (pageIndex: number) => {
+    setCurrentPageIndex(Math.max(0, Math.min(totalPages - 1, pageIndex)));
   };
 
   // 渲染函数 - 使用主题色彩
@@ -77,10 +114,13 @@ export default function ComicDisplay({
       <div className="relative">
         {/* 外层装饰圆环 */}
         <div className="w-32 h-32 rounded-full border-4 border-primary/20 animate-pulse"></div>
-        
+
         {/* 进度圆环 */}
         <div className="absolute inset-0 w-32 h-32">
-          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
+          <svg
+            className="w-full h-full transform -rotate-90"
+            viewBox="0 0 128 128"
+          >
             {/* 背景圆环 */}
             <circle
               cx="64"
@@ -105,11 +145,13 @@ export default function ComicDisplay({
               strokeDashoffset={`${2 * Math.PI * 56 * (1 - progress / 100)}`}
             />
           </svg>
-          
+
           {/* 中心内容 */}
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <Wand2 className="w-8 h-8 text-primary mb-2 animate-pulse" />
-            <span className="text-2xl font-bold text-primary">{Math.round(progress)}%</span>
+            <span className="text-2xl font-bold text-primary">
+              {Math.round(progress)}%
+            </span>
           </div>
         </div>
       </div>
@@ -119,14 +161,17 @@ export default function ComicDisplay({
         <h3 className="text-xl font-semibold text-foreground">
           {progressMessage || t("generating")}
         </h3>
-        
+
         {/* 场景进度 */}
         {currentScene && totalScenes && (
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              {t("generatingScene", { current: currentScene, total: totalScenes })}
+              {t("generatingScene", {
+                current: currentScene,
+                total: totalScenes,
+              })}
             </p>
-            
+
             {/* 场景进度条 */}
             <div className="flex justify-center space-x-2">
               {Array.from({ length: totalScenes }, (_, i) => (
@@ -144,7 +189,7 @@ export default function ComicDisplay({
             </div>
           </div>
         )}
-        
+
         {/* 动态状态文本 */}
         <div className="flex items-center justify-center space-x-2 text-sm text-muted-foreground">
           <div className="flex space-x-1">
@@ -166,6 +211,92 @@ export default function ComicDisplay({
     </div>
   );
 
+  // 渲染添加新页面的空状态
+  const renderAddNewPageState = () => (
+    <div className="flex flex-col items-center justify-center h-full text-center min-h-[500px]">
+      {/* 现代化插图区域 */}
+      <div className="relative mb-8">
+        {/* 主要图标容器 */}
+        <div className="relative w-32 h-32 mx-auto">
+          {/* 背景圆环 */}
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500/20 to-blue-500/20 rounded-full"></div>
+          <div className="absolute inset-2 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-full shadow-inner"></div>
+
+          {/* 图标 */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Plus className="w-12 h-12 text-green-600/70" />
+          </div>
+
+          {/* 装饰性小图标 */}
+          <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+            <Wand2 className="w-4 h-4 text-white" />
+          </div>
+        </div>
+
+        {/* 浮动装饰元素 */}
+        <div className="absolute top-0 left-0 w-2 h-2 bg-green-500/30 rounded-full animate-ping"></div>
+        <div className="absolute top-8 -right-4 w-1.5 h-1.5 bg-blue-500/40 rounded-full animate-ping [animation-delay:1s]"></div>
+        <div className="absolute -bottom-2 left-8 w-1 h-1 bg-purple-400/50 rounded-full animate-ping [animation-delay:2s]"></div>
+      </div>
+
+      {/* 文本内容 */}
+      <div className="space-y-4 mb-8">
+        <h3 className="text-2xl font-bold text-foreground">123</h3>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
+          继续您的故事！点击下方按钮为您的漫画添加新的精彩页面。
+        </p>
+      </div>
+
+      {/* 现代化添加按钮 */}
+      <div className="flex flex-col items-center gap-4">
+        <button
+          onClick={onAddNewPage}
+          disabled={!onAddNewPage || isGenerating}
+          className={`group relative inline-flex items-center justify-center gap-3 py-4 px-8 rounded-xl font-semibold transition-all duration-300 ${
+            onAddNewPage && !isGenerating
+              ? "bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg hover:shadow-xl transform hover:scale-105 hover:-translate-y-0.5"
+              : "bg-muted text-muted-foreground cursor-not-allowed"
+          }`}
+        >
+          {/* 按钮背景光效 */}
+          {onAddNewPage && !isGenerating && (
+            <div className="absolute inset-0 bg-gradient-to-r from-green-500/80 to-blue-500/80 rounded-xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
+          )}
+
+          {/* 按钮内容 */}
+          <div className="relative flex items-center gap-3">
+            <Plus
+              className={`w-5 h-5 ${
+                isGenerating ? "animate-pulse" : "group-hover:animate-bounce"
+              }`}
+            />
+            <span className="text-base">
+              {isGenerating ? "生成中..." : "添加新页面"}
+            </span>
+          </div>
+        </button>
+
+        {/* 提示文本 */}
+        <p className="text-xs text-muted-foreground/70 flex items-center gap-2">
+          <svg
+            className="w-3 h-3"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          扩展您的漫画故事，创造更多精彩内容
+        </p>
+      </div>
+    </div>
+  );
+
   const renderEmptyState = () => (
     <div className="flex flex-col items-center justify-center h-full text-center">
       {/* 现代化插图区域 */}
@@ -175,12 +306,12 @@ export default function ComicDisplay({
           {/* 背景圆环 */}
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full"></div>
           <div className="absolute inset-2 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 rounded-full shadow-inner"></div>
-          
+
           {/* 图标 */}
           <div className="absolute inset-0 flex items-center justify-center">
             <ImageIcon className="w-10 h-10 text-primary/70" />
           </div>
-          
+
           {/* 装饰性小图标 */}
           <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-orange-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg">
             <Wand2 className="w-3 h-3 text-white" />
@@ -218,261 +349,94 @@ export default function ComicDisplay({
           {canGenerate && !isGenerating && (
             <div className="absolute inset-0 bg-gradient-to-r from-primary/80 to-accent/80 rounded-xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
           )}
-          
+
           {/* 按钮内容 */}
           <div className="relative flex items-center gap-3">
-            <Wand2 className={`w-5 h-5 ${isGenerating ? "animate-pulse" : "group-hover:animate-bounce"}`} />
+            <Wand2
+              className={`w-5 h-5 ${
+                isGenerating ? "animate-pulse" : "group-hover:animate-bounce"
+              }`}
+            />
             <span className="text-base">
               {isGenerating ? t("generating") : t("generateComic")}
             </span>
           </div>
         </button>
-
-        {/* 提示文本 */}
-        {!canGenerate && !isGenerating && (
-          <p className="text-xs text-muted-foreground/70 flex items-center gap-2">
-            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            请先在左侧添加角色和编写故事
-          </p>
-        )}
       </div>
     </div>
   );
 
   // 获取场景面板样式
   const getScenePanelStyle = () => {
-    if (format === "single")
-      return "aspect-[3/4] bg-card border-4 border-border rounded-lg overflow-hidden relative shadow-lg flex items-center justify-center w-full max-w-md mx-auto";
-    if (layoutMode === "horizontal-strip")
-      return "aspect-[1/1.2] bg-card border-4 border-border rounded-sm overflow-hidden relative shadow-lg flex items-center justify-center";
-    if (layoutMode === "comic-book")
-      return "aspect-[3/4] bg-card border-4 border-border rounded-lg overflow-hidden relative shadow-lg flex items-center justify-center";
-    return "aspect-square bg-card border-4 border-border rounded-sm overflow-hidden relative shadow-lg flex items-center justify-center";
+    // 翻页模式下，每个场景都占满容器
+    return "aspect-[3/4] bg-card border-4 border-border rounded-lg overflow-hidden relative shadow-lg flex items-center justify-center w-full max-w-2xl mx-auto";
   };
 
-  // 根据格式和布局渲染漫画
-  const renderComicGrid = () => {
-    if (!scenes || scenes.length === 0) return null;
-
-    // 单格漫画 (海报模式) - 使用主题色彩
-    if (format === "single" || selectedComicStyle === "poster") {
-      return (
-        <div className="w-full max-w-3xl mx-auto space-y-6">
-          {/* 现代化海报展示 */}
-          <div className="relative">
-            {/* 海报容器 */}
-            <div className="bg-gradient-to-br from-white via-gray-50/30 to-white dark:from-gray-900 dark:via-gray-800/30 dark:to-gray-900 rounded-2xl shadow-2xl border border-border/20 relative overflow-hidden">
-              
-              {/* 装饰性顶部条 */}
-              <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary"></div>
-              
-              {/* 纸质纹理效果 */}
-              <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(circle_at_1px_1px,rgb(0,0,0,0.15)_1px,transparent_0)] [background-size:24px_24px]"></div>
-
-              {/* 海报场景 */}
-              <div className="flex justify-center items-center min-h-[400px] relative z-10 p-8">
-                <div className="relative group">
-                  {/* 海报装饰框 */}
-                  <div className="absolute -inset-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-2xl opacity-100 group-hover:from-primary/10 group-hover:to-accent/10 transition-all duration-300"></div>
-                  
-                  <ComicSceneComponent
-                    scene={scenes[0]}
-                    index={0}
-                    panelStyle={getScenePanelStyle()}
-                    onRetryScene={onRetryScene}
-                    onImageClick={handleImageClick}
-                  />
-                  
-                  {/* 海报标识 */}
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <div className="bg-gradient-to-r from-primary to-accent text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
-                      POSTER
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* 增强的交互按钮组 */}
-          <div className="space-y-4">
-            {/* 主要操作按钮 */}
-            <div className="flex justify-center gap-3">
-              {/* 重新生成按钮 */}
-              <button
-                onClick={onGenerate}
-                disabled={isGenerating}
-                className="bg-chart-3/90 hover:bg-chart-3 text-white rounded-lg px-4 py-3 flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg"
-              >
-                <RefreshCw
-                  className={`w-4 h-4 ${isGenerating ? "animate-spin" : ""}`}
-                />
-                <span className="text-sm font-medium">
-                  {isGenerating ? t("generating") : t("regenerate")}
-                </span>
-              </button>
-
-              {/* 下载按钮 */}
-              <button className="bg-primary/90 hover:bg-primary text-primary-foreground rounded-lg px-4 py-3 flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg">
-                <Download className="w-4 h-4" />
-                <span className="text-sm font-medium">{t("download")}</span>
-              </button>
-
-              {/* 分享按钮 */}
-              <button className="bg-blue-500/90 hover:bg-blue-500 text-white rounded-lg px-4 py-3 flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                </svg>
-                <span className="text-sm font-medium">分享</span>
-              </button>
-            </div>
-
-            {/* 次要操作按钮 */}
-            <div className="flex justify-center gap-2">
-              {/* 编辑故事按钮 */}
-              <button className="bg-purple-500/90 hover:bg-purple-500 text-white rounded-md px-3 py-2 flex items-center gap-1.5 transition-all duration-300 text-xs">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-                编辑故事
-              </button>
-
-              {/* 调整风格按钮 */}
-              <button className="bg-orange-500/90 hover:bg-orange-500 text-white rounded-md px-3 py-2 flex items-center gap-1.5 transition-all duration-300 text-xs">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM7 21h10a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v7z" />
-                </svg>
-                调整风格
-              </button>
-
-              {/* 保存到收藏 */}
-              <button className="bg-pink-500/90 hover:bg-pink-500 text-white rounded-md px-3 py-2 flex items-center gap-1.5 transition-all duration-300 text-xs">
-                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                收藏
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // 动态布局 - 基于选中的漫画风格
-    const getGridClass = () => {
-      switch (selectedComicStyle) {
-        case "poster":
-          return "flex justify-center items-center relative z-10";
-        case "4koma":
-          return "grid grid-cols-2 grid-rows-2 gap-6 relative z-10";
-        case "three-panel":
-          return "grid grid-cols-1 grid-rows-3 gap-4 relative z-10";
-        case "asymmetric":
-          return "grid gap-4 relative z-10 asymmetric-layout";
-        default:
-          // 如果没有选择样式，则使用原来的layoutMode逻辑
-          switch (layoutMode) {
-            case "grid-2x2":
-              return "grid grid-cols-2 gap-6 relative z-10";
-            case "vertical-strip":
-              return "grid grid-cols-1 gap-4 relative z-10";
-            case "horizontal-strip":
-              return "grid grid-cols-4 gap-3 relative z-10";
-            case "comic-book":
-              return "grid grid-cols-2 gap-8 relative z-10";
-            default:
-              return "grid grid-cols-2 gap-6 relative z-10";
-          }
-      }
-    };
-    const gridClass = getGridClass();
+  // 渲染单个场景（翻页模式）
+  const renderSingleScene = () => {
+    if (!currentScene_display) return null;
 
     return (
       <div className="w-full max-w-4xl mx-auto space-y-6">
         {/* 现代化漫画画布 */}
         <div className="relative">
           {/* 漫画容器 */}
-          <div className="bg-gradient-to-br from-white via-gray-50/50 to-white dark:from-gray-900 dark:via-gray-800/50 dark:to-gray-900 rounded-2xl shadow-2xl border border-border/20 relative overflow-hidden">
-            
+          <div className="bg-gradient-to-br from-white via-gray-50/30 to-white dark:from-gray-900 dark:via-gray-800/30 dark:to-gray-900 rounded-2xl shadow-2xl border border-border/20 relative overflow-hidden">
             {/* 装饰性顶部条 */}
             <div className="h-1 bg-gradient-to-r from-primary via-accent to-primary"></div>
-            
-            {/* 纸质纹理效果 */}
-            <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(circle_at_1px_1px,rgb(0,0,0,0.15)_1px,transparent_0)] [background-size:20px_20px]"></div>
 
-            {/* 漫画网格 */}
-            <div className={`${gridClass} p-8`}>
-              {selectedComicStyle === "asymmetric" ? (
-                // 不对称布局特殊处理
-                <>
-                  <style jsx>{`
-                    .asymmetric-layout {
-                      display: grid;
-                      grid-template-columns: 1fr 1fr;
-                      grid-template-rows: 1fr 1fr;
-                    }
-                    .asymmetric-layout > div:nth-child(1) {
-                      grid-row: 1;
-                      grid-column: 1;
-                    }
-                    .asymmetric-layout > div:nth-child(2) {
-                      grid-row: 1 / 3;
-                      grid-column: 2;
-                    }
-                    .asymmetric-layout > div:nth-child(3) {
-                      grid-row: 2;
-                      grid-column: 1;
-                    }
-                    .asymmetric-layout > div:nth-child(4) {
-                      grid-row: 3;
-                      grid-column: 1 / 3;
-                    }
-                  `}</style>
-                  {scenes?.slice(0, 4).map((scene, index) => (
-                    <div key={scene.id} className="relative group">
-                      {/* 场景装饰框 */}
-                      <div className="absolute -inset-2 bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      
-                      <ComicSceneComponent
-                        scene={scene}
-                        index={index}
-                        panelStyle={getScenePanelStyle()}
-                        onRetryScene={onRetryScene}
-                        onImageClick={handleImageClick}
-                      />
-                      
-                      {/* 场景编号 */}
-                      <div className="absolute -top-3 -left-3 w-6 h-6 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg">
-                        {index + 1}
+            {/* 纸质纹理效果 */}
+            <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(circle_at_1px_1px,rgb(0,0,0,0.15)_1px,transparent_0)] [background-size:24px_24px]"></div>
+
+            {/* 单个场景 */}
+            <div className="flex justify-center items-center min-h-[500px] relative z-10 p-8">
+              <div className="relative group">
+                {/* 场景装饰框 */}
+                <div className="absolute -inset-4 bg-gradient-to-br from-primary/5 to-accent/5 rounded-2xl opacity-100 group-hover:from-primary/10 group-hover:to-accent/10 transition-all duration-300"></div>
+
+                <ComicSceneComponent
+                  scene={currentScene_display}
+                  index={currentPageIndex}
+                  panelStyle={getScenePanelStyle()}
+                  onRetryScene={onRetryScene}
+                  onImageClick={handleImageClick}
+                />
+              </div>
+            </div>
+
+            {/* 场景引用文字 - 新增部分 */}
+            {currentScene_display.quote && (
+              <div className="relative z-10 px-8 pb-6">
+                <div className="max-w-2xl mx-auto">
+                  <div className="relative bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5 rounded-2xl p-6 border border-border/20 backdrop-blur-sm">
+                    {/* 装饰引号 */}
+                    <div className="absolute -top-3 left-6">
+                      <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center shadow-lg">
+                        <svg
+                          className="w-4 h-4 text-white"
+                          fill="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z" />
+                        </svg>
                       </div>
                     </div>
-                  ))}
-                </>
-              ) : (
-                // 其他布局的正常处理
-                scenes?.map((scene, index) => (
-                  <div key={scene.id} className="relative group">
-                    {/* 场景装饰框 */}
-                    <div className="absolute -inset-2 bg-gradient-to-br from-primary/10 to-accent/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    <ComicSceneComponent
-                      scene={scene}
-                      index={index}
-                      panelStyle={getScenePanelStyle()}
-                      onRetryScene={onRetryScene}
-                      onImageClick={handleImageClick}
-                    />
-                    
-                    {/* 场景编号 */}
-                    <div className="absolute -top-3 -left-3 w-6 h-6 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg">
-                      {index + 1}
+
+                    {/* 引用文字 */}
+                    <blockquote className="relative">
+                      <p className="text-lg font-medium text-foreground leading-relaxed italic text-center pt-2">
+                        &quot;{currentScene_display.quote}&quot;
+                      </p>
+                    </blockquote>
+
+                    {/* 装饰线条 */}
+                    <div className="flex justify-center mt-4">
+                      <div className="w-16 h-0.5 bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -490,7 +454,7 @@ export default function ComicDisplay({
                 className={`w-4 h-4 ${isGenerating ? "animate-spin" : ""}`}
               />
               <span className="text-sm font-medium">
-                {isGenerating ? t("generating") : t("regenerate")}
+                {isGenerating ? t("generating") : "重新生成此页"}
               </span>
             </button>
 
@@ -502,60 +466,20 @@ export default function ComicDisplay({
 
             {/* 分享按钮 */}
             <button className="bg-blue-500/90 hover:bg-blue-500 text-white rounded-lg px-4 py-3 flex items-center gap-2 transition-all duration-300 hover:scale-105 shadow-lg">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
+                />
               </svg>
               <span className="text-sm font-medium">分享</span>
-            </button>
-          </div>
-
-          {/* 布局控制 */}
-          <div className="flex justify-center gap-2">
-            <span className="text-xs text-muted-foreground flex items-center mr-2">布局:</span>
-            <button 
-              onClick={() => onLayoutModeChange("grid-2x2")}
-              className={`px-2 py-1 rounded text-xs transition-all ${layoutMode === "grid-2x2" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-            >
-              2x2
-            </button>
-            <button 
-              onClick={() => onLayoutModeChange("vertical-strip")}
-              className={`px-2 py-1 rounded text-xs transition-all ${layoutMode === "vertical-strip" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-            >
-              垂直
-            </button>
-            <button 
-              onClick={() => onLayoutModeChange("horizontal-strip")}
-              className={`px-2 py-1 rounded text-xs transition-all ${layoutMode === "horizontal-strip" ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-            >
-              水平
-            </button>
-          </div>
-
-          {/* 次要操作按钮 */}
-          <div className="flex justify-center gap-2">
-            {/* 编辑所有面板 */}
-            <button className="bg-purple-500/90 hover:bg-purple-500 text-white rounded-md px-3 py-2 flex items-center gap-1.5 transition-all duration-300 text-xs">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              批量编辑
-            </button>
-
-            {/* 调整间距 */}
-            <button className="bg-orange-500/90 hover:bg-orange-500 text-white rounded-md px-3 py-2 flex items-center gap-1.5 transition-all duration-300 text-xs">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-              </svg>
-              调整间距
-            </button>
-
-            {/* 保存到收藏 */}
-            <button className="bg-pink-500/90 hover:bg-pink-500 text-white rounded-md px-3 py-2 flex items-center gap-1.5 transition-all duration-300 text-xs">
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-              收藏
             </button>
           </div>
         </div>
@@ -563,15 +487,91 @@ export default function ComicDisplay({
     );
   };
 
+  // 渲染翻页导航
+  const renderPaginationControls = () => {
+    if (totalPages <= 1) return null;
+
+    return (
+      <div className="flex items-center justify-center gap-6 mt-6">
+        {/* 左翻页按钮 */}
+        <button
+          onClick={goToPrevPage}
+          disabled={currentPageIndex === 0}
+          className={`group flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${
+            currentPageIndex === 0
+              ? "bg-muted/50 text-muted-foreground cursor-not-allowed"
+              : "bg-white dark:bg-gray-800 text-foreground shadow-lg hover:shadow-xl hover:scale-110 border border-border/20"
+          }`}
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+
+        {/* 页面指示器 */}
+        <div className="flex items-center gap-2">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => goToPage(index)}
+              className={`transition-all duration-300 ${
+                index === currentPageIndex
+                  ? "w-8 h-3 bg-primary rounded-full"
+                  : "w-3 h-3 bg-muted hover:bg-muted/80 rounded-full"
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* 页面计数器 */}
+        <div className="text-sm text-muted-foreground font-medium min-w-[60px] text-center">
+          {isOnAddNewPageScreen ? (
+            <span className="text-green-600">新页面</span>
+          ) : (
+            <span>
+              {currentPageIndex + 1} / {scenes?.length || 0}
+            </span>
+          )}
+        </div>
+
+        {/* 右翻页按钮 */}
+        <button
+          onClick={goToNextPage}
+          disabled={currentPageIndex >= totalPages - 1}
+          className={`group flex items-center justify-center w-12 h-12 rounded-full transition-all duration-300 ${
+            currentPageIndex >= totalPages - 1
+              ? "bg-muted/50 text-muted-foreground cursor-not-allowed"
+              : "bg-white dark:bg-gray-800 text-foreground shadow-lg hover:shadow-xl hover:scale-110 border border-border/20"
+          }`}
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+      </div>
+    );
+  };
+
   const renderMainContent = () => {
     if (error) return renderErrorState();
     if (isGenerating) return renderLoadingState();
-    if (scenes && scenes.length > 0) return renderComicGrid();
-    return renderEmptyState();
+
+    // 如果没有场景，显示空状态
+    if (!scenes || scenes.length === 0) {
+      return renderEmptyState();
+    }
+
+    // 如果在添加新页面页面
+    if (isOnAddNewPageScreen) {
+      return renderAddNewPageState();
+    }
+
+    // 显示当前场景
+    return renderSingleScene();
   };
 
-  // 获取动态标题 - 基于选中的漫画风格
+  // 获取动态标题
   const getTitle = () => {
+    if (scenes && scenes.length > 0) {
+      return `第 ${currentPageIndex + 1} 页`;
+    }
+
     switch (selectedComicStyle) {
       case "poster":
         return "海报样式";
@@ -592,12 +592,11 @@ export default function ComicDisplay({
       <div className="relative h-full">
         {/* 现代化玻璃态容器 */}
         <div className="relative h-full bg-gradient-to-br from-white/95 via-white/90 to-white/95 dark:from-gray-900/95 dark:via-gray-800/90 dark:to-gray-900/95 backdrop-blur-2xl rounded-2xl border border-white/20 dark:border-gray-700/30 shadow-2xl overflow-hidden flex flex-col">
-          
           {/* 现代化顶部导航栏 */}
           <div className="flex-shrink-0 relative">
             {/* 背景渐变 */}
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-accent/5 to-primary/5"></div>
-            
+
             {/* 内容 */}
             <div className="relative px-6 py-4 border-b border-border/10">
               <div className="flex items-center justify-between">
@@ -612,7 +611,7 @@ export default function ComicDisplay({
                       <Wand2 className="w-2 h-2 text-white" />
                     </div>
                   </div>
-                  
+
                   {/* 标题信息 */}
                   <div>
                     <h3 className="text-lg font-bold text-foreground">
@@ -633,11 +632,11 @@ export default function ComicDisplay({
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-primary/10 rounded-full">
                       <div className="w-2 h-2 bg-primary rounded-full"></div>
                       <span className="text-xs font-medium text-primary">
-                        {scenes.length} 个场景
+                        {scenes.length} 个页面
                       </span>
                     </div>
                   )}
-                  
+
                   {isGenerating && (
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-100 dark:bg-orange-900/30 rounded-full">
                       <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
@@ -653,10 +652,15 @@ export default function ComicDisplay({
 
           {/* 主要内容区域 - 现代化布局 */}
           <div className="flex-1 overflow-hidden">
-            <div className="h-full p-6">
-              {renderMainContent()}
-            </div>
+            <div className="h-full p-6">{renderMainContent()}</div>
           </div>
+
+          {/* 翻页控制器 */}
+          {scenes && scenes.length > 0 && (
+            <div className="flex-shrink-0 border-t border-border/10 px-6 py-4">
+              {renderPaginationControls()}
+            </div>
+          )}
         </div>
 
         {/* 浮动装饰元素 */}
@@ -670,11 +674,11 @@ export default function ComicDisplay({
       {isModalOpen && selectedImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           {/* 背景遮罩 */}
-          <div 
+          <div
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={closeModal}
           ></div>
-          
+
           {/* 模态框内容 */}
           <div className="relative z-10 max-w-7xl max-h-[90vh] mx-4">
             {/* 关闭按钮 */}
@@ -684,7 +688,7 @@ export default function ComicDisplay({
             >
               <X className="w-5 h-5" />
             </button>
-            
+
             {/* 放大的图片 */}
             <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-white/20 overflow-hidden">
               <img
@@ -694,14 +698,14 @@ export default function ComicDisplay({
                 onClick={(e) => e.stopPropagation()}
               />
             </div>
-            
+
             {/* 下载按钮 */}
             <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2">
               <button
                 onClick={() => {
-                  const link = document.createElement('a');
+                  const link = document.createElement("a");
                   link.href = selectedImage;
-                  link.download = 'comic-panel.png';
+                  link.download = "comic-panel.png";
                   link.click();
                 }}
                 className="bg-white/10 hover:bg-white/20 backdrop-blur-xl rounded-full px-4 py-2 text-white text-sm font-medium transition-all duration-200 border border-white/20 flex items-center gap-2"

@@ -21,10 +21,14 @@ export interface ComicGenerationState {
 }
 
 export interface ComicGenerationOptions {
-  diary_content: string;
-  characters: Array<{ id: string; name: string; avatar_url: string }>;
+  content: string; // 改为content，保持与API一致
   style?: "cute" | "realistic" | "minimal" | "kawaii";
-  format?: ComicFormat; // 只保留format，不传layout_mode到后端
+  format?: ComicFormat;
+}
+
+export interface AddPageOptions {
+  content: string; // 改为content，保持与API一致
+  style?: "cute" | "realistic" | "minimal" | "kawaii";
 }
 
 export function useComicGeneration() {
@@ -70,7 +74,10 @@ export function useComicGeneration() {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify(options),
+          body: JSON.stringify({
+            content: options.content, // 使用content而不是diary_content
+            style: options.style,
+          }),
         });
 
         if (!response.ok) {
@@ -103,40 +110,35 @@ export function useComicGeneration() {
                     setState((prev) => ({
                       ...prev,
                       progress: data.progress,
-                      currentStep: data.step,
                       message: data.message,
+                      currentStep: data.step,
                       currentScene: data.current_scene,
                       totalScenes: data.total_scenes || prev.totalScenes,
+                    }));
+                    break;
+
+                  case "scene_complete":
+                    setState((prev) => ({
+                      ...prev,
+                      progress: data.progress,
+                      message: `场景 ${data.scene_number} 完成`,
                     }));
                     break;
 
                   case "complete":
                     setState((prev) => ({
                       ...prev,
-                      progress: 100,
-                      currentStep: "completed",
-                      message: data.message,
-                      result: data.data,
                       isGenerating: false,
+                      progress: 100,
+                      message: "漫画生成完成！",
+                      result: {
+                        comic_id: data.data.comic_id,
+                        scenes: [data.data.scene], // 将单个scene包装为数组
+                        status: data.data.status,
+                      },
                     }));
-                    // 刷新用户profile和交易历史，确保credit余额及时更新
-                    queryClient.invalidateQueries({ queryKey: ["profile"] });
-                    queryClient.invalidateQueries({
-                      queryKey: ["transactions"],
-                    });
-                    break;
-
-                  case "credit_deducted":
-                    // 如果有credit扣除事件，立即刷新数据
-                    setState((prev) => ({
-                      ...prev,
-                      message: data.message || prev.message,
-                    }));
-                    // 立即刷新用户profile和交易历史，确保UI显示最新的credit余额
-                    queryClient.invalidateQueries({ queryKey: ["profile"] });
-                    queryClient.invalidateQueries({
-                      queryKey: ["transactions"],
-                    });
+                    // 清除相关查询缓存
+                    queryClient.invalidateQueries({ queryKey: ["comics"] });
                     break;
 
                   case "error":
@@ -160,6 +162,124 @@ export function useComicGeneration() {
       }
     },
     [queryClient]
+  );
+
+  const addNewPage = useCallback(
+    async (options: AddPageOptions) => {
+      // 确保有现有的漫画结果
+      if (!state.result?.comic_id) {
+        throw new Error("没有找到现有的漫画，请先生成漫画");
+      }
+
+      const currentPageCount = state.result.scenes?.length || 0;
+      const nextPageNumber = currentPageCount + 1;
+
+      setState((prev) => ({
+        ...prev,
+        isGenerating: true,
+        progress: 0,
+        currentStep: "analyzing",
+        message: `正在添加第 ${nextPageNumber} 页...`,
+        error: undefined,
+      }));
+
+      try {
+        // 获取用户会话
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session?.access_token) {
+          throw new Error("用户未登录");
+        }
+
+        const response = await fetch("/api/add-comic-page", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            comic_id: state.result.comic_id,
+            page_number: nextPageNumber,
+            content: options.content, // 使用content而不是diary_content
+            style: options.style,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || "添加页面失败");
+        }
+
+        // 处理流式响应
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+
+        if (!reader) {
+          throw new Error("无法读取响应流");
+        }
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split("\n");
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              try {
+                const data = JSON.parse(line.slice(6));
+
+                switch (data.type) {
+                  case "progress":
+                    setState((prev) => ({
+                      ...prev,
+                      progress: data.progress,
+                      message: data.message,
+                      currentStep: data.step,
+                    }));
+                    break;
+
+                  case "complete":
+                    setState((prev) => ({
+                      ...prev,
+                      isGenerating: false,
+                      progress: 100,
+                      message: "漫画生成完成！",
+                      result: {
+                        comic_id: data.data.comic_id,
+                        scenes: [data.data.scene], // 将单个scene包装为数组
+                        status: data.data.status,
+                      },
+                    }));
+
+                    // 清除相关查询缓存
+                    queryClient.invalidateQueries({ queryKey: ["comics"] });
+                    break;
+
+                  case "error":
+                    throw new Error(data.error);
+                }
+              } catch (parseError) {
+                console.warn("解析流式响应数据时出错:", parseError);
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("添加新页面时出错:", error);
+        setState((prev) => ({
+          ...prev,
+          error:
+            error instanceof Error ? error.message : "添加页面时出现未知错误",
+          isGenerating: false,
+        }));
+        throw error;
+      }
+    },
+    [state.result?.comic_id, state.result?.scenes, queryClient]
   );
 
   const reset = useCallback(() => {
@@ -228,6 +348,7 @@ export function useComicGeneration() {
   return {
     ...state,
     generateComic,
+    addNewPage,
     reset,
     retryScene,
   };

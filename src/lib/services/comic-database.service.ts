@@ -1,125 +1,119 @@
 import { supabaseAdmin } from "@/lib/supabase/server";
-import { Character } from "@/types/characters";
-import {
-  Diary,
-  Comic,
-  ComicScene,
-  SceneDescription,
-  SceneCharacter,
-  ComicFormat,
-  LayoutMode,
-} from "@/types/diary";
+import { Comic, ComicScene, SceneDescription } from "@/types/diary";
 
 export class ComicDatabaseService {
   /**
-   * 验证角色属于用户（可选，用于安全验证）
+   * 创建新的comic记录
    */
-  async validateUserCharacters(
-    userId: string,
-    characterIds: string[]
-  ): Promise<boolean> {
-    const { data: characters, error } = await supabaseAdmin
-      .from("characters")
+  async createComic(params: {
+    userId: string;
+    title?: string;
+    content: string; // 直接存储内容，不再依赖diary
+    mood?: string;
+    style: string;
+  }): Promise<string> {
+    const { userId, title, content, mood, style } = params;
+
+    const { data, error } = await supabaseAdmin
+      .from("comic")
+      .insert({
+        user_id: userId,
+        title,
+        content,
+        mood,
+        style,
+        scene_ids: [], // 初始化为空数组
+        status: "processing",
+      })
       .select("id")
-      .in("id", characterIds)
-      .eq("user_id", userId);
-
-    if (error) {
-      console.error("验证角色失败:", error);
-      return false;
-    }
-
-    return characters && characters.length === characterIds.length;
-  }
-
-  /**
-   * 创建日记记录
-   */
-  async createDiary(
-    userId: string,
-    content: string,
-    title?: string
-  ): Promise<Diary> {
-    const { data: diary, error } = await supabaseAdmin
-      .from("diary")
-      .insert([
-        {
-          user_id: userId,
-          content: content,
-          title: title,
-          status: "processing",
-        },
-      ])
-      .select()
       .single();
 
     if (error) {
-      console.error("创建日记失败:", error);
-      throw new Error("保存日记失败");
+      throw new Error(`创建漫画记录失败: ${error.message}`);
     }
 
-    return diary;
+    return data.id;
   }
 
   /**
-   * 创建漫画记录
+   * 向comic的scene_ids数组中添加新场景
    */
-  async createComic(
-    diaryId: string,
-    userId: string,
-    style: string,
-    format: ComicFormat = "four", // 新增参数
-    layoutMode?: LayoutMode, // 新增参数
-    title?: string
-  ): Promise<Comic> {
+  async addSceneToComic(comicId: string, sceneId: string): Promise<void> {
+    // 先获取当前的scene_ids
+    const { data: comic, error: fetchError } = await supabaseAdmin
+      .from("comic")
+      .select("scene_ids")
+      .eq("id", comicId)
+      .single();
+
+    if (fetchError) {
+      throw new Error(`获取漫画信息失败: ${fetchError.message}`);
+    }
+
+    const currentSceneIds = comic.scene_ids || [];
+    const updatedSceneIds = [...currentSceneIds, sceneId];
+
+    // 更新scene_ids数组
+    const { error: updateError } = await supabaseAdmin
+      .from("comic")
+      .update({
+        scene_ids: updatedSceneIds,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", comicId);
+
+    if (updateError) {
+      throw new Error(`更新漫画场景列表失败: ${updateError.message}`);
+    }
+  }
+
+  /**
+   * 获取comic及其所有场景
+   */
+  async getComicWithScenes(comicId: string): Promise<Comic | null> {
     const { data: comic, error } = await supabaseAdmin
       .from("comic")
-      .insert([
-        {
-          diary_id: diaryId,
-          user_id: userId,
-          title: title || `漫画 - ${new Date().toLocaleDateString()}`,
-          style: style,
-          format: format, // 新增字段
-          layout_mode: layoutMode, // 新增字段
-          status: "processing",
-        },
-      ])
-      .select()
+      .select(
+        `
+        *,
+        scenes:comic_scene(*)
+      `
+      )
+      .eq("id", comicId)
       .single();
 
     if (error) {
-      console.error("创建漫画失败:", error);
-      throw new Error("创建漫画失败");
+      if (error.code === "PGRST116") return null;
+      throw new Error(`获取漫画失败: ${error.message}`);
+    }
+
+    // 按照scene_ids的顺序排列场景
+    if (comic.scenes && comic.scene_ids) {
+      const orderedScenes = comic.scene_ids
+        .map((sceneId: string) =>
+          comic.scenes.find((scene: ComicScene) => scene.id === sceneId)
+        )
+        .filter(Boolean);
+      comic.scenes = orderedScenes;
     }
 
     return comic;
   }
 
   /**
-   * 创建场景记录
+   * 创建多个场景记录
    */
   async createScenes(
     comicId: string,
-    sceneDescriptions: SceneDescription[],
-    characters: Character[]
+    sceneDescriptions: SceneDescription[]
   ): Promise<ComicScene[]> {
     const sceneInserts = sceneDescriptions.map((scene, index) => {
-      // 根据character_ids获取完整的角色信息
-      const sceneCharacters: SceneCharacter[] = characters
-        .filter((c) => scene.character_ids.includes(c.id))
-        .map((c) => ({
-          id: c.id,
-          name: c.name,
-          avatar_url: c.avatar_url,
-        }));
-
       return {
         comic_id: comicId,
         scene_order: index + 1,
+        content: "", // 可以根据需要设置内容
         scenario_description: scene.description,
         mood: scene.mood,
-        characters: sceneCharacters,
         status: "pending" as const,
       };
     });
@@ -135,6 +129,56 @@ export class ComicDatabaseService {
     }
 
     return scenes;
+  }
+
+  /**
+   * 创建单个场景记录
+   */
+  async createScene(params: {
+    comicId: string;
+    sceneOrder: number;
+    content: string;
+    description: string;
+    mood?: string;
+    quote?: string;
+    imageUrl?: string;
+    imagePrompt?: string;
+  }): Promise<ComicScene> {
+    const {
+      comicId,
+      sceneOrder,
+      content,
+      description,
+      mood,
+      quote,
+      imageUrl,
+      imagePrompt,
+    } = params;
+
+    const { data: scene, error } = await supabaseAdmin
+      .from("comic_scene")
+      .insert({
+        comic_id: comicId,
+        scene_order: sceneOrder,
+        content: content,
+        scenario_description: description,
+        mood: mood,
+        quote: quote,
+        image_url: imageUrl,
+        image_prompt: imagePrompt,
+        status: "pending" as const,
+        characters: [], // 初始化为空数组
+        retry_count: 0,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("创建场景失败:", error);
+      throw new Error("创建场景失败");
+    }
+
+    return scene;
   }
 
   /**
@@ -213,33 +257,21 @@ export class ComicDatabaseService {
   /**
    * 完成漫画生成
    */
-  async completeComic(comicId: string, diaryId: string): Promise<void> {
-    await Promise.all([
-      supabaseAdmin
-        .from("comic")
-        .update({ status: "completed" })
-        .eq("id", comicId),
-      supabaseAdmin
-        .from("diary")
-        .update({ status: "completed" })
-        .eq("id", diaryId),
-    ]);
+  async completeComic(comicId: string): Promise<void> {
+    await supabaseAdmin
+      .from("comic")
+      .update({ status: "completed" })
+      .eq("id", comicId);
   }
 
   /**
    * 标记漫画生成失败
    */
-  async markComicFailed(comicId: string, diaryId: string): Promise<void> {
-    await Promise.all([
-      supabaseAdmin
-        .from("comic")
-        .update({ status: "failed" })
-        .eq("id", comicId),
-      supabaseAdmin
-        .from("diary")
-        .update({ status: "failed" })
-        .eq("id", diaryId),
-    ]);
+  async markComicFailed(comicId: string): Promise<void> {
+    await supabaseAdmin
+      .from("comic")
+      .update({ status: "failed" })
+      .eq("id", comicId);
   }
 
   /**
@@ -251,7 +283,6 @@ export class ComicDatabaseService {
   ): Promise<{
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     scene: any;
-    characters: SceneCharacter[];
     style: string;
   }> {
     const { data: scene, error } = await supabaseAdmin
@@ -272,7 +303,6 @@ export class ComicDatabaseService {
 
     return {
       scene,
-      characters: scene.characters as SceneCharacter[],
       style: scene.comic.style,
     };
   }
@@ -291,6 +321,53 @@ export class ComicDatabaseService {
         retry_count: retryCount + 1,
       })
       .eq("id", sceneId);
+  }
+
+  /**
+   * 获取用户的所有漫画
+   */
+  async getUserComics(userId: string): Promise<Comic[]> {
+    const { data: comics, error } = await supabaseAdmin
+      .from("comic")
+      .select("*")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      throw new Error(`获取用户漫画失败: ${error.message}`);
+    }
+
+    return comics || [];
+  }
+
+  /**
+   * 删除漫画及其所有场景
+   */
+  async deleteComic(comicId: string, userId: string): Promise<void> {
+    // 验证用户权限
+    const { data: comic, error: fetchError } = await supabaseAdmin
+      .from("comic")
+      .select("user_id")
+      .eq("id", comicId)
+      .single();
+
+    if (fetchError || !comic) {
+      throw new Error("漫画不存在");
+    }
+
+    if (comic.user_id !== userId) {
+      throw new Error("无权删除此漫画");
+    }
+
+    // 删除漫画（场景会通过外键级联删除）
+    const { error: deleteError } = await supabaseAdmin
+      .from("comic")
+      .delete()
+      .eq("id", comicId);
+
+    if (deleteError) {
+      throw new Error(`删除漫画失败: ${deleteError.message}`);
+    }
   }
 }
 

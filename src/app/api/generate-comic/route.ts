@@ -11,15 +11,13 @@ import {
 import {
   validateRequestBody,
   validateRequiredFields,
-  validateArrayField,
 } from "@/lib/helpers/request-validation.helpers";
-import { posterGenerationService } from "@/lib/services/poster-generation.service";
 
 const COMIC_GENERATION_STEPS = [
   { name: "checking", message: "正在检查用户余额...", weight: 10 },
-  { name: "analyzing", message: "正在验证角色信息...", weight: 15 },
-  { name: "creating", message: "正在创建漫画...", weight: 60 },
-  { name: "finalizing", message: "正在完成处理...", weight: 15 },
+  { name: "analyzing", message: "正在分析内容...", weight: 20 },
+  { name: "generating", message: "正在生成漫画场景...", weight: 60 },
+  { name: "finalizing", message: "正在完成处理...", weight: 10 },
 ];
 
 export async function POST(request: NextRequest) {
@@ -43,65 +41,29 @@ export async function POST(request: NextRequest) {
 
     // 字段验证
     const { isValid: fieldsValid, errors: fieldErrors } =
-      validateRequiredFields(body!, ["diary_content", "characters"]);
+      validateRequiredFields(body!, ["content"]);
 
     if (!fieldsValid) {
       return createValidationErrorResponse(fieldErrors.join(", "));
     }
 
-    // 角色数组验证
-    const { isValid: charactersValid, errors: charactersErrors } =
-      validateArrayField(body!.characters, "characters");
-
-    if (!charactersValid) {
-      return createValidationErrorResponse(charactersErrors.join(", "));
-    }
-
-    // 提取参数，移除layout_mode传递给后端
-    const {
-      diary_content,
-      characters,
-      style = "cute",
-      format = "four", // 只需要format参数
-    } = body!;
-
-    // 验证format参数
-    if (format && !["single", "four"].includes(format)) {
-      return createValidationErrorResponse("无效的漫画格式");
-    }
+    // 提取参数
+    const { content, style = "cute" } = body!;
 
     // 创建流式响应
     return StreamGenerationHelper.createStreamResponse(
       COMIC_GENERATION_STEPS,
       async (helper) => {
-        let result;
+        // 生成单个场景
+        const result = await comicGenerationService.generateComic({
+          userId: user.id,
+          content,
+          style,
+          controller: helper["controller"],
+          encoder: helper["encoder"],
+        });
 
-        if (format === "single") {
-          // 使用海报生成服务
-          result = await posterGenerationService.generateSingleScene({
-            userId: user.id,
-            diaryContent: diary_content,
-            characters,
-            style,
-            controller: helper["controller"],
-            encoder: helper["encoder"],
-          });
-
-          helper.sendComplete(result, "海报生成完成！");
-        } else {
-          // 使用原来的漫画生成服务，不传layout_mode
-          result = await comicGenerationService.generateComic({
-            userId: user.id,
-            diaryContent: diary_content,
-            characters,
-            style,
-            format,
-            controller: helper["controller"],
-            encoder: helper["encoder"],
-          });
-
-          helper.sendComplete(result, "漫画生成完成！");
-        }
+        helper.sendComplete(result, "漫画场景生成完成！");
       }
     );
   } catch (error) {

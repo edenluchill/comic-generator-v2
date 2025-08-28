@@ -16,9 +16,9 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const offset = (page - 1) * limit;
 
-    // 查询用户的日记，包括关联的漫画信息
+    // 查询用户的漫画，包括关联的场景信息
     const { data: diaries, error: diariesError } = await supabaseAdmin
-      .from("diary")
+      .from("comic")
       .select(
         `
         id,
@@ -27,21 +27,20 @@ export async function GET(request: NextRequest) {
         content,
         mood,
         date,
+        style,
         status,
         created_at,
         updated_at,
-        comics:comic(
+        comic_scene(
           id,
-          title,
-          style,
-          status,
-          created_at,
-          comic_scene(
-            id,
-            scene_order,
-            image_url,
-            status
-          )
+          scene_order,
+          content,
+          scenario_description,
+          mood,
+          quote,
+          image_url,
+          image_prompt,
+          status
         )
       `
       )
@@ -56,7 +55,7 @@ export async function GET(request: NextRequest) {
 
     // 获取总数
     const { count, error: countError } = await supabaseAdmin
-      .from("diary")
+      .from("comic")
       .select("*", { count: "exact", head: true })
       .eq("user_id", user.id);
 

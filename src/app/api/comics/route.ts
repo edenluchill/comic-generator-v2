@@ -16,22 +16,25 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const offset = (page - 1) * limit;
 
-    // 查询用户的漫画
     const { data: comics, error: comicsError } = await supabaseAdmin
       .from("comic")
       .select(
         `
         *,
-        diary(content, title, date),
         comic_scene(
           id,
           scene_order,
+          content,
           scenario_description,
           mood,
+          quote,
           image_url,
+          image_prompt,
           characters,
           status,
-          created_at
+          retry_count,
+          created_at,
+          updated_at
         )
       `
       )

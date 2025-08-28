@@ -83,6 +83,74 @@ export class FluxCharacterGenerator {
   }
 
   /**
+   * 图片生成函数 - 使用Flux的generate API (不需要输入图片)
+   */
+  async generate(
+    prompt: string,
+    options?: Partial<FluxGenerationOptions>
+  ): Promise<FluxGenerationResult> {
+    if (!this.apiKey) {
+      throw new Error("Flux API密钥未配置");
+    }
+
+    try {
+      const requestBody = {
+        prompt: prompt,
+        aspect_ratio: options?.aspectRatio || "1:1",
+        seed: options?.seed,
+        output_format: options?.outputFormat || "png",
+        prompt_upsampling: options?.promptUpsampling || false,
+        safety_tolerance: options?.safetyTolerance || 2,
+        webhook_url: options?.webhookUrl,
+        webhook_secret: options?.webhookSecret,
+        width: options?.width,
+        height: options?.height,
+      };
+
+      const response: AxiosResponse<FluxAPIResponse> = await axios.post(
+        `${this.baseUrl}/flux-pro-1.1`,
+        requestBody,
+        {
+          headers: {
+            "x-key": this.apiKey,
+            "Content-Type": "application/json",
+          },
+          timeout: 60000,
+        }
+      );
+
+      if (response.status !== 200) {
+        throw new Error(
+          `Flux API请求失败: ${response.status} ${response.statusText}`
+        );
+      }
+
+      const result = response.data;
+
+      return {
+        id: result.id,
+        status: result.status as
+          | "pending"
+          | "processing"
+          | "Ready"
+          | "Error"
+          | "Failed",
+        pollingUrl: result.polling_url,
+        generatedAt: new Date().toISOString(),
+        prompt: prompt,
+        progress: 0,
+      };
+    } catch (error) {
+      console.error("Flux图片生成失败:", error);
+      throw new Error(
+        error instanceof Error
+          ? `图片生成失败: ${error.message}`
+          : "Flux图片生成时发生未知错误"
+      );
+    }
+  }
+
+  /**
    * 图片编辑函数 - 使用Flux的imageEdit API
    */
   async imageEdit(

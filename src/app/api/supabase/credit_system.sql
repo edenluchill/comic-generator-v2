@@ -24,7 +24,7 @@ CREATE TABLE user_profiles (
   
   -- 统计信息
   total_comics_generated INTEGER DEFAULT 0,
-  total_characters_created INTEGER DEFAULT 0,
+
   
   -- 时间戳
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -80,8 +80,8 @@ CREATE TABLE subscription_plans (
 
 -- 4. 插入默认订阅计划
 INSERT INTO subscription_plans (id, name, price_cents, monthly_credits, features, stripe_price_id) VALUES 
-('free', 'Free Plan', 0, 60, '{"max_characters": 2, "watermark": true, "quality": "720p"}', ''),
-('premium', 'Premium Plan', 599, 1000, '{"max_characters": -1, "watermark": false, "quality": "4k", "priority_processing": true}', 'price_premium_monthly_placeholder');
+('free', 'Free Plan', 0, 60, '{"watermark": true, "quality": "720p"}', ''),
+('premium', 'Premium Plan', 599, 1000, '{"watermark": false, "quality": "4k", "priority_processing": true}', 'price_premium_monthly_placeholder');
 
 -- ===========================================
 -- 索引优化

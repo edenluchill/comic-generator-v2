@@ -23,8 +23,10 @@ export async function POST(
     const newDescription = body.new_description;
 
     // 获取场景信息
-    const { scene, characters, style } =
-      await comicDatabaseService.getSceneForRetry(sceneId, user.id);
+    const { scene, style } = await comicDatabaseService.getSceneForRetry(
+      sceneId,
+      user.id
+    );
 
     // 使用新描述（如果提供了）或原始描述
     const descriptionToUse = newDescription || scene.scenario_description;
@@ -40,7 +42,6 @@ export async function POST(
       const imageResult = await sceneImageService.retrySceneImage(
         sceneId,
         descriptionToUse,
-        characters,
         style,
         user.id
       );

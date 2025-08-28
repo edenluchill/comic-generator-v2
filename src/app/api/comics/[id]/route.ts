@@ -4,7 +4,81 @@ import { authenticateRequest } from "@/lib/auth-helpers";
 import { deleteStoredImage } from "@/lib/image-storage";
 import { APIResponse } from "@/types/api";
 
-// 新增：更新日记
+// 获取单个漫画
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+
+    // 认证检查
+    const { user, error: authError } = await authenticateRequest(request);
+    if (authError || !user) {
+      return NextResponse.json({ error: "未授权访问" }, { status: 401 });
+    }
+
+    const { data: comic, error } = await supabaseAdmin
+      .from("comic")
+      .select(
+        `
+        *,
+        comic_scene(
+          id,
+          scene_order,
+          content,
+          scenario_description,
+          mood,
+          quote,
+          image_url,
+          image_prompt,
+          characters,
+          status,
+          retry_count,
+          created_at,
+          updated_at
+        )
+      `
+      )
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single();
+
+    if (error || !comic) {
+      return NextResponse.json(
+        { error: "漫画不存在或无权限访问" },
+        { status: 404 }
+      );
+    }
+
+    // 格式化数据
+    const formattedComic = {
+      ...comic,
+      scenes: comic.comic_scene
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .sort((a: any, b: any) => a.scene_order - b.scene_order)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        .map((scene: any) => ({
+          ...scene,
+          characters: scene.characters || [],
+        })),
+    };
+
+    return NextResponse.json<APIResponse>({
+      success: true,
+      data: formattedComic,
+      message: "获取漫画成功",
+    });
+  } catch (error) {
+    console.error("获取漫画API错误:", error);
+    return NextResponse.json<APIResponse>({
+      success: false,
+      error: error instanceof Error ? error.message : "服务器内部错误",
+    });
+  }
+}
+
+// 更新漫画
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -58,13 +132,13 @@ export async function PUT(
       .single();
 
     if (error) {
-      console.error("更新日记失败:", error);
-      return NextResponse.json({ error: "更新日记失败" }, { status: 500 });
+      console.error("更新漫画失败:", error);
+      return NextResponse.json({ error: "更新漫画失败" }, { status: 500 });
     }
 
     if (!comic) {
       return NextResponse.json(
-        { error: "日记不存在或无权限" },
+        { error: "漫画不存在或无权限" },
         { status: 404 }
       );
     }
@@ -72,10 +146,10 @@ export async function PUT(
     return NextResponse.json({
       success: true,
       data: comic,
-      message: "日记更新成功",
+      message: "漫画更新成功",
     });
   } catch (error) {
-    console.error("更新日记API错误:", error);
+    console.error("更新漫画API错误:", error);
     return NextResponse.json(
       {
         success: false,
@@ -118,7 +192,7 @@ export async function DELETE(
 
     if (fetchError || !comic) {
       return NextResponse.json(
-        { error: "日记不存在或无权限访问" },
+        { error: "漫画不存在或无权限访问" },
         { status: 404 }
       );
     }
@@ -151,16 +225,16 @@ export async function DELETE(
       .eq("user_id", user.id);
 
     if (deleteError) {
-      console.error("删除日记失败:", deleteError);
-      return NextResponse.json({ error: "删除日记失败" }, { status: 500 });
+      console.error("删除漫画失败:", deleteError);
+      return NextResponse.json({ error: "删除漫画失败" }, { status: 500 });
     }
 
     return NextResponse.json<APIResponse>({
       success: true,
-      message: "日记删除成功",
+      message: "漫画删除成功",
     });
   } catch (error) {
-    console.error("删除日记API错误:", error);
+    console.error("删除漫画API错误:", error);
     return NextResponse.json<APIResponse>({
       success: false,
       error: error instanceof Error ? error.message : "服务器内部错误",

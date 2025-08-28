@@ -11,7 +11,7 @@ export interface FaceAnalysisOptions {
 
 const openai = new OpenAI({
   apiKey:
-    "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",
+    "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",
 });
 
 export class FaceAnalysisService {

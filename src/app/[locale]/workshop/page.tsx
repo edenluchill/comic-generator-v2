@@ -16,8 +16,6 @@ function WorkshopContent() {
     return <ComicGeneration />;
   }
 
-  // 移除角色创建模式，专注于漫画生成
-
   // 默认显示概览页面
   return <WorkshopOverview />;
 }

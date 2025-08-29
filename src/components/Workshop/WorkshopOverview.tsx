@@ -136,28 +136,6 @@ export default function WorkshopOverview() {
                       <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
                         {comic.content}
                       </p>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{comic.scenes?.length || 0} 个场景</span>
-                        <span
-                          className={`px-2 py-1 rounded-full ${
-                            comic.status === "completed"
-                              ? "bg-green-100 text-green-800"
-                              : comic.status === "processing"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : comic.status === "failed"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-gray-100 text-gray-800"
-                          }`}
-                        >
-                          {comic.status === "completed"
-                            ? "已完成"
-                            : comic.status === "processing"
-                            ? "生成中"
-                            : comic.status === "failed"
-                            ? "失败"
-                            : "待处理"}
-                        </span>
-                      </div>
                     </div>
                   </div>
                 ))}

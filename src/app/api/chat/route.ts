@@ -23,18 +23,10 @@ export async function POST(req: Request) {
       system:
         "You are a helpful assistant specialized in comic generation and creative storytelling. You can analyze images and help create engaging stories and comics.",
       messages: modelMessages,
-      onChunk: (chunk) => {
-        console.log("Chunk: ", chunk);
-      },
-      onStepFinish: (step) => {
-        console.log("Step Finish: ", step);
-      },
       experimental_transform: smoothStream({
         delayInMs: 20, // optional: defaults to 10ms
         chunking: "word", // optional: defaults to 'word'
       }),
-
-      // experimental_transform: smoothStream({ chunking: "word" }),
     });
 
     return result.toUIMessageStreamResponse();

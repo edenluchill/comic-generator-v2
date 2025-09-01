@@ -247,12 +247,16 @@ export function useComicGeneration() {
                       ...prev,
                       isGenerating: false,
                       progress: 100,
-                      message: "漫画生成完成！",
-                      result: {
-                        comic_id: data.data.comic_id,
-                        scenes: [data.data.scene], // 将单个scene包装为数组
-                        status: data.data.status,
-                      },
+                      message: "新页面添加完成！",
+                      result: prev.result
+                        ? {
+                            ...prev.result,
+                            scenes: [
+                              ...(prev.result.scenes || []),
+                              data.data.scene,
+                            ], // 添加新场景到现有数组
+                          }
+                        : prev.result,
                     }));
 
                     // 清除相关查询缓存

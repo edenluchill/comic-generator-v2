@@ -178,6 +178,7 @@ export default function ComicGeneration() {
     result,
     error,
     generateComic,
+    addNewPage,
     retryScene,
   } = useComicGeneration();
 
@@ -322,6 +323,20 @@ export default function ComicGeneration() {
     }
   };
 
+  // 新增：处理添加新页面
+  const handleAddNewPage = async (content: string) => {
+    if (!content.trim()) return;
+
+    try {
+      await addNewPage({
+        content: content,
+        style: selectedStyle,
+      });
+    } catch (error) {
+      console.error("添加新页面失败:", error);
+    }
+  };
+
   const handleRetryScene = async (sceneId: string, newDescription: string) => {
     try {
       await retryScene(sceneId, newDescription);
@@ -340,6 +355,19 @@ export default function ComicGeneration() {
     t("workshop"),
     handleBackToWorkshop
   );
+
+  // 监听result变化，生成完成后更新URL
+  useEffect(() => {
+    if (result?.comic_id && !isGenerating) {
+      // 更新URL包含comic ID，但不刷新页面
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set("mode", "comic");
+      newSearchParams.set("id", result.comic_id);
+
+      // 使用replace避免在浏览器历史中添加新记录
+      router.replace(`/workshop?${newSearchParams.toString()}`);
+    }
+  }, [result?.comic_id, isGenerating, router, searchParams]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50/50 via-white to-gray-100/50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 relative">
@@ -668,6 +696,7 @@ export default function ComicGeneration() {
               layoutMode={layoutMode}
               onLayoutModeChange={setLayoutMode}
               selectedComicStyle={selectedComicStyle}
+              onAddNewPage={handleAddNewPage}
             />
           </div>
         </div>

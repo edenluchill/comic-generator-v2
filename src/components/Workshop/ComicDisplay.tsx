@@ -32,7 +32,7 @@ interface ComicDisplayProps {
   layoutMode: LayoutMode;
   onLayoutModeChange: (mode: LayoutMode) => void;
   selectedComicStyle?: string;
-  onAddNewPage?: () => void; // 新增：添加新页面的回调
+  onAddNewPage?: (content: string) => Promise<void>; // 更新回调类型
 }
 
 export default function ComicDisplay({
@@ -47,9 +47,6 @@ export default function ComicDisplay({
   error,
   onRetryScene,
   format,
-  // onFormatChange,
-  // layoutMode,
-  // onLayoutModeChange,
   selectedComicStyle = "4koma",
   onAddNewPage,
 }: ComicDisplayProps) {
@@ -61,6 +58,10 @@ export default function ComicDisplay({
   // Modal state for image popup
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // 新增页面相关状态
+  const [newPageContent, setNewPageContent] = useState("");
+  const [isAddingPage, setIsAddingPage] = useState(false);
 
   // 计算总页数（包括现有场景 + 1个添加新页面的页面）
   const totalPages = (scenes?.length || 0) + 1;
@@ -241,58 +242,69 @@ export default function ComicDisplay({
 
       {/* 文本内容 */}
       <div className="space-y-4 mb-8">
-        <h3 className="text-2xl font-bold text-foreground">123</h3>
+        <h3 className="text-xl font-bold text-foreground">添加新页面</h3>
         <p className="text-sm text-muted-foreground max-w-md mx-auto leading-relaxed">
-          继续您的故事！点击下方按钮为您的漫画添加新的精彩页面。
+          继续您的故事！描述接下来发生的情节，AI将为您生成新的漫画页面。
         </p>
       </div>
 
-      {/* 现代化添加按钮 */}
-      <div className="flex flex-col items-center gap-4">
-        <button
-          onClick={onAddNewPage}
-          disabled={!onAddNewPage || isGenerating}
-          className={`group relative inline-flex items-center justify-center gap-3 py-4 px-8 rounded-xl font-semibold transition-all duration-300 ${
-            onAddNewPage && !isGenerating
-              ? "bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg hover:shadow-xl transform hover:scale-105 hover:-translate-y-0.5"
-              : "bg-muted text-muted-foreground cursor-not-allowed"
-          }`}
-        >
-          {/* 按钮背景光效 */}
-          {onAddNewPage && !isGenerating && (
-            <div className="absolute inset-0 bg-gradient-to-r from-green-500/80 to-blue-500/80 rounded-xl blur-xl opacity-50 group-hover:opacity-70 transition-opacity"></div>
-          )}
+      {/* 输入区域 */}
+      <div className="w-full max-w-2xl mx-auto space-y-4">
+        <textarea
+          value={newPageContent}
+          onChange={(e) => setNewPageContent(e.target.value)}
+          placeholder="描述接下来的故事情节..."
+          className="w-full h-32 p-4 border border-border rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+          disabled={isAddingPage}
+        />
 
-          {/* 按钮内容 */}
-          <div className="relative flex items-center gap-3">
-            <Plus
-              className={`w-5 h-5 ${
-                isGenerating ? "animate-pulse" : "group-hover:animate-bounce"
-              }`}
-            />
-            <span className="text-base">
-              {isGenerating ? "生成中..." : "添加新页面"}
-            </span>
-          </div>
-        </button>
-
-        {/* 提示文本 */}
-        <p className="text-xs text-muted-foreground/70 flex items-center gap-2">
-          <svg
-            className="w-3 h-3"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+        {/* 操作按钮 */}
+        <div className="flex justify-center gap-3">
+          <button
+            onClick={() =>
+              setCurrentPageIndex(Math.max(0, (scenes?.length || 0) - 1))
+            }
+            className="px-6 py-3 border border-border rounded-xl text-muted-foreground hover:text-foreground hover:border-primary/30 transition-all duration-200"
+            disabled={isAddingPage}
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          扩展您的漫画故事，创造更多精彩内容
-        </p>
+            返回上一页
+          </button>
+
+          <button
+            onClick={async () => {
+              if (!newPageContent.trim() || !onAddNewPage) return;
+
+              setIsAddingPage(true);
+              try {
+                await onAddNewPage(newPageContent);
+                setNewPageContent(""); // 清空输入
+                // 页面会自动更新，因为scenes会更新
+              } catch (error) {
+                console.error("添加页面失败:", error);
+              } finally {
+                setIsAddingPage(false);
+              }
+            }}
+            disabled={!newPageContent.trim() || isAddingPage || !onAddNewPage}
+            className={`px-8 py-3 rounded-xl font-semibold transition-all duration-300 ${
+              newPageContent.trim() && !isAddingPage && onAddNewPage
+                ? "bg-gradient-to-r from-green-500 to-blue-500 text-white shadow-lg hover:shadow-xl hover:scale-105"
+                : "bg-muted text-muted-foreground cursor-not-allowed"
+            }`}
+          >
+            {isAddingPage ? (
+              <div className="flex items-center gap-2">
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                <span>生成中...</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <Plus className="w-4 h-4" />
+                <span>添加新页面</span>
+              </div>
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -548,9 +560,10 @@ export default function ComicDisplay({
     );
   };
 
+  // 更新主要内容渲染逻辑
   const renderMainContent = () => {
     if (error) return renderErrorState();
-    if (isGenerating) return renderLoadingState();
+    if (isGenerating || isAddingPage) return renderLoadingState();
 
     // 如果没有场景，显示空状态
     if (!scenes || scenes.length === 0) {
@@ -633,15 +646,6 @@ export default function ComicDisplay({
                       <div className="w-2 h-2 bg-primary rounded-full"></div>
                       <span className="text-xs font-medium text-primary">
                         {scenes.length} 个页面
-                      </span>
-                    </div>
-                  )}
-
-                  {isGenerating && (
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-orange-100 dark:bg-orange-900/30 rounded-full">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
-                      <span className="text-xs font-medium text-orange-600 dark:text-orange-400">
-                        生成中
                       </span>
                     </div>
                   )}

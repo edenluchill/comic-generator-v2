@@ -5,6 +5,7 @@ import { lazy, Suspense } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { DataStreamProvider } from "@/components/providers/data-stream-provider";
 
 // 延迟加载重型组件
 const Header = lazy(() => import("@/components/Header"));
@@ -45,18 +46,20 @@ export default function ClientLayout({
       enableSystem={false}
       disableTransitionOnChange
     >
-      <QueryClientProvider client={queryClient}>
-        <Suspense fallback={<HeaderFallback />}>
-          <Header />
-        </Suspense>
+      <DataStreamProvider>
+        <QueryClientProvider client={queryClient}>
+          <Suspense fallback={<HeaderFallback />}>
+            <Header />
+          </Suspense>
 
-        {/* 主内容区域 - 添加底部安全区域 */}
-        <main className="pb-mobile-safe">{children}</main>
+          {/* 主内容区域 - 添加底部安全区域 */}
+          <main className="pb-mobile-safe">{children}</main>
 
-        <Suspense fallback={<div className="h-16" />}>
-          <MobileNavigationBar />
-        </Suspense>
-      </QueryClientProvider>
+          <Suspense fallback={<div className="h-16" />}>
+            <MobileNavigationBar />
+          </Suspense>
+        </QueryClientProvider>
+      </DataStreamProvider>
     </ThemeProvider>
   );
 }

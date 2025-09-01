@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useRef, KeyboardEvent } from "react";
-import { Send, Paperclip } from "lucide-react";
+import {
+  Send,
+  Paperclip,
+  TestTube,
+  Palette,
+  RotateCcw,
+  Settings,
+  Mic,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import ImageUpload from "./ImageUpload";
@@ -12,12 +20,18 @@ interface ChatInputProps {
   sendMessage: UseChatHelpers<ChatMessage>["sendMessage"];
   disabled?: boolean;
   placeholder?: string;
+  isLoading?: boolean;
+  onToggleTestComic?: () => void;
+  isTestComicVisible?: boolean;
 }
 
 export default function ChatInput({
   sendMessage,
   disabled = false,
   placeholder = "Type your message...",
+  isLoading = false,
+  onToggleTestComic,
+  isTestComicVisible = false,
 }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const [images, setImages] = useState<File[]>([]);
@@ -54,15 +68,6 @@ export default function ChatInput({
         });
       }
 
-      // await sendMessage({
-      //   role: "user",
-      //   text: content,
-      //   parts,
-      //   metadata: {
-      //     createdAt: new Date().toISOString(),
-      //   },
-      // });
-
       sendMessage({
         role: "user",
         parts: [
@@ -94,6 +99,7 @@ export default function ChatInput({
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    // 支持 Shift+Enter 换行，Enter 发送
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -104,16 +110,17 @@ export default function ChatInput({
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = "auto";
-      const maxHeight = 120; // max-height equivalent
-      textarea.style.height = `${Math.min(textarea.scrollHeight, maxHeight)}px`;
+      const maxHeight = 200; // 增加最大高度以支持更多行
+      const newHeight = Math.min(textarea.scrollHeight, maxHeight);
+      textarea.style.height = `${newHeight}px`;
     }
   };
 
   return (
-    <div className="border-t border-border bg-card/50 backdrop-blur-sm">
+    <div className="p-6">
       {/* Image Upload Section */}
       {showImageUpload && (
-        <div className="p-4 border-b border-border">
+        <div className="mb-4 p-4 rounded-lg border border-foreground/20 bg-background/50 backdrop-blur-sm">
           <ImageUpload
             onImagesChange={setImages}
             maxImages={4}
@@ -122,30 +129,16 @@ export default function ChatInput({
         </div>
       )}
 
-      {/* Input Area */}
-      <div className="p-4">
-        <div
-          className={cn(
-            "flex items-center gap-3 rounded-lg border border-border bg-background p-3 transition-all duration-200",
-            "focus-within:border-primary focus-within:ring-1 focus-within:ring-primary/20"
-          )}
-        >
-          {/* Attachment Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="flex-shrink-0 h-8 w-8"
-            onClick={() => setShowImageUpload(!showImageUpload)}
-            disabled={disabled}
-          >
-            <Paperclip
-              className={cn(
-                "w-4 h-4 transition-colors",
-                showImageUpload ? "text-primary" : "text-muted-foreground"
-              )}
-            />
-          </Button>
-
+      {/* Main Input Container - 上下布局 */}
+      <div
+        className={cn(
+          "rounded-2xl border-2 border-foreground/30 bg-background/50 backdrop-blur-sm transition-all duration-200",
+          "focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20",
+          "shadow-lg"
+        )}
+      >
+        {/* Input Row - 下方 */}
+        <div className="flex items-end gap-3 p-4">
           {/* Text Input */}
           <textarea
             ref={textareaRef}
@@ -158,8 +151,8 @@ export default function ChatInput({
             placeholder={placeholder}
             disabled={disabled}
             className={cn(
-              "flex-1 resize-none border-0 bg-transparent text-sm placeholder:text-muted-foreground",
-              "focus:outline-none focus:ring-0 min-h-[20px] max-h-[120px]",
+              "flex-1 resize-none border-0 bg-transparent text-sm placeholder:text-muted-foreground/70",
+              "focus:outline-none focus:ring-0 min-h-[24px] max-h-[200px] leading-6",
               disabled && "opacity-50 cursor-not-allowed"
             )}
             rows={1}
@@ -168,7 +161,7 @@ export default function ChatInput({
           {/* Send Button */}
           <Button
             size="icon"
-            className="flex-shrink-0 h-8 w-8"
+            className="h-9 w-9 flex-shrink-0"
             onClick={handleSend}
             disabled={disabled || (!message.trim() && images.length === 0)}
           >
@@ -176,12 +169,100 @@ export default function ChatInput({
           </Button>
         </div>
 
-        {/* Status indicators */}
-        {images.length > 0 && (
-          <div className="mt-2 text-xs text-muted-foreground">
-            {images.length} image{images.length !== 1 ? "s" : ""} attached
+        {/* Action Buttons Row - 上方 */}
+        <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-foreground/10">
+          {/* Left Action Buttons */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hover:bg-accent/50"
+              onClick={() => setShowImageUpload(!showImageUpload)}
+              disabled={disabled}
+              title="上传图片"
+            >
+              <Paperclip
+                className={cn(
+                  "w-4 h-4 transition-colors",
+                  showImageUpload ? "text-primary" : "text-muted-foreground"
+                )}
+              />
+            </Button>
+
+            {onToggleTestComic && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 hover:bg-accent/50"
+                onClick={onToggleTestComic}
+                title={isTestComicVisible ? "隐藏测试漫画" : "显示测试漫画"}
+              >
+                <TestTube
+                  className={cn(
+                    "w-4 h-4 transition-colors",
+                    isTestComicVisible
+                      ? "text-primary"
+                      : "text-muted-foreground"
+                  )}
+                />
+              </Button>
+            )}
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hover:bg-accent/50"
+              title="样式设置"
+            >
+              <Palette className="w-4 h-4 text-muted-foreground" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hover:bg-accent/50"
+              title="语音输入"
+            >
+              <Mic className="w-4 h-4 text-muted-foreground" />
+            </Button>
           </div>
-        )}
+
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hover:bg-accent/50"
+              onClick={() => window.location.reload()}
+              disabled={isLoading}
+              title="重置对话"
+            >
+              <RotateCcw className="w-4 h-4 text-muted-foreground" />
+            </Button>
+
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hover:bg-accent/50"
+              title="设置"
+            >
+              <Settings className="w-4 h-4 text-muted-foreground" />
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Status indicators */}
+      <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground/80">
+        <div className="flex items-center gap-4">
+          {images.length > 0 && (
+            <span>
+              {images.length} image{images.length !== 1 ? "s" : ""} attached
+            </span>
+          )}
+          <span className="text-xs">Shift+Enter 换行，Enter 发送</span>
+        </div>
+        <div>{isLoading ? "AI正在思考..." : "准备就绪"}</div>
       </div>
     </div>
   );

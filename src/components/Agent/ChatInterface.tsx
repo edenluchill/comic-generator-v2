@@ -2,9 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { useChat } from "@ai-sdk/react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { RotateCcw, Settings, TestTube } from "lucide-react";
 import { Messages } from "./Messages";
 import ChatInput from "./ChatInput";
 import ComicArtifact from "./ComicArtifact";
@@ -19,10 +16,7 @@ import { DefaultChatTransport } from "ai";
 import { fetchWithErrorHandlers } from "@/lib/message-util";
 import { useDataStream } from "../providers/data-stream-provider";
 
-export default function ChatInterface({
-  title = "AI Chat Assistant",
-  className,
-}: ChatInterfaceProps) {
+export default function ChatInterface({ className }: ChatInterfaceProps) {
   const { setDataStream } = useDataStream();
   const { messages, sendMessage, status } = useChat<ChatMessage>({
     transport: new DefaultChatTransport({
@@ -54,7 +48,6 @@ export default function ChatInterface({
 
   const handleCloseArtifact = () => {
     setIsArtifactVisible(false);
-    // 不需要延迟清除artifact，让AnimatePresence处理退出动画
   };
 
   // 当动画完成后清除artifact
@@ -171,45 +164,9 @@ export default function ChatInterface({
         }}
         layout
       >
-        <Card className={`flex flex-col h-full w-full ${className}`}>
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-border bg-muted/20">
-            <div>
-              <h2 className="font-semibold text-lg">{title}</h2>
-              <p className="text-sm text-muted-foreground">
-                {isLoading ? "AI is thinking..." : "Ready to chat"}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {/* 测试按钮 */}
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleToggleTestComic}
-                className="h-8 w-8"
-                title={isArtifactVisible ? "隐藏测试漫画" : "显示测试漫画"}
-              >
-                <TestTube className="w-4 h-4" />
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => window.location.reload()}
-                disabled={isLoading}
-                className="h-8 w-8"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </Button>
-
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Settings className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Messages */}
+        {/* 去掉Card包装，直接使用透明背景 */}
+        <div className={`flex flex-col h-full w-full ${className}`}>
+          {/* Messages - 透明背景 */}
           <div className="flex-1 min-h-0">
             <Messages
               messages={messages as ChatMessageType[]}
@@ -218,15 +175,18 @@ export default function ChatInterface({
             />
           </div>
 
-          {/* Input */}
-          <div className="sticky bottom-0">
+          {/* Input区域 - 包含所有action buttons */}
+          <div className="flex-shrink-0">
             <ChatInput
               sendMessage={sendMessage}
               disabled={isLoading}
-              placeholder="Ask me anything..."
+              placeholder="Ask me anything about comic creation..."
+              isLoading={isLoading}
+              onToggleTestComic={handleToggleTestComic}
+              isTestComicVisible={isArtifactVisible}
             />
           </div>
-        </Card>
+        </div>
       </motion.div>
 
       {/* 漫画展示区域 */}

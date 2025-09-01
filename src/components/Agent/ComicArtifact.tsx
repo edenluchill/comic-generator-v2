@@ -65,7 +65,7 @@ export default function ComicArtifact({
   if (isSidePanel) {
     return (
       <div className={`h-full ${className}`}>
-        <Card className="h-full flex flex-col bg-background border-l">
+        <Card className="h-full pt-0 pb-6 flex flex-col bg-background border-l">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-border">
             <div className="flex-1 min-w-0">

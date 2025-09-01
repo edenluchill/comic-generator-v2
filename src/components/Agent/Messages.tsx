@@ -27,8 +27,8 @@ export function Messages({ messages, status, onShowArtifact }: MessagesProps) {
   }, [messages]);
 
   return (
-    <div className="flex-1 h-full overflow-y-auto p-4 space-y-4 overflow-y-auto">
-      <Conversation className="flex flex-col min-w-0 gap-6 pt-4 pb-32">
+    <div className="flex-1 h-full overflow-y-auto space-y-4">
+      <Conversation className="flex flex-col min-w-0 gap-6 pt-4 pb-32 px-6">
         <ConversationContent className="flex flex-col gap-6 overflow-y-auto">
           <AnimatePresence initial={false}>
             {messages.map((message, index) => (
@@ -59,7 +59,7 @@ export function Messages({ messages, status, onShowArtifact }: MessagesProps) {
       </Conversation>
 
       {status === "streaming" && messages.length === 0 && (
-        <div className="flex items-center justify-center py-8">
+        <div className="flex items-center justify-center py-8 px-6">
           <div className="flex items-center gap-2 text-muted-foreground">
             <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.3s]"></div>
             <div className="w-2 h-2 bg-current rounded-full animate-bounce [animation-delay:-0.15s]"></div>

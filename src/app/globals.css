@@ -692,3 +692,142 @@
 .warm .animate-warm-glow {
   animation: warm-glow 3s ease-in-out infinite;
 }
+
+/* ========== 自定义滚动条样式 ========== */
+/* 粉色主题（默认）滚动条 */
+:root ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+:root ::-webkit-scrollbar-track {
+  background: oklch(0.96 0.03 340 / 0.3);
+  border-radius: 3px;
+}
+
+:root ::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    135deg,
+    oklch(0.75 0.12 340) 0%,
+    oklch(0.7 0.15 320) 100%
+  );
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+:root ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    135deg,
+    oklch(0.65 0.15 340) 0%,
+    oklch(0.6 0.18 320) 100%
+  );
+}
+
+:root ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* 暗色主题滚动条 */
+.dark ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: oklch(0.15 0.02 340 / 0.3);
+  border-radius: 3px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    135deg,
+    oklch(0.4 0.1 340) 0%,
+    oklch(0.45 0.12 320) 100%
+  );
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    135deg,
+    oklch(0.5 0.12 340) 0%,
+    oklch(0.55 0.15 320) 100%
+  );
+}
+
+/* 温暖主题滚动条 */
+.warm ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.warm ::-webkit-scrollbar-track {
+  background: oklch(0.95 0.03 45 / 0.3);
+  border-radius: 3px;
+}
+
+.warm ::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    135deg,
+    oklch(0.7 0.15 45) 0%,
+    oklch(0.65 0.18 60) 100%
+  );
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.warm ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    135deg,
+    oklch(0.6 0.18 45) 0%,
+    oklch(0.55 0.22 60) 100%
+  );
+}
+
+/* AI主题滚动条 */
+.ai ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.ai ::-webkit-scrollbar-track {
+  background: oklch(0.94 0.03 250 / 0.3);
+  border-radius: 3px;
+}
+
+.ai ::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    135deg,
+    oklch(0.6 0.18 250) 0%,
+    oklch(0.65 0.15 270) 100%
+  );
+  border-radius: 3px;
+  transition: all 0.2s ease;
+}
+
+.ai ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    135deg,
+    oklch(0.55 0.22 250) 0%,
+    oklch(0.6 0.18 270) 100%
+  );
+}
+
+/* Firefox滚动条样式 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: oklch(0.7 0.15 340) oklch(0.96 0.03 340 / 0.3);
+}
+
+.dark * {
+  scrollbar-color: oklch(0.45 0.12 340) oklch(0.15 0.02 340 / 0.3);
+}
+
+.warm * {
+  scrollbar-color: oklch(0.65 0.18 45) oklch(0.95 0.03 45 / 0.3);
+}
+
+.ai * {
+  scrollbar-color: oklch(0.65 0.15 250) oklch(0.94 0.03 250 / 0.3);
+}

@@ -165,9 +165,11 @@ export default function ChatInterface({ className }: ChatInterfaceProps) {
         layout
       >
         {/* 去掉Card包装，直接使用透明背景 */}
-        <div className={`flex flex-col h-full w-full ${className}`}>
+        <div
+          className={`grid grid-rows-[1fr_auto] h-full w-full gap-0 ${className}`}
+        >
           {/* Messages - 透明背景 */}
-          <div className="flex-1 min-h-0">
+          <div className="min-h-0 overflow-hidden">
             <Messages
               messages={messages as ChatMessageType[]}
               status={status}

@@ -137,7 +137,7 @@ export default function ChatInput({
           "shadow-lg"
         )}
       >
-        {/* Input Row - 下方 */}
+        {/* Input Row */}
         <div className="flex items-end gap-3 p-4">
           {/* Text Input */}
           <textarea
@@ -169,8 +169,8 @@ export default function ChatInput({
           </Button>
         </div>
 
-        {/* Action Buttons Row - 上方 */}
-        <div className="flex items-center justify-between px-4 pt-3 pb-2 border-b border-foreground/10">
+        {/* Action Buttons Row */}
+        <div className="flex items-center justify-between px-4 pt-3 pb-2">
           {/* Left Action Buttons */}
           <div className="flex items-center gap-1">
             <Button
@@ -250,19 +250,6 @@ export default function ChatInput({
             </Button>
           </div>
         </div>
-      </div>
-
-      {/* Status indicators */}
-      <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground/80">
-        <div className="flex items-center gap-4">
-          {images.length > 0 && (
-            <span>
-              {images.length} image{images.length !== 1 ? "s" : ""} attached
-            </span>
-          )}
-          <span className="text-xs">Shift+Enter 换行，Enter 发送</span>
-        </div>
-        <div>{isLoading ? "AI正在思考..." : "准备就绪"}</div>
       </div>
     </div>
   );

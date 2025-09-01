@@ -8,7 +8,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Maximize2,
-  MessageSquare,
+  ArrowLeft,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -61,49 +61,46 @@ export default function ComicArtifact({
 
   if (!isVisible || scenes.length === 0) return null;
 
-  // 侧边面板模式 - 移除内部动画，由父组件处理
+  // 侧边面板模式 - 移动端优化
   if (isSidePanel) {
     return (
       <div className={`h-full ${className}`}>
-        <Card className="h-full pt-0 pb-6 flex flex-col bg-background border-l">
-          {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-border">
-            <div className="flex-1 min-w-0">
-              <h2 className="font-semibold text-lg truncate">{title}</h2>
-              <p className="text-sm text-muted-foreground">
-                场景 {currentSceneIndex + 1} / {totalScenes}
-              </p>
-            </div>
-
-            <div className="flex items-center gap-2 flex-shrink-0">
-              {/* 只在仅显示漫画模式时显示返回聊天按钮 */}
+        <Card className="h-full flex flex-col bg-background border-l md:border-l-0">
+          {/* 移动端优化的Header */}
+          <div className="flex items-center justify-between p-3 md:p-4 border-b border-border bg-background/95 backdrop-blur-sm sticky top-0 z-10">
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              {/* 移动端返回按钮 */}
               {showOnlyArtifact && (
                 <Button
                   variant="ghost"
-                  size="icon"
+                  size="sm"
                   onClick={onClose}
-                  className="h-8 w-8"
-                  title="返回聊天"
+                  className="flex items-center gap-2 px-3 py-2 h-auto bg-primary/10 hover:bg-primary/20 text-primary"
                 >
-                  <MessageSquare className="w-4 h-4" />
+                  <ArrowLeft className="w-4 h-4" />
+                  <span className="text-sm font-medium">返回</span>
                 </Button>
               )}
 
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsFullscreen(!isFullscreen)}
-                className="h-8 w-8"
-              >
-                <Maximize2 className="w-4 h-4" />
-              </Button>
+              <div className="flex-1 min-w-0">
+                <h2 className="font-semibold text-base md:text-lg truncate">
+                  {title}
+                </h2>
+                <p className="text-xs md:text-sm text-muted-foreground">
+                  场景 {currentSceneIndex + 1} / {totalScenes}
+                </p>
+              </div>
+            </div>
 
+            {/* 操作按钮 */}
+            <div className="flex items-center gap-1 flex-shrink-0">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleDownload}
-                className="h-8 w-8"
+                className="h-8 w-8 md:h-9 md:w-9 hover:bg-accent"
                 disabled={!currentScene?.image_url}
+                title="下载图片"
               >
                 <Download className="w-4 h-4" />
               </Button>
@@ -113,7 +110,8 @@ export default function ComicArtifact({
                   variant="ghost"
                   size="icon"
                   onClick={onClose}
-                  className="h-8 w-8"
+                  className="h-8 w-8 md:h-9 md:w-9 hover:bg-accent"
+                  title="关闭"
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -123,8 +121,8 @@ export default function ComicArtifact({
 
           {/* Content */}
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Main Comic Display */}
-            <div className="flex-1 flex items-center justify-center p-4 relative min-h-0">
+            {/* Main Comic Display - 优化移动端显示 */}
+            <div className="flex-1 flex items-center justify-center p-2 md:p-4 relative min-h-0 bg-muted/20">
               {currentScene?.image_url ? (
                 <div className="relative w-full h-full flex items-center justify-center">
                   <Image
@@ -140,66 +138,72 @@ export default function ComicArtifact({
                       width: "auto",
                       height: "auto",
                     }}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   />
                 </div>
               ) : (
-                <div className="w-full h-64 bg-muted rounded-lg flex items-center justify-center">
-                  <p className="text-muted-foreground">场景生成中...</p>
+                <div className="w-full h-40 md:h-64 bg-muted rounded-lg flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="animate-spin w-6 h-6 border-2 border-primary border-t-transparent rounded-full mx-auto mb-2"></div>
+                    <p className="text-sm text-muted-foreground">
+                      场景生成中...
+                    </p>
+                  </div>
                 </div>
               )}
 
-              {/* Navigation Arrows */}
+              {/* Navigation Arrows - 移动端优化 */}
               {totalScenes > 1 && (
                 <>
                   <Button
-                    variant="ghost"
+                    variant="secondary"
                     size="icon"
                     onClick={handlePrevScene}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-background/80 backdrop-blur-sm hover:bg-background/90"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 h-8 w-8 md:h-10 md:w-10 bg-background/90 backdrop-blur-sm hover:bg-background shadow-lg border"
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    <ChevronLeft className="w-4 h-4 md:w-5 md:h-5" />
                   </Button>
 
                   <Button
-                    variant="ghost"
+                    variant="secondary"
                     size="icon"
                     onClick={handleNextScene}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-background/80 backdrop-blur-sm hover:bg-background/90"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 md:h-10 md:w-10 bg-background/90 backdrop-blur-sm hover:bg-background shadow-lg border"
                   >
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5" />
                   </Button>
                 </>
               )}
             </div>
 
-            {/* Scene Info */}
-            <div className="p-4 border-t border-border bg-muted/20">
+            {/* Scene Info - 移动端优化 */}
+            <div className="p-3 md:p-4 border-t border-border bg-background/50">
               <div className="space-y-2">
                 {currentScene?.scenario_description && (
-                  <p className="text-sm text-foreground">
-                    <span className="font-medium">场景描述：</span>
+                  <p className="text-xs md:text-sm text-foreground leading-relaxed">
+                    <span className="font-medium text-primary">场景：</span>
                     {currentScene.scenario_description}
                   </p>
                 )}
                 {currentScene?.quote && (
-                  <p className="text-sm text-muted-foreground italic">
+                  <p className="text-xs md:text-sm text-muted-foreground italic bg-accent/30 rounded-md p-2 border-l-2 border-primary/30">
                     &quot;{currentScene.quote}&quot;
                   </p>
                 )}
               </div>
             </div>
 
-            {/* Scene Thumbnails */}
+            {/* Scene Thumbnails - 移动端优化 */}
             {totalScenes > 1 && (
-              <div className="p-4 border-t border-border">
-                <div className="flex gap-2 overflow-x-auto">
+              <div className="p-3 md:p-4 border-t border-border bg-background">
+                <div className="flex gap-2 overflow-x-auto pb-2">
                   {scenes.map((scene, index) => (
                     <button
                       key={scene.id}
                       onClick={() => setCurrentSceneIndex(index)}
-                      className={`flex-shrink-0 w-16 h-12 rounded border-2 transition-all ${
+                      className={`flex-shrink-0 w-12 h-9 md:w-16 md:h-12 rounded border-2 transition-all ${
                         index === currentSceneIndex
-                          ? "border-primary"
+                          ? "border-primary ring-2 ring-primary/20"
                           : "border-border hover:border-primary/50"
                       }`}
                     >
@@ -213,7 +217,7 @@ export default function ComicArtifact({
                         />
                       ) : (
                         <div className="w-full h-full bg-muted rounded flex items-center justify-center">
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-muted-foreground font-medium">
                             {index + 1}
                           </span>
                         </div>

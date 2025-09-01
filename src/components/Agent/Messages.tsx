@@ -27,7 +27,7 @@ export function Messages({ messages, status, onShowArtifact }: MessagesProps) {
   }, [messages]);
 
   return (
-    <div className="flex-1 h-full overflow-y-auto space-y-4">
+    <div className="flex-1 h-full overflow-y-auto space-y-4 custom-scrollbar">
       <Conversation className="flex flex-col min-w-0 gap-6 pt-4 pb-32 px-6">
         <ConversationContent className="flex flex-col gap-6 overflow-y-auto">
           <AnimatePresence initial={false}>

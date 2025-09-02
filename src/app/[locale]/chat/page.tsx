@@ -23,7 +23,7 @@ export default function ChatPage() {
   // 避免hydration mismatch
   if (!mounted) {
     return (
-      <div className="h-[calc(100vh-theme(spacing.16))] w-full bg-theme-gradient overflow-hidden">
+      <div className="h-full w-full bg-theme-gradient overflow-hidden">
         <div className="h-full w-full flex items-center justify-center">
           <div className="animate-pulse text-muted-foreground">Loading...</div>
         </div>
@@ -32,7 +32,7 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-theme(spacing.16))] w-full bg-theme-gradient overflow-hidden">
+    <div className="h-full w-full bg-theme-gradient overflow-hidden">
       <div className="h-full w-full grid grid-rows-[1fr] p-4 md:p-8">
         {isMobile ? (
           <MobileChatInterface className="min-h-0 overflow-hidden" />

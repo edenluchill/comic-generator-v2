@@ -117,7 +117,7 @@ export default function ChatInput({
   };
 
   return (
-    <div className="p-6">
+    <div>
       {/* Image Upload Section */}
       {showImageUpload && (
         <div className="mb-4 p-4 rounded-lg border border-foreground/20 bg-background/50 backdrop-blur-sm">

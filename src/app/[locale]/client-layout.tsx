@@ -52,8 +52,8 @@ export default function ClientLayout({
             <Header />
           </Suspense>
 
-          {/* 主内容区域 - 添加底部安全区域 */}
-          <main className="pb-mobile-safe">{children}</main>
+          {/* 主内容区域 - 使用全屏安全高度 */}
+          <main className="h-screen-safe">{children}</main>
 
           <Suspense fallback={<div className="h-16" />}>
             <MobileNavigationBar />

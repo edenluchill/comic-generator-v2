@@ -113,7 +113,7 @@ const PureChatMessage = ({
     <AnimatePresence>
       <motion.div
         data-testid={`message-${role}`}
-        className="px-4 mx-auto w-full max-w-4xl group/message"
+        className="mx-auto w-full max-w-4xl group/message"
         initial={{ y: 5, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         data-role={role}
@@ -240,7 +240,7 @@ export const ThinkingMessage = () => {
   return (
     <motion.div
       data-testid="message-assistant-loading"
-      className="px-4 mx-auto w-full max-w-4xl group/message"
+      className="mx-auto w-full max-w-4xl group/message"
       initial={{ y: 5, opacity: 0 }}
       animate={{ y: 0, opacity: 1, transition: { delay: 0.5 } }}
       data-role="assistant"

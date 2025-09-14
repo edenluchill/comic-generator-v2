@@ -74,23 +74,53 @@ const PureChatMessage = ({
   };
 
   const content = getTextContent(message);
-  console.log("getTextContent: ", content);
   const attachments = getFileAttachments(message);
   const { role } = message;
 
   const renderArtifacts = () => {
-    // 检查 message 是否有 artifacts 属性
+    let artifacts: ArtifactType[] = [];
+
+    // 首先检查 message 是否有 artifacts 属性
     if (
-      !("artifacts" in message) ||
-      !message.artifacts ||
-      message.artifacts.length === 0
+      "artifacts" in message &&
+      message.artifacts &&
+      message.artifacts.length > 0
     ) {
+      artifacts = [...message.artifacts];
+    }
+
+    // 检查工具调用结果中是否有漫画数据
+    const messageWithTools = message as ChatMessage & {
+      toolInvocations?: Array<{
+        toolName: string;
+        state: string;
+        result?: {
+          comic?: ArtifactType;
+          message: string;
+          status: string;
+        };
+      }>;
+    };
+
+    if (message.role === "assistant" && messageWithTools.toolInvocations) {
+      for (const toolInvocation of messageWithTools.toolInvocations) {
+        if (
+          toolInvocation.toolName === "generateComic" &&
+          toolInvocation.state === "result" &&
+          toolInvocation.result?.comic
+        ) {
+          artifacts.push(toolInvocation.result.comic);
+        }
+      }
+    }
+
+    if (artifacts.length === 0) {
       return null;
     }
 
     return (
       <div className="mt-4 space-y-2">
-        {message.artifacts.map((artifact: ArtifactType, index: number) => (
+        {artifacts.map((artifact: ArtifactType, index: number) => (
           <div key={index}>
             {artifact.type === "comic" && (
               <Button

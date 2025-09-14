@@ -5,6 +5,7 @@
   },
   "Navigation": {
     "home": "환영",
+    "chat": "채팅",
     "workshop": "이야기",
     "language": "언어",
     "account": "계정"

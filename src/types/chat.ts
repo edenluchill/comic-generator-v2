@@ -2,6 +2,7 @@ import { z } from "zod";
 import { ComicScene } from "./diary";
 import { InferUITool, UIMessage } from "ai";
 import { getWeather } from "@/lib/ai/tools/get-weather";
+import { createComicGenerationTool } from "@/lib/ai/tools/generate-comic";
 
 export type DataPart = { type: "append-message"; message: string };
 
@@ -38,16 +39,17 @@ export interface ReasoningPart {
 export type MessagePart = TextPart | FilePart | ImagePart | ReasoningPart;
 
 type weatherTool = InferUITool<typeof getWeather>;
+type comicGenerationTool = InferUITool<
+  ReturnType<typeof createComicGenerationTool>
+>;
 
 export type ChatTools = {
   getWeather: weatherTool;
+  generateComic: comicGenerationTool;
 };
 
 export type CustomUIDataTypes = {
-  textDelta: string;
   imageDelta: string;
-  sheetDelta: string;
-  codeDelta: string;
   suggestion: unknown;
   appendMessage: string;
   id: string;
@@ -55,6 +57,39 @@ export type CustomUIDataTypes = {
   kind: string;
   clear: null;
   finish: null;
+  // 漫画生成相关事件 - 使用实际的事件名称
+  "event-comic-start": {
+    message: string;
+  };
+  "event-comic-progress": {
+    type: string;
+    step?: string;
+    message: string;
+    progress: number;
+    currentScene?: number;
+    totalScenes?: number;
+  };
+  "event-comic-created": {
+    comic: ComicArtifact;
+  };
+  "event-scene-created": {
+    scene: ComicScene;
+  };
+  "event-scene-updated": {
+    scene: ComicScene;
+  };
+  "event-scene-image-generated": {
+    sceneId: string;
+    imageUrl: string;
+  };
+  "event-comic-finish": {
+    comic: ComicArtifact;
+    scenes: ComicScene[];
+    result: unknown;
+  };
+  "event-comic-error": {
+    error: string;
+  };
 };
 
 // 基础 ChatMessage 类型来自 AI SDK

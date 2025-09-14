@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
     // 启用并行路由处理
     parallelServerBuildTraces: true,
     webpackBuildWorker: true,
+    // 启用更快的页面切换
+    scrollRestoration: true,
+    // 启用预渲染优化
+    ppr: false, // 部分预渲染
   },
 
   // 保留单一的turbopack配置

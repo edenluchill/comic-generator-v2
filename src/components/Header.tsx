@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/hooks/useTranslations";
-import { Home, Pencil, Palette } from "lucide-react";
+import { Home, Pencil, Palette, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocalizedNavigation } from "@/hooks/useLocalizedNavigation";
 import { lazy, memo } from "react";
@@ -51,53 +51,73 @@ const Header = memo(function Header() {
             </div>
           </Link>
 
+          {/* 中央导航区域 */}
+          <nav className="hidden md:flex items-center gap-1 backdrop-blur-sm rounded-lg p-1 border border-border shadow-sm">
+            <Link href={getLocalizedHref("/")}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-8 px-3 transition-all duration-200",
+                  "flex items-center gap-0.5",
+                  "text-sm font-medium",
+                  "hover:bg-primary/10 hover:text-primary",
+                  isActive("/")
+                    ? "bg-primary/15 text-primary shadow-sm border-primary/30 hover:bg-primary/15 hover:text-primary"
+                    : "text-muted-foreground",
+                  "rounded-md border border-transparent"
+                )}
+              >
+                <Home className="w-4 h-4" />
+                <span>{t("home")}</span>
+              </Button>
+            </Link>
+
+            <Link href={getLocalizedHref("/chat")}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-8 px-3 transition-all duration-200",
+                  "flex items-center gap-0.5",
+                  "text-sm font-medium",
+                  "hover:bg-primary/10 hover:text-primary",
+                  isActive("/chat")
+                    ? "bg-primary/15 text-primary shadow-sm border-primary/30 hover:bg-primary/15 hover:text-primary"
+                    : "text-muted-foreground",
+                  "rounded-md border border-transparent"
+                )}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>{t("chat")}</span>
+              </Button>
+            </Link>
+
+            <Link href={getLocalizedHref("/workshop")}>
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  "h-8 px-3 transition-all duration-200",
+                  "flex items-center gap-0.5",
+                  "text-sm font-medium",
+                  "hover:bg-primary/10 hover:text-primary",
+                  isActive("/workshop")
+                    ? "bg-primary/15 text-primary shadow-sm border-primary/30 hover:bg-primary/15 hover:text-primary"
+                    : "text-muted-foreground",
+                  "rounded-md border border-transparent"
+                )}
+              >
+                <Pencil className="w-4 h-4" />
+                <span>{t("workshop")}</span>
+              </Button>
+            </Link>
+          </nav>
+
           {/* 右侧功能区 */}
           <div className="flex items-center gap-1">
             {/* Premium 升级按钮 */}
             <PremiumButton />
-
-            {/* 桌面端导航链接 - 独立分组 */}
-            <nav className="hidden md:flex items-center gap-1 backdrop-blur-sm rounded-lg p-1 border border-border shadow-sm">
-              <Link href={getLocalizedHref("/")}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "h-8 px-3 transition-all duration-200",
-                    "flex items-center gap-0.5",
-                    "text-sm font-medium",
-                    "hover:bg-primary/10 hover:text-primary",
-                    isActive("/")
-                      ? "bg-primary/15 text-primary shadow-sm border-primary/30 hover:bg-primary/15 hover:text-primary"
-                      : "text-muted-foreground",
-                    "rounded-md border border-transparent"
-                  )}
-                >
-                  <Home className="w-4 h-4" />
-                  <span>{t("home")}</span>
-                </Button>
-              </Link>
-
-              <Link href={getLocalizedHref("/workshop")}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "h-8 px-3 transition-all duration-200",
-                    "flex items-center gap-0.5",
-                    "text-sm font-medium",
-                    "hover:bg-primary/10 hover:text-primary",
-                    isActive("/workshop")
-                      ? "bg-primary/15 text-primary shadow-sm border-primary/30 hover:bg-primary/15 hover:text-primary"
-                      : "text-muted-foreground",
-                    "rounded-md border border-transparent"
-                  )}
-                >
-                  <Pencil className="w-4 h-4" />
-                  <span>{t("workshop")}</span>
-                </Button>
-              </Link>
-            </nav>
 
             {/* 功能按钮组 */}
             <div className="flex items-center gap-1.5">

@@ -5,6 +5,7 @@
   },
   "Navigation": {
     "home": "Welcome",
+    "chat": "Chat",
     "workshop": "Story",
     "language": "Language",
     "account": "Account"

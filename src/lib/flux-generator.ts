@@ -115,7 +115,7 @@ export class FluxCharacterGenerator {
             "x-key": this.apiKey,
             "Content-Type": "application/json",
           },
-          timeout: 60000,
+          timeout: 180000,
         }
       );
 
@@ -185,7 +185,7 @@ export class FluxCharacterGenerator {
             "x-key": this.apiKey,
             "Content-Type": "application/json",
           },
-          timeout: 60000, // 增加到60秒以适应复杂漫画场景
+          timeout: 180000, // 增加到60秒以适应复杂漫画场景
         }
       );
 

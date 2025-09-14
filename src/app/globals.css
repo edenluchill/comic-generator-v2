@@ -1,6 +1,35 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* 性能优化 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 优化链接预加载 */
+a {
+  @apply transition-colors duration-200;
+}
+
+/* 优化图片加载 */
+img {
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* 页面切换优化 */
+main {
+  contain: layout style paint;
+}
+
+/* 动画性能优化 */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
 @custom-variant dark (&:is(.dark *));
 @custom-variant warm (&:is(.warm *));
 @custom-variant ai (&:is(.ai *));

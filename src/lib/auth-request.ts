@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase/client";
  * @returns Promise<Response>
  */
 export async function makeAuthenticatedRequest(
-  url: string,
+  input: RequestInfo | URL,
   options: RequestInit = {}
 ): Promise<Response> {
   const {
@@ -27,7 +27,7 @@ export async function makeAuthenticatedRequest(
     ...options.headers,
   };
 
-  return fetch(url, {
+  return fetch(input, {
     ...options,
     headers,
   });

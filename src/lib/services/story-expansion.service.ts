@@ -14,19 +14,25 @@ export interface StoryExpansionOptions {
   temperature?: number;
 }
 
+export interface Character {
+  name: string;
+  description: string;
+  selectionDescription: string;
+}
+
 export interface SceneDescription {
   title: string;
   description: string;
-  mood: string;
   quote: string;
   visualElements: string;
+  characters: string[];
 }
 
 export interface FivePageStoryResult {
   title: string;
   scenes: SceneDescription[];
-  overallMood: string;
-  theme: string;
+  artStyle: string;
+  allCharacters: Character[];
 }
 
 export class StoryExpansionService {
@@ -55,9 +61,8 @@ Each page should follow a classic story structure:
 For each scene, provide:
 1. A compelling title
 2. Detailed visual description suitable for AI image generation
-3. The emotional mood/atmosphere
-4. A memorable quote or dialogue
-5. Key visual elements that make the scene vivid
+3. A memorable quote or dialogue
+4. Key visual elements that make the scene vivid
 
 Style preference: ${style}`,
         },
@@ -72,7 +77,7 @@ Style preference: ${style}`,
           function: {
             name: "expand_story_to_five_pages",
             description:
-              "Expand a story into exactly 5 comic pages with detailed scene descriptions",
+              "Expand a story into exactly 5 comic pages with detailed scene descriptions in English",
             parameters: {
               type: "object",
               properties: {
@@ -80,13 +85,33 @@ Style preference: ${style}`,
                   type: "string",
                   description: "Overall title for the 5-page comic story",
                 },
-                overallMood: {
+                artStyle: {
                   type: "string",
-                  description: "The overall emotional tone of the entire story",
+                  description: "The main art style of the story in English",
                 },
-                theme: {
-                  type: "string",
-                  description: "The main theme or message of the story",
+                allCharacters: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      name: {
+                        type: "string",
+                        description: "Character name",
+                      },
+                      description: {
+                        type: "string",
+                        description:
+                          "Detailed character description for image generation, including appearance, clothing, and personality traits",
+                      },
+                      selectionDescription: {
+                        type: "string",
+                        description:
+                          "Short description to distinguish this character from others, used for character selection",
+                      },
+                    },
+                    required: ["name", "description", "selectionDescription"],
+                  },
+                  description: "All characters that appear in the story",
                 },
                 scenes: {
                   type: "array",
@@ -102,11 +127,6 @@ Style preference: ${style}`,
                         description:
                           "Detailed English description suitable for AI image generation, including setting, characters, actions, and atmosphere",
                       },
-                      mood: {
-                        type: "string",
-                        description:
-                          "Specific mood/emotion for this scene (e.g., happy, tense, peaceful, exciting, melancholic)",
-                      },
                       quote: {
                         type: "string",
                         description:
@@ -117,13 +137,21 @@ Style preference: ${style}`,
                         description:
                           "Key visual elements, composition, lighting, and artistic details for this scene",
                       },
+                      characters: {
+                        type: "array",
+                        items: {
+                          type: "string",
+                        },
+                        description:
+                          "Array of character names that appear in this scene (subset of allCharacters)",
+                      },
                     },
                     required: [
                       "title",
                       "description",
-                      "mood",
                       "quote",
                       "visualElements",
+                      "characters",
                     ],
                   },
                   minItems: 5,
@@ -132,7 +160,7 @@ Style preference: ${style}`,
                     "Exactly 5 scenes representing the 5 pages of the comic",
                 },
               },
-              required: ["title", "overallMood", "theme", "scenes"],
+              required: ["title", "artStyle", "allCharacters", "scenes"],
             },
           },
         },
@@ -173,15 +201,31 @@ Style preference: ${style}`,
         throw new Error("故事扩展结果格式错误：必须包含恰好5个场景");
       }
 
+      if (!result.allCharacters || !Array.isArray(result.allCharacters)) {
+        throw new Error("故事扩展结果格式错误：必须包含角色列表");
+      }
+
+      // 验证每个角色的必需字段
+      for (let i = 0; i < result.allCharacters.length; i++) {
+        const character = result.allCharacters[i];
+        if (
+          !character.name ||
+          !character.description ||
+          !character.selectionDescription
+        ) {
+          throw new Error(`故事扩展结果格式错误：角色${i + 1}缺少必需字段`);
+        }
+      }
+
       // 验证每个场景的必需字段
       for (let i = 0; i < result.scenes.length; i++) {
         const scene = result.scenes[i];
         if (
           !scene.title ||
           !scene.description ||
-          !scene.mood ||
           !scene.quote ||
-          !scene.visualElements
+          !scene.visualElements ||
+          !Array.isArray(scene.characters)
         ) {
           throw new Error(`故事扩展结果格式错误：场景${i + 1}缺少必需字段`);
         }
@@ -189,21 +233,31 @@ Style preference: ${style}`,
 
       return {
         title: result.title,
-        overallMood: result.overallMood || "mixed",
-        theme: result.theme || "life story",
+        artStyle: result.artStyle || "life story",
+        allCharacters: result.allCharacters.map(
+          (character: {
+            name: string;
+            description: string;
+            selectionDescription: string;
+          }) => ({
+            name: character.name as string,
+            description: character.description as string,
+            selectionDescription: character.selectionDescription as string,
+          })
+        ),
         scenes: result.scenes.map(
           (scene: {
             title: string;
             description: string;
-            mood: string;
             quote: string;
             visualElements: string;
+            characters: string[];
           }) => ({
             title: scene.title as string,
             description: scene.description as string,
-            mood: scene.mood as string,
             quote: scene.quote as string,
             visualElements: scene.visualElements as string,
+            characters: scene.characters as string[],
           })
         ),
       };

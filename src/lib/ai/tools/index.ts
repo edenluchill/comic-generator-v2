@@ -1,2 +1,2 @@
 export { getWeather } from "./get-weather";
-export { generateComic, createComicGenerationTool } from "./generate-comic";
+export { createComicGenerationTool } from "./generate-comic";

@@ -1,14 +1,15 @@
 import { ComicScene } from "@/types/diary";
 import { storyExpansionService } from "./story-expansion.service";
 import { comicDatabaseService } from "./comic-database.service";
-import { sceneImageService } from "./scene-image.service";
 import { creditService } from "./credit.service";
-// import { CREDIT_COSTS } from "@/types/credits";
+import { geminiImageService } from "./gemini-image.service";
+import { UIDataTypes, UIMessagePart, UITools } from "ai";
 
 export interface FivePageComicOptions {
   userId: string;
   story: string;
-  style: string;
+  artStyle: string;
+  images?: UIMessagePart<UIDataTypes, UITools>[]; // 添加这行
   updateProgress?: (data: {
     type: string;
     message: string;
@@ -33,7 +34,7 @@ export class FivePageComicService {
   async generateFivePageComic(
     options: FivePageComicOptions
   ): Promise<FivePageComicResult> {
-    const { userId, story, style, updateProgress } = options;
+    const { userId, story, artStyle, images = [], updateProgress } = options; // Add inputImages here
 
     // Helper function to send progress updates
     const sendProgress = (data: {
@@ -48,9 +49,6 @@ export class FivePageComicService {
           type: "progress",
           ...data,
         });
-      } else {
-        // Fallback to original method
-        // StreamUtils.encodeProgress(encoder, controller, data);
       }
     };
 
@@ -64,17 +62,17 @@ export class FivePageComicService {
         progress: 2,
       });
 
-      const creditCheck = await creditService.checkCredits(
-        userId,
-        totalCreditCost
-      );
+      // const creditCheck = await creditService.checkCredits(
+      //   userId,
+      //   totalCreditCost
+      // );
 
-      if (!creditCheck.hasEnoughCredits) {
-        throw new Error(
-          creditCheck.message ||
-            `余额不足，需要 ${totalCreditCost} credits，当前只有 ${creditCheck.currentCredits} credits`
-        );
-      }
+      // if (!creditCheck.hasEnoughCredits) {
+      //   throw new Error(
+      //     creditCheck.message ||
+      //       `余额不足，需要 ${totalCreditCost} credits, 当前只有 ${creditCheck.currentCredits} credits`
+      //   );
+      // }
 
       // 步骤2：故事扩展为5页场景
       sendProgress({
@@ -85,8 +83,10 @@ export class FivePageComicService {
 
       const expansionResult = await storyExpansionService.expandToFivePages({
         story,
-        style,
+        style: artStyle,
       });
+
+      console.log("expansionResult:", expansionResult);
 
       // 步骤3：创建漫画记录
       sendProgress({
@@ -99,7 +99,7 @@ export class FivePageComicService {
         userId,
         title: expansionResult.title,
         content: story, // 保存原始故事
-        style,
+        style: artStyle,
       });
 
       // 步骤4：生成5页场景
@@ -124,7 +124,6 @@ export class FivePageComicService {
           sceneOrder: i + 1,
           content: `${sceneData.title}: ${sceneData.description}`,
           description: sceneData.description,
-          mood: sceneData.mood,
           quote: sceneData.quote,
         });
 
@@ -137,9 +136,16 @@ export class FivePageComicService {
           totalScenes,
         });
 
-        const imageResult = await sceneImageService.generateSceneImage({
-          sceneDescription: `Draw a ${style} style comic scene, the scene is ${sceneData.description}. Visual elements: ${sceneData.visualElements}`,
-          style,
+        // const imageResult = await sceneImageService.generateSceneImage({
+        //   sceneDescription: `Draw a ${expansionResult.artStyle} scene, about ${sceneData.description}`,
+        //   style: artStyle,
+        //   userId,
+        //   sceneId: scene.id,
+        // });
+
+        const imageResult = await geminiImageService.generateImage({
+          prompt: `Draw a ${expansionResult.artStyle} scene, about ${sceneData.description}`,
+          inputImages: [],
           userId,
           sceneId: scene.id,
         });
@@ -148,7 +154,7 @@ export class FivePageComicService {
         const updatedScene = await comicDatabaseService.updateSceneImage(
           scene.id,
           imageResult.imageUrl,
-          imageResult.imagePrompt
+          imageResult.prompt
         );
 
         // 添加场景到漫画
@@ -181,7 +187,7 @@ export class FivePageComicService {
         metadata: {
           comic_id: comicId,
           total_pages: 5,
-          style: style,
+          style: artStyle,
           original_story: story,
         },
       });

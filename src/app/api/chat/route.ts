@@ -25,8 +25,27 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    // Note: We don't extract images on the server side because blob URLs
+    // are not accessible. The AI SDK's convertToModelMessages will handle
+    // image processing automatically for the model.
+
     // Convert messages and handle images
-    const modelMessages = convertToModelMessages(messages);
+    const latestMessage = messages[messages.length - 1];
+    const images = latestMessage.parts.filter(
+      (part) => part.type === "file" && part.mediaType.startsWith("image/")
+    );
+    const filteredMessages = messages.map((message) => {
+      return {
+        ...message,
+        content: Array.isArray(message.parts)
+          ? message.parts.filter((part) => part.type === "text")
+          : message.parts,
+      };
+    });
+    const modelMessages = convertToModelMessages(filteredMessages);
+    // const images = latestMessage?.content?.filter(
+    //   (part) => part.type === "file" && part.mediaType.startsWith("image/")
+    // );
 
     const stream = createUIMessageStream({
       execute: ({ writer: dataStream }) => {
@@ -40,6 +59,7 @@ export async function POST(req: NextRequest) {
             generateComic: createComicGenerationTool({
               userId: user.id,
               dataStream,
+              images, // 传递提取的图片
             }),
           },
           experimental_transform: smoothStream({

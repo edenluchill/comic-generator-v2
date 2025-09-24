@@ -23,10 +23,10 @@ export class SceneImageService {
   async generateSceneImage(
     options: SceneImageGenerationOptions
   ): Promise<SceneImageResult> {
-    const { sceneDescription, style, userId, sceneId, onProgress } = options;
+    const { sceneDescription, userId, sceneId, onProgress } = options;
 
     // 构建完整的提示词
-    const fullPrompt = this.buildScenePrompt(sceneDescription, style);
+    const fullPrompt = sceneDescription;
 
     // 使用 generate 方法生成图片（不需要输入图片）
     const imageResult = await this.generator.generate(fullPrompt, {
@@ -71,7 +71,7 @@ export class SceneImageService {
     userId: string
   ): Promise<SceneImageResult> {
     // 构建完整的提示词
-    const fullPrompt = this.buildScenePrompt(sceneDescription, style);
+    const fullPrompt = sceneDescription;
 
     const imageResult = await this.generator.generate(fullPrompt, {
       aspectRatio: "1:1",
@@ -100,23 +100,6 @@ export class SceneImageService {
       imageUrl: storedImageUrl,
       imagePrompt: fullPrompt,
     };
-  }
-
-  /**
-   * 构建场景提示词
-   */
-  private buildScenePrompt(sceneDescription: string, style: string): string {
-    // 根据风格添加相应的提示词前缀
-    const stylePrompts: Record<string, string> = {
-      cute: "cute, kawaii, adorable style, ",
-      realistic: "realistic, detailed, high quality, ",
-      minimal: "minimal, simple, clean style, ",
-      kawaii: "kawaii, cute, Japanese style, ",
-    };
-
-    const stylePrefix = stylePrompts[style] || "";
-
-    return `${stylePrefix}${sceneDescription}, high quality, detailed, beautiful composition`;
   }
 }
 

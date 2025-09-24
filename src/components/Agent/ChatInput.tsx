@@ -43,39 +43,27 @@ export default function ChatInput({
 
     try {
       const content = message.trim();
-      const parts: MessagePart[] = [{ type: "text" as const, text: content }];
 
-      // Convert File objects to attachments if needed
-      if (images.length > 0) {
-        const attachments = await Promise.all(
-          images.map(async (file) => {
-            const url = URL.createObjectURL(file);
-            return {
-              contentType: file.type,
-              url,
-            } as Attachment;
-          })
-        );
-
-        attachments.forEach((attachment) => {
-          if (attachment.contentType.startsWith("image/")) {
-            parts.push({
-              type: "file" as const,
-              mediaType: attachment.contentType,
-              url: attachment.url,
-            });
-          }
-        });
-      }
+      // Convert File objects to base64 data URLs
+      const imageDataUrls = await Promise.all(
+        images.map(async (file) => {
+          return new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        })
+      );
 
       sendMessage({
         role: "user",
         parts: [
-          ...images.map((image) => ({
+          ...imageDataUrls.map((dataUrl, index) => ({
             type: "file" as const,
-            url: URL.createObjectURL(image),
-            name: image.name,
-            mediaType: image.type,
+            url: dataUrl, // 使用 data URL 而不是 blob URL
+            name: images[index].name,
+            mediaType: images[index].type,
           })),
           {
             type: "text",

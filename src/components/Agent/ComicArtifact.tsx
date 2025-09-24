@@ -44,9 +44,6 @@ function EmptyState({
         <div className="w-20 h-20 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full flex items-center justify-center">
           <Sparkles className="w-10 h-10 text-purple-500" />
         </div>
-        <div className="absolute -top-1 -right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
-          <span className="text-xs">✨</span>
-        </div>
       </div>
 
       <h3 className="text-xl font-semibold text-foreground mb-2">
@@ -90,17 +87,6 @@ function GenerationProgress() {
             <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
           )}
         </div>
-
-        {progress.isGenerating && (
-          <div className="absolute -top-2 -right-2">
-            <Badge
-              variant="secondary"
-              className="bg-blue-100 text-blue-800 text-xs"
-            >
-              {progress.progress}%
-            </Badge>
-          </div>
-        )}
       </div>
 
       <h3 className="text-xl font-semibold text-foreground mb-2">
